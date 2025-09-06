@@ -1,0 +1,115 @@
+spring:
+  # 数据源配置 - 生产环境
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL:jdbc:mysql://localhost:3306/frankweb?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8}
+    username: ${DB_USERNAME:frankweb}
+    password: ${DB_PASSWORD:frankweb}
+    druid:
+      initialSize: 10                               # 初始连接数
+      minIdle: 10                                  # 最小空闲连接数
+      maxActive: 100                               # 最大连接数
+      maxWait: 60000                               # 获取连接最大等待时间（毫秒）
+      connectTimeout: 30000                        # 建立连接超时时间（毫秒）
+      socketTimeout: 60000                         # 读取超时时间（毫秒）
+      timeBetweenEvictionRunsMillis: 60000         # 检测空闲连接间隔（毫秒）
+      minEvictableIdleTimeMillis: 300000           # 连接最小空闲时间（毫秒）
+      maxEvictableIdleTimeMillis: 900000           # 连接最大空闲时间（毫秒）
+      validationQuery: SELECT 1                     # 验证查询
+      testWhileIdle: true                          # 空闲时验证
+      testOnBorrow: false                          # 获取连接时验证
+      testOnReturn: false                          # 归还连接时验证
+      poolPreparedStatements: true                 # 缓存PreparedStatement
+      maxPoolPreparedStatementPerConnectionSize: 20 # 每个连接缓存的最大PreparedStatement数
+      webStatFilter:
+        enabled: false                              # 生产环境关闭 Web 监控
+      statViewServlet:
+        enabled: false                              # 生产环境关闭 Druid 控制台
+      filter:
+        stat:
+          enabled: true                             # 启用 SQL 监控
+          log-slow-sql: true                        # 记录慢 SQL
+          slow-sql-millis: 2000                     # 慢 SQL 阈值（毫秒）
+          merge-sql: true                           # 合并 SQL 统计
+        wall:
+          enabled: true                             # 启用 SQL 防火墙
+          config:
+            multi-statement-allow: false           # 禁止多条 SQL 执行
+            none-base-statement-allow: false       # 禁止非基础语句
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+      timeout: 3000                                 # 连接超时时间（毫秒）
+      lettuce:
+        pool:
+          max-active: 200                           # 最大连接数
+          max-idle: 20                              # 最大空闲连接数
+          min-idle: 5                               # 最小空闲连接数
+          max-wait: 3000                            # 获取连接最大等待时间（毫秒）
+
+# MyBatis Plus配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl  # 生产环境关闭SQL日志
+  global-config:
+    db-config:
+      logic-delete-field: delFlag                   # 逻辑删除字段
+      logic-delete-value: 1                         # 删除值
+      logic-not-delete-value: 0                     # 未删除值
+
+# 日志配置
+logging:
+  config: classpath:log4j2.xml
+  level:
+    root: INFO
+    org.frank: INFO
+    org.springframework.web: WARN
+    com.baomidou.mybatisplus: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+
+# 服务器配置
+server:
+  port: 8080
+  servlet:
+    context-path: /frankweb
+  compression:
+    enabled: true                                   # 启用响应压缩
+    mime-types: application/json,text/html,text/xml,text/plain,application/javascript,text/css
+    min-response-size: 2048                         # 最小压缩大小
+
+# 安全配置
+management:
+  endpoints:
+    web:
+      exposure:
+        exclude: "*"                                # 禁用所有actuator端点
+  endpoint:
+    health:
+      show-details: never                           # 不显示健康检查详情
+
+# 应用配置
+spring:
+  profiles:
+    active: prod
+  
+  # 应用信息
+  application:
+    name: frank-web
+  
+  # Jackson配置
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    serialization:
+      write-dates-as-timestamps: false
+
+# 用户配置
+user:
+  password:
+    maxRetryCount: 5
+    lockTime: 30

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.frank</groupId>
+        <artifactId>frank-end</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>frank-infrastructure</artifactId>
+    <packaging>jar</packaging>
+    <name>frank-infrastructure</name>
+    <description>FRANK项目基础设施层 - 实现数据访问和外部系统集成</description>
+
+    <dependencies>
+        <!-- 引入 domain 模块 -->
+        <dependency>
+            <groupId>com.frank</groupId>
+            <artifactId>frank-domain</artifactId>
+        </dependency>
+
+        <!-- 引入 common 模块 -->
+        <dependency>
+            <groupId>com.frank</groupId>
+            <artifactId>frank-common</artifactId>
+        </dependency>
+
+        <!-- MyBatis Plus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!-- Database drivers -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

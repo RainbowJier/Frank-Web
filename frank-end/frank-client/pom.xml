@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.frank</groupId>
+        <artifactId>frank-end</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>frank-client</artifactId>
+    <name>frank-client</name>
+    <description>FRANK项目客户端接口层 - 定义服务接口</description>
+
+    <dependencies>
+        <!-- 引入 app 模块 -->
+        <dependency>
+            <groupId>com.frank</groupId>
+            <artifactId>frank-app</artifactId>
+        </dependency>
+
+        <!-- 引入 domain 模块 -->
+        <dependency>
+            <groupId>com.frank</groupId>
+            <artifactId>frank-domain</artifactId>
+        </dependency>
+
+        <!-- 引入 shared 模块 -->
+        <dependency>
+            <groupId>com.frank</groupId>
+            <artifactId>frank-shared</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+

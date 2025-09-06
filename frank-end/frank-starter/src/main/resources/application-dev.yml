@@ -1,0 +1,56 @@
+spring:
+  # 数据源配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/postgres}
+    username: ${DB_USERNAME:frankweb}
+    password: ${DB_PASSWORD:frankweb}
+    druid:
+      initialSize: 5                                # 初始连接数
+      minIdle: 10                                   # 最小空闲连接数
+      maxActive: 20                                 # 最大连接数
+      maxWait: 60000                                # 获取连接最大等待时间（毫秒）
+      connectTimeout: 30000                         # 建立连接超时时间（毫秒）
+      socketTimeout: 60000                          # 读取超时时间（毫秒）
+      timeBetweenEvictionRunsMillis: 60000          # 检测空闲连接间隔（毫秒）
+      minEvictableIdleTimeMillis: 300000            # 连接最小空闲时间（毫秒）
+      maxEvictableIdleTimeMillis: 900000            # 连接最大空闲时间（毫秒）
+      webStatFilter:
+        enabled: true                               # 开启 Web 监控过滤器，监控接口请求时间
+      statViewServlet:
+        enabled: true                               # 启用 Druid 控制台
+        allow:                                      # 白名单，空表示允许所有
+        url-pattern: /druid/*                       # 控制台访问路径
+        login-username: admin                    # 控制台用户名
+        login-password: admin                      # 控制台密码
+      filter:
+        stat:
+          enabled: true                             # 启用 SQL 监控
+          log-slow-sql: true                        # 记录慢 SQL
+          slow-sql-millis: 1000                     # 慢 SQL 阈值（毫秒）
+          merge-sql: true                           # 合并 SQL 统计
+        wall:
+          config:
+            multi-statement-allow: true             # 允许多条 SQL 执行
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+
+# MyBatis Plus配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 日志配置
+logging:
+  config: classpath:log4j2.xml      # 日志配置文件路径
+  level:
+    com.frank: DEBUG
+    org.springframework.web: INFO
+    com.baomidou.mybatisplus: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

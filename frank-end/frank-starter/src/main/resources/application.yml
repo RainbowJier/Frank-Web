@@ -1,0 +1,79 @@
+server:
+  port: 9040
+  servlet:
+    context-path: /frankweb
+
+spring:
+  application:
+    name: frank-system
+  profiles:
+    active: dev
+
+  # Jackson配置
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+    default-property-inclusion: NON_NULL
+
+# MyBatis Plus配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: org.frank.domain.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    call-setters-on-nulls: true
+    jdbc-type-for-null: 'null'
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID
+      logic-delete-field: del_flag
+      logic-delete-value: -1
+      logic-not-delete-value: 1
+
+# Knife4j配置
+knife4j:
+  enable: true
+  openapi:
+    title: FRANK系统API文档
+    description: Frank系统API接口文档
+    version: 1.0.0
+    contact:
+      name: FRANK开发团队
+    group:
+      default:
+        group-name: default
+        api-rule: package
+        api-rule-resources:
+          - com.frank.adapter.controller
+
+token:
+  # 令牌自定义标识
+  header: Authorization
+  # 令牌秘钥
+  secret: "frank-web-jwt-secret-key-must-be-at-least-32-bytes-long"
+  # 令牌有效期（单位：分钟）
+  expireTime: 30
+
+# 拦截器配置
+interceptor:
+  # 不需要验证token的路径
+  exclude:
+    - /frankweb/login
+    - /frankweb/register
+    - /frankweb/captcha
+    - /frankweb/doc.html
+    - /frankweb/doc.html/**
+    - /frankweb/webjars/**
+    - /frankweb/v3/api-docs/**
+    - /frankweb/swagger-resources/**
+    - /frankweb/swagger-ui.html
+    - /frankweb/v2/api-docs/**
+    - /frankweb/configuration/**
+    - /frankweb/error
+
+# 用户配置
+user:
+  password:
+    maxRetryCount: 5                # 最大错误尝试次数
+    lockTime: 10                    # 锁定时长（分钟）
