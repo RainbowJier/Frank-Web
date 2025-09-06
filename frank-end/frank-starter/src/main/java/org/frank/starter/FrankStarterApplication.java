@@ -1,9 +1,12 @@
 package org.frank.starter;
 
 import lombok.extern.slf4j.Slf4j;
+import org.frank.common.properties.CorsProperties;
+import org.frank.common.properties.ExcludePathsProperties;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -15,6 +18,7 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @MapperScan("org.frank.infrastructure.mapper")
 @ComponentScan("org.frank")
+@EnableConfigurationProperties({CorsProperties.class, ExcludePathsProperties.class})
 public class FrankStarterApplication {
     public static final String BANNER = """
             \s

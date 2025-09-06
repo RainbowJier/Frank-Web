@@ -14,39 +14,43 @@ import java.util.List;
  *
  * @author Frank
  */
+
 @Data
 @Slf4j
-@Component
 @ConfigurationProperties(prefix = "interceptor")
 public class ExcludePathsProperties {
-    
-    /**
-     * 不需要验证token的路径列表
-     * 支持Ant风格的通配符，如：/frankweb/doc.html/**
-     */
+
     private List<String> exclude = new ArrayList<>();
 
     /**
      * 获取排除路径列表
-     * 如果列表为空，返回默认的排除路径
-     *
-     * @return 排除路径列表
      */
     public List<String> getExclude() {
-        if (exclude == null || exclude.isEmpty()) {
-            log.warn("No exclude paths configured, using default empty list");
-            return new ArrayList<>();
+        if (exclude == null) {
+            exclude = new ArrayList<>();
         }
         return exclude;
     }
 
     /**
      * 设置排除路径列表
-     *
-     * @param exclude 排除路径列表
      */
     public void setExclude(List<String> exclude) {
         this.exclude = exclude != null ? exclude : new ArrayList<>();
-        log.debug("Exclude paths configured: {}", this.exclude);
+        log.info("Exclude paths configured: {}", this.exclude);
+    }
+
+    /**
+     * 转换为数组格式
+     */
+    public String[] getExcludeArray() {
+        return getExclude().toArray(new String[0]);
+    }
+
+    /**
+     * 检查路径是否被排除
+     */
+    public boolean isPathExcluded(String path) {
+        return getExclude().contains(path);
     }
 }

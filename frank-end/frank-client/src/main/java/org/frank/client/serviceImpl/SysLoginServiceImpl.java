@@ -62,8 +62,7 @@ public class SysLoginServiceImpl implements SysLoginService {
     }
 
     private void validatePassword(SysUser sysUser, String password) {
-        log.info("开始验证用户 {} 的密码", sysUser.getUserName());
-        
+
         Integer retryCount = redisCache.getCacheObject(getPasswordErrorCountKey(sysUser.getUserName()));
         if (retryCount == null) {
             retryCount = 0;

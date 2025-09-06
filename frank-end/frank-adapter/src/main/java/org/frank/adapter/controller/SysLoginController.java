@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/api/v1/sys-login")
+@RequestMapping("/sys-login")
 @Api(value = "sysLogin", tags = "用户登录")
 public class SysLoginController {
 
@@ -30,11 +30,7 @@ public class SysLoginController {
         return AjaxResult.success(new LoginResp(token));
     }
 
-    // test
-    @PostMapping("/test")
-    public String test() {
-        return "test";
-    }
+
 
 
 

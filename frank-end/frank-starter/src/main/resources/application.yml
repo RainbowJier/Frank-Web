@@ -5,7 +5,7 @@ server:
 
 spring:
   application:
-    name: frank-system
+    name: frank-web
   profiles:
     active: dev
 
@@ -57,10 +57,9 @@ token:
 
 # 拦截器配置
 interceptor:
-  # 不需要验证token的路径
   exclude:
-    - /frankweb/login
-    - /frankweb/register
+    - /frankweb/sys-login/*
+    - /frankweb/sys-register/*
     - /frankweb/captcha
     - /frankweb/doc.html
     - /frankweb/doc.html/**
@@ -77,3 +76,12 @@ user:
   password:
     maxRetryCount: 5                # 最大错误尝试次数
     lockTime: 10                    # 锁定时长（分钟）
+
+# 跨域配置
+cors:
+  allowed-origins: "http://localhost"  # 允许的前端源地址
+  allowed-methods: "GET,POST,PUT,DELETE,OPTIONS,PATCH"  # 允许的HTTP方法
+  allowed-headers: "*"               # 允许的请求头
+  exposed-headers: "*"               # 暴露的响应头
+  allow-credentials: true            # 是否允许发送凭证信息
+  max-age: 3600                      # 预检请求结果缓存时间（秒）
