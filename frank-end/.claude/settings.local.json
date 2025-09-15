@@ -5,7 +5,8 @@
       "Bash(java:*)",
       "Bash(dir:*)",
       "Bash(where mvn:*)",
-      "Bash(./mvnw:*)"
+      "Bash(./mvnw:*)",
+      "Bash(mkdir:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

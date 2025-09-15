@@ -6,11 +6,11 @@ import lombok.Data;
 
 /**
  * 用户和角色关联表
- * @TableName sys_user_role
+ * @TableName sys_user_rel_role
  */
-@TableName(value ="sys_user_role")
+@TableName(value ="sys_user_rel_role")
 @Data
-public class SysUserRole {
+public class SysUserRelRole {
     /**
      * 用户ID
      */

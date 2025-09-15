@@ -78,14 +78,15 @@ public class SysUser extends BaseEntity {
     private String password;
 
     /**
-     * 账号状态（1正常 -1停用）
-     */
-    @TableField(value = "status")
-    private Integer status;
-
-    /**
      * 删除标志（1代表存在 -1代表删除）
      */
     @TableField(value = "del_flag")
     private Integer delFlag;
+
+    @TableField(exist = false)
+    private boolean isAdmin;
+
+    public boolean isAdmin() {
+        return userId != null && 1L == userId;
+    }
 }

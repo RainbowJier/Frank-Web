@@ -88,12 +88,6 @@ public class SysMenu extends BaseEntity {
     private Integer visible;
 
     /**
-     * 菜单状态（1正常 -1停用）
-     */
-    @TableField(value = "status")
-    private Integer status;
-
-    /**
      * 权限标识
      */
     @TableField(value = "perms")

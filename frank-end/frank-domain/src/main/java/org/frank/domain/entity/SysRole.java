@@ -60,14 +60,16 @@ public class SysRole extends BaseEntity {
     private Integer deptCheckStrictly;
 
     /**
-     * 角色状态（1正常 -1停用）
-     */
-    @TableField(value = "status")
-    private Integer status;
-
-    /**
      *
      */
     @TableField(value = "del_flag")
     private Integer delFlag;
+
+    public static boolean isAdmin(Long roleId) {
+        return roleId != null && 1L == roleId;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin(this.roleId);
+    }
 }

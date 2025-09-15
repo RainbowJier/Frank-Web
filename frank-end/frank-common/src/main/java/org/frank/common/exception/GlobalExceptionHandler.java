@@ -1,10 +1,7 @@
-package org.frank.adapter.controller.exception;
+package org.frank.common.exception;
 
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.frank.common.core.domain.AjaxResult;
-import org.frank.common.exception.AuthenticationException;
-import org.frank.common.exception.BusinessException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,14 +37,6 @@ public class GlobalExceptionHandler {
         return AjaxResult.validateFailed(message);
     }
 
-    /**
-     * 约束违反异常
-     */
-    @ExceptionHandler(ConstraintViolationException.class)
-    public AjaxResult<Void> handleConstraintViolationException(ConstraintViolationException e) {
-        log.error("约束违反异常：", e);
-        return AjaxResult.failed(e.getMessage());
-    }
 
     /**
      * 业务异常

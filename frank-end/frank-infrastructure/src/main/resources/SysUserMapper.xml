@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.frank.infrastructure.mapper.SysUserMapper">
 
-    <resultMap id="BaseResultMap" type="SysUser">
+    <resultMap id="BaseResultMap" type="org.frank.domain.entity.SysUser">
             <id property="userId" column="user_id" />
             <result property="deptId" column="dept_id" />
             <result property="userName" column="user_name" />
@@ -15,7 +15,6 @@
             <result property="sex" column="sex" />
             <result property="avatar" column="avatar" />
             <result property="password" column="password" />
-            <result property="status" column="status" />
             <result property="delFlag" column="del_flag" />
             <result property="createBy" column="create_by" />
             <result property="createTime" column="create_time" />
@@ -26,7 +25,7 @@
 
     <sql id="Base_Column_List">
         user_id,dept_id,user_name,nick_name,user_type,email,
-        phone_number,sex,avatar,password,status,del_flag,
+        phone_number,sex,avatar,password,del_flag,
         create_by,create_time,update_by,update_time,remark
     </sql>
 

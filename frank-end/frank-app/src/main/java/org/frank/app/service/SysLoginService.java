@@ -8,7 +8,7 @@ public interface SysLoginService {
     /**
      * login.
      * @param loginReq
-     * @return
+     * @return token
      */
     String login(LoginReq loginReq);
 }

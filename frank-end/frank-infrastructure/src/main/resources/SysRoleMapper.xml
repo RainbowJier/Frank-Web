@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.frank.infrastructure.mapper.SysRoleMapper">
 
-    <resultMap id="BaseResultMap" type="SysRole">
+    <resultMap id="BaseResultMap" type="org.frank.domain.entity.SysRole">
             <id property="roleId" column="role_id" />
             <result property="roleName" column="role_name" />
             <result property="roleKey" column="role_key" />
@@ -12,7 +12,6 @@
             <result property="dataScope" column="data_scope" />
             <result property="menuCheckStrictly" column="menu_check_strictly" />
             <result property="deptCheckStrictly" column="dept_check_strictly" />
-            <result property="status" column="status" />
             <result property="delFlag" column="del_flag" />
             <result property="createBy" column="create_by" />
             <result property="createTime" column="create_time" />
@@ -23,7 +22,7 @@
 
     <sql id="Base_Column_List">
         role_id,role_name,role_key,role_sort,data_scope,menu_check_strictly,
-        dept_check_strictly,status,del_flag,create_by,create_time,
+        dept_check_strictly,del_flag,create_by,create_time,
         update_by,update_time,remark
     </sql>
 </mapper>

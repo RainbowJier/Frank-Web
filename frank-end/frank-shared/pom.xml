@@ -20,6 +20,11 @@
             <artifactId>frank-common</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.frank</groupId>
+            <artifactId>frank-domain</artifactId>
+        </dependency>
+
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>

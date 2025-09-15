@@ -2,14 +2,14 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.frank.infrastructure.mapper.SysUserRoleMapper">
+<mapper namespace="org.frank.infrastructure.mapper.SysRoleRelMenuMapper">
 
-    <resultMap id="BaseResultMap" type="SysUserRole">
-            <id property="userId" column="user_id" />
+    <resultMap id="BaseResultMap" type="org.frank.domain.entity.SysRoleRelMenu">
             <id property="roleId" column="role_id" />
+            <id property="menuId" column="menu_id" />
     </resultMap>
 
     <sql id="Base_Column_List">
-        user_id,role_id
+        role_id,menu_id
     </sql>
 </mapper>

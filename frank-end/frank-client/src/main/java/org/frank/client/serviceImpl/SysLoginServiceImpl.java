@@ -74,7 +74,7 @@ public class SysLoginServiceImpl implements SysLoginService {
         }
 
         boolean isMatch = matchesPassword(password, sysUser.getPassword());
-        
+
         if (!isMatch) {
             retryCount = retryCount + 1;
             redisCache.setCacheObject(getPasswordErrorCountKey(sysUser.getUserName()), retryCount, lockTime, TimeUnit.MINUTES);
@@ -93,8 +93,7 @@ public class SysLoginServiceImpl implements SysLoginService {
     }
 
     /**
-     * matches password - 使用BCryptUtils进行密码验证
-     * 支持BCrypt加密方式，更安全
+     * matches password
      */
     private boolean matchesPassword(String rawPassword, String encodedPassword) {
         return BCryptUtils.matchesPassword(rawPassword, encodedPassword);

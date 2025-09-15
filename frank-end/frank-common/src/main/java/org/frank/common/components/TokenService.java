@@ -106,10 +106,10 @@ public class TokenService {
      *
      * @param token The token.
      * @return The data claims.
-     * @throws ExpiredJwtException if the token is expired.
-     * @throws MalformedJwtException if the token is malformed.
-     * @throws SignatureException if the signature is invalid.
-     * @throws UnsupportedJwtException if the token is unsupported.
+     * @throws ExpiredJwtException      if the token is expired.
+     * @throws MalformedJwtException    if the token is malformed.
+     * @throws SignatureException       if the signature is invalid.
+     * @throws UnsupportedJwtException  if the token is unsupported.
      * @throws IllegalArgumentException if the token is invalid.
      */
     public Claims parseToken(String token) {
@@ -138,14 +138,22 @@ public class TokenService {
      *
      * @param loginUser The login user info.
      */
-    public void verifyToken(LoginUser loginUser) {
+    public boolean verifyToken(LoginUser loginUser) {
         long expireTime = loginUser.getExpireTime();
         long currentTime = System.currentTimeMillis();
+
+        // 先检查是否已过期
+        if (expireTime <= currentTime) {
+            return false;
+        }
+
+        // 未过期但接近过期时刷新
         if (expireTime - currentTime <= MILLIS_MINUTE_TWENTY) {
             refreshToken(loginUser);
         }
-    }
 
+        return true;
+    }
 
     /**
      * Get login user info from request.
@@ -234,6 +242,10 @@ public class TokenService {
      */
     public String getToken(HttpServletRequest request) {
         String token = request.getHeader(header);
+        if(token.isEmpty()){
+            throw new RuntimeException("token is empty");
+        }
+
         if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.TOKEN_PREFIX)) {
             return token.replace(Constants.TOKEN_PREFIX, "");
         }

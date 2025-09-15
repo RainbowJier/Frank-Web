@@ -14,11 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
 @RequestMapping("/sys-login")
 @Api(value = "sysLogin", tags = "用户登录")
-public class SysLoginController {
+public class SysLoginController extends BaseController {
 
     @Resource
     private SysLoginService service;
@@ -29,10 +28,6 @@ public class SysLoginController {
         String token = service.login(loginReq);
         return AjaxResult.success(new LoginResp(token));
     }
-
-
-
-
 
 
 }

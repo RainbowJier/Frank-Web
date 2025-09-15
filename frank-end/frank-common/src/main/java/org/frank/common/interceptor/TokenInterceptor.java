@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.frank.common.components.TokenService;
 import org.frank.common.core.domain.AjaxResult;
+import org.frank.common.core.domain.LoginUser;
 import org.frank.common.properties.ExcludePathsProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -25,7 +26,7 @@ public class TokenInterceptor implements HandlerInterceptor {
 
     @Resource
     private TokenService tokenService;
-    
+
     @Resource
     private ExcludePathsProperties excludePathsProperties;
 
@@ -48,22 +49,14 @@ public class TokenInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        // 获取token
-        String token = tokenService.getToken(request);
-        if (token == null || token.trim().isEmpty()) {
-            log.warn("Token is missing for URI: {}", requestURI);
-            handleUnauthorized(response, "Token不能为空");
-            return false;
-        }
-
-        // 验证token有效性
-        if (tokenService.getLoginUser(request) == null) {
+        // verify token valid or not.
+        LoginUser loginUser = tokenService.getLoginUser(request);
+        if (!tokenService.verifyToken(loginUser)) {
             log.warn("Token is invalid or expired for URI: {}", requestURI);
-            handleUnauthorized(response, "Token无效或已过期");
-            return false;
+            throw new RuntimeException("Token无效或已过期");
         }
 
-        log.debug("Token validation successful for URI: {}", requestURI);
+        log.info("Token validation successful for URI: {}", requestURI);
         return true;
     }
 
@@ -112,7 +105,7 @@ public class TokenInterceptor implements HandlerInterceptor {
         if (pattern.contains("/*")) {
             String[] patternParts = pattern.split("/");
             String[] uriParts = requestURI.split("/");
-            
+
             if (patternParts.length != uriParts.length) {
                 return false;
             }
