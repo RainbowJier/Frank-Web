@@ -1,4 +1,4 @@
-package org.frank.shared.sysLogin.resp;
+package org.frank.shared.UserPermission.resp;
 
 
 import io.swagger.annotations.ApiModel;
@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.frank.domain.entity.SysUser;
+import org.frank.shared.sysLogin.resp.SysUserResp;
 
 import java.util.Set;
 

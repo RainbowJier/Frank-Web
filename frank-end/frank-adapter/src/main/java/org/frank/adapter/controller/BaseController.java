@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.frank.common.components.TokenService;
 import org.frank.common.core.domain.LoginUser;
-import org.frank.common.util.ServletUtils;
+import org.frank.common.util.ServletUtil;
 import org.frank.domain.entity.SysUser;
 import org.frank.domain.gateway.ISysRoleGateway;
 import org.frank.domain.gateway.ISysUserGateway;
@@ -28,7 +28,7 @@ public class BaseController {
     private ISysRoleGateway sysRoleGateway;
 
     protected LoginUser getLoginUser() {
-        HttpServletRequest request = ServletUtils.getRequest();
+        HttpServletRequest request = ServletUtil.getRequest();
         return tokenService.getLoginUser(request);
     }
 

@@ -46,8 +46,12 @@ comment on column sys_user.remark is '备注';
 -- ----------------------------
 insert into sys_user overriding system value
 values (1, 103, 'admin', 'administrator', '00', 'frank@163.com', '', 1, '',
-        'euLUpj0cPhoYeh/Yn0ce9Q==', 1, 1, now(), now(),
-        'admin', now(), '管理员');
+        'euLUpj0cPhoYeh/Yn0ce9Q==', 1, 1, now(), now(),'管理员');
+
+insert into sys_user overriding system value
+values (2, 103, 'frank', 'administrator', '00', 'frank@163.com', '', 1, '',
+        'euLUpj0cPhoYeh/Yn0ce9Q==', 1, 1, now(),now(), now(), '普通用户');
+
 
 
 -- ----------------------------
@@ -160,7 +164,6 @@ VALUES ('2', '1'),
        ('2', '114'),
        ('2', '115'),
        ('2', '116'),
-       ('2', '117'),
        ('2', '500'),
        ('2', '501'),
        ('2', '1000'),
@@ -264,10 +267,9 @@ COMMENT ON COLUMN sys_menu.route_name IS '路由名称';
 COMMENT ON COLUMN sys_menu.is_frame IS '是否为外链（0是 1否）';
 COMMENT ON COLUMN sys_menu.is_cache IS '是否缓存（0缓存 1不缓存）';
 COMMENT ON COLUMN sys_menu.menu_type IS '菜单类型（M目录 C菜单 F按钮）';
-COMMENT ON COLUMN sys_menu.visible IS '菜单状态（1显示 -1隐藏）';
+COMMENT ON COLUMN sys_menu.visible IS '菜单状态（1-显示 0-隐藏）';
 COMMENT ON COLUMN sys_menu.perms IS '权限标识';
 COMMENT ON COLUMN sys_menu.icon IS '菜单图标';
-
 COMMENT ON COLUMN sys_menu.create_by IS '创建者';
 COMMENT ON COLUMN sys_menu.create_time IS '创建时间';
 COMMENT ON COLUMN sys_menu.update_by IS '更新者';

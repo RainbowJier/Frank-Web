@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * 客户端工具类
  */
-public class ServletUtils {
+public class ServletUtil {
     /**
      * 获取String参数
      */

@@ -50,4 +50,11 @@ public interface ISysRoleRelMenuGateway extends IService<SysRoleRelMenu> {
      * @return
      */
     List<Long> selectMenuIdsByRoleIds(List<Long> roleIds);
+
+    /**
+     * 根据用户ID查询菜单树
+     * @param roleIds
+     * @return
+     */
+    List<Long> selectMenuTreeByUserId(List<Long> roleIds);
 }

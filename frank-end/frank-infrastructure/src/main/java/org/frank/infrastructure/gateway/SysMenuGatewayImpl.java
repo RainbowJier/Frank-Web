@@ -25,6 +25,25 @@ public class SysMenuGatewayImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     public List<SysMenu> selectByIds(List<Long> menuIds) {
         return sysMenuMapper.selectByIds(menuIds);
     }
+
+    @Override
+    public List<SysMenu> selectMenuTreeAll() {
+        LambdaQueryWrapper<SysMenu> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(SysMenu::getMenuType, "M", "C")
+                .orderByAsc(SysMenu::getParentId, SysMenu::getOrderNum);
+
+        return sysMenuMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public List<SysMenu> selectMenuTreeByIds(List<Long> menuIds) {
+        LambdaQueryWrapper<SysMenu> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(SysMenu::getMenuType, "M", "C")
+                .in(SysMenu::getMenuId, menuIds)
+                .orderByAsc(SysMenu::getParentId, SysMenu::getOrderNum);
+
+        return sysMenuMapper.selectList(queryWrapper);
+    }
 }
 
 

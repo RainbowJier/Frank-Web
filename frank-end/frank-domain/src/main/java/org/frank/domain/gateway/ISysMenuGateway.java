@@ -9,4 +9,14 @@ import java.util.List;
 public interface ISysMenuGateway extends IService<SysMenu> {
 
     List<SysMenu> selectByIds(List<Long> menuIds);
+
+    /**
+     * get all menu tree.
+     */
+    List<SysMenu> selectMenuTreeAll();
+
+    /**
+     * get menu tree by menuIds.
+     */
+    List<SysMenu> selectMenuTreeByIds(List<Long> menuIds);
 }

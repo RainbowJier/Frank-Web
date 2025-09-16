@@ -115,4 +115,11 @@ public class SysRoleRelMenuGatewayImpl extends ServiceImpl<SysRoleRelMenuMapper,
                 .map(SysRoleRelMenu::getMenuId)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Long> selectMenuTreeByUserId(List<Long> roleIds) {
+
+
+        return List.of();
+    }
 }

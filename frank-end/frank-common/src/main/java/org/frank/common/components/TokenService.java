@@ -16,7 +16,7 @@ import org.frank.common.constant.CacheConstants;
 import org.frank.common.constant.Constants;
 import org.frank.common.core.domain.LoginUser;
 import org.frank.common.core.redis.RedisCache;
-import org.frank.common.util.ServletUtils;
+import org.frank.common.util.ServletUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -148,9 +148,10 @@ public class TokenService {
         }
 
         // 未过期但接近过期时刷新
-        if (expireTime - currentTime <= MILLIS_MINUTE_TWENTY) {
-            refreshToken(loginUser);
-        }
+        refreshToken(loginUser);
+        // if (expireTime - currentTime <= MILLIS_MINUTE_TWENTY) {
+        //
+        // }
 
         return true;
     }
@@ -229,7 +230,7 @@ public class TokenService {
      * @param loginUser The login user info.
      */
     private void setUserAgent(LoginUser loginUser) {
-        final UserAgent userAgent = UserAgentUtil.parse(ServletUtils.getRequest().getHeader("User-Agent"));
+        final UserAgent userAgent = UserAgentUtil.parse(ServletUtil.getRequest().getHeader("User-Agent"));
         loginUser.setBrowser(userAgent.getBrowser().getName());
         loginUser.setOs(userAgent.getOs().getName());
     }
