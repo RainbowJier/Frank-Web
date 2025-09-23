@@ -27,7 +27,6 @@
         <easyexcel.version>3.3.2</easyexcel.version>
         <swagger.annotations.version>1.6.14</swagger.annotations.version>
         <mysql.version>8.0.33</mysql.version>
-        <redis.version>3.5.5</redis.version>
         <druid.version>1.2.16</druid.version>
         <jwt.version>0.12.5</jwt.version>
         <bcrypt.version>0.10.2</bcrypt.version>
