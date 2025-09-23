@@ -142,16 +142,11 @@ public class TokenService {
         long expireTime = loginUser.getExpireTime();
         long currentTime = System.currentTimeMillis();
 
-        // 先检查是否已过期
-        if (expireTime <= currentTime) {
+        // 未过期但接近过期时刷新
+        if (expireTime - currentTime <= MILLIS_MINUTE_TWENTY) {
+            refreshToken(loginUser);
             return false;
         }
-
-        // 未过期但接近过期时刷新
-        refreshToken(loginUser);
-        // if (expireTime - currentTime <= MILLIS_MINUTE_TWENTY) {
-        //
-        // }
 
         return true;
     }

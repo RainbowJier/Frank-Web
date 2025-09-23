@@ -12,6 +12,7 @@ import org.frank.common.enums.ResultCodeEnum;
 import org.frank.common.exception.BusinessException;
 import org.frank.common.properties.ExcludePathsProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.io.IOException;
@@ -40,23 +41,28 @@ public class TokenInterceptor implements HandlerInterceptor {
 
         log.debug("Processing {} request for URI: {}", method, requestURI);
 
-        // 检查是否在白名单中
+        // white list.
         if (isExcludePath(requestURI)) {
             log.debug("URI {} is in exclude paths, skipping token validation", requestURI);
             return true;
         }
 
-        // 跳过OPTIONS请求（CORS预检请求）
         if ("OPTIONS".equalsIgnoreCase(method)) {
             log.debug("OPTIONS request for URI {}, skipping token validation", requestURI);
             return true;
         }
 
-        // verify token valid or not.
+        // get token.
         LoginUser loginUser = tokenService.getLoginUser(request);
-        if (ObjectUtil.isEmpty(loginUser) || !tokenService.verifyToken(loginUser)) {
+        if (ObjectUtils.isEmpty(loginUser)) {
+            log.warn("No login user found for URI: {}", requestURI);
+            throw new BusinessException(ResultCodeEnum.UNAUTHORIZED.getCode(), "Please login first.");
+        }
+
+        // verify token valid or not.
+        if (!tokenService.verifyToken(loginUser)) {
             log.warn("Token is invalid or expired for URI: {}", requestURI);
-            throw new BusinessException(ResultCodeEnum.UNAUTHORIZED.getCode(), "Token无效或已过期");
+            throw new BusinessException(ResultCodeEnum.UNAUTHORIZED.getCode(), "Token is invalid or expired.");
         }
 
         log.info("Token validation successful for URI: {}", requestURI);
