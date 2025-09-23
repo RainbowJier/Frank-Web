@@ -9,6 +9,7 @@ import org.frank.common.components.TokenService;
 import org.frank.common.core.domain.AjaxResult;
 import org.frank.common.core.domain.LoginUser;
 import org.frank.common.enums.ResultCodeEnum;
+import org.frank.common.exception.AuthenticationException;
 import org.frank.common.exception.BusinessException;
 import org.frank.common.properties.ExcludePathsProperties;
 import org.springframework.stereotype.Component;
@@ -56,13 +57,13 @@ public class TokenInterceptor implements HandlerInterceptor {
         LoginUser loginUser = tokenService.getLoginUser(request);
         if (ObjectUtils.isEmpty(loginUser)) {
             log.warn("No login user found for URI: {}", requestURI);
-            throw new BusinessException(ResultCodeEnum.UNAUTHORIZED.getCode(), "Please login first.");
+            throw new AuthenticationException("Please login first.");
         }
 
         // verify token valid or not.
         if (!tokenService.verifyToken(loginUser)) {
             log.warn("Token is invalid or expired for URI: {}", requestURI);
-            throw new BusinessException(ResultCodeEnum.UNAUTHORIZED.getCode(), "Token is invalid or expired.");
+            throw new AuthenticationException("Token is invalid or expired.");
         }
 
         log.info("Token validation successful for URI: {}", requestURI);
