@@ -58,8 +58,7 @@ token:
 # 拦截器配置
 interceptor:
   exclude:
-    - /frankweb/sys-login/*
-    - /frankweb/sys-register/*
+    - /frankweb/sys-login/login
     - /frankweb/captcha
     - /frankweb/doc.html
     - /frankweb/doc.html/**

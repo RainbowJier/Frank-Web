@@ -27,7 +27,7 @@ public class SysPermissionController extends BaseController {
     private SysPermissionService service;
 
     /**
-     * 获取用户信息
+     * 获取用户权限信息
      */
     @GetMapping("getInfo")
     public AjaxResult<InfoResp> getInfo() {
