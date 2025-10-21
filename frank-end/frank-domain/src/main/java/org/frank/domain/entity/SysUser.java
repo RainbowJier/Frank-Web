@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.frank.common.core.domain.BaseEntity;
 
 /**
  * 用户信息表
@@ -76,12 +75,6 @@ public class SysUser extends BaseEntity {
      */
     @TableField(value = "password")
     private String password;
-
-    /**
-     * 删除标志（1代表存在 -1代表删除）
-     */
-    @TableField(value = "del_flag")
-    private Integer delFlag;
 
     @TableField(exist = false)
     private boolean isAdmin;

@@ -16,9 +16,9 @@ import org.frank.domain.gateway.ISysMenuGateway;
 import org.frank.domain.gateway.ISysRoleGateway;
 import org.frank.domain.gateway.ISysRoleRelMenuGateway;
 import org.frank.domain.gateway.ISysUserRelRoleGateway;
-import org.frank.shared.UserPermission.resp.MetaResp;
-import org.frank.shared.UserPermission.resp.RouterResp;
-import org.frank.shared.UserPermission.resp.SysMenuResp;
+import org.frank.shared.userPermission.resp.MetaResp;
+import org.frank.shared.userPermission.resp.RouterResp;
+import org.frank.shared.userPermission.resp.SysMenuResp;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 

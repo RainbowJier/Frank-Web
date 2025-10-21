@@ -225,7 +225,7 @@ public class TokenService {
      * @param loginUser The login user info.
      */
     private void setUserAgent(LoginUser loginUser) {
-        final UserAgent userAgent = UserAgentUtil.parse(ServletUtil.getRequest().getHeader("User-Agent"));
+        UserAgent userAgent = UserAgentUtil.parse(ServletUtil.getRequest().getHeader("User-Agent"));
         loginUser.setBrowser(userAgent.getBrowser().getName());
         loginUser.setOs(userAgent.getOs().getName());
     }
@@ -238,7 +238,7 @@ public class TokenService {
      */
     public String getToken(HttpServletRequest request) {
         String token = request.getHeader(header);
-        if(token.isEmpty()){
+        if (ObjectUtils.isEmpty(token)) {
             throw new RuntimeException("token is empty");
         }
 

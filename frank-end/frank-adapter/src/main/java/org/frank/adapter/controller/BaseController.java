@@ -24,9 +24,6 @@ public class BaseController {
     @Resource
     private ISysUserRelRoleGateway sysUserRelRoleGateway;
 
-    @Resource
-    private ISysRoleGateway sysRoleGateway;
-
     protected LoginUser getLoginUser() {
         HttpServletRequest request = ServletUtil.getRequest();
         return tokenService.getLoginUser(request);

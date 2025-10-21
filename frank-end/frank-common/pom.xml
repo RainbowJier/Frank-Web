@@ -92,6 +92,10 @@
             <artifactId>spring-boot-starter-web</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.frank</groupId>
+            <artifactId>frank-domain</artifactId>
+        </dependency>
 
     </dependencies>
 

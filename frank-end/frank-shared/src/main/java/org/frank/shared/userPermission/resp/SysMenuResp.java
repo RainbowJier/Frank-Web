@@ -1,11 +1,8 @@
-package org.frank.shared.UserPermission.resp;
+package org.frank.shared.userPermission.resp;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.frank.common.core.domain.BaseEntity;
+import org.frank.domain.entity.BaseEntity;
 
 import java.util.ArrayList;
 import java.util.List;

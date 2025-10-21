@@ -1,6 +1,5 @@
 package org.frank.common.interceptor;
 
-import cn.hutool.core.util.ObjectUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -8,10 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.frank.common.components.TokenService;
 import org.frank.common.core.domain.AjaxResult;
 import org.frank.common.core.domain.LoginUser;
-import org.frank.common.enums.ResultCodeEnum;
 import org.frank.common.exception.AuthenticationException;
-import org.frank.common.exception.BusinessException;
 import org.frank.common.properties.ExcludePathsProperties;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -27,6 +25,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
+@Order(1)
 public class TokenInterceptor implements HandlerInterceptor {
 
     @Resource

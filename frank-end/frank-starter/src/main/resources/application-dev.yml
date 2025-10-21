@@ -46,17 +46,13 @@ spring:
           min-idle: 0
           max-wait: -1ms
 
-# MyBatis Plus配置
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
 # 日志配置
 logging:
+  sql:
+    enabled: true
   config: classpath:log4j2.xml      # 日志配置文件路径
   level:
-    com.frank: DEBUG
+    com.frank: INFO
     org.springframework.web: INFO
-    com.baomidou.mybatisplus: DEBUG
   pattern:
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

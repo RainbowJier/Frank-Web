@@ -1,4 +1,4 @@
-package org.frank.common.core.domain;
+package org.frank.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -15,7 +15,6 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public abstract class BaseEntity implements Serializable {
-
     /**
      * 创建者
      */
@@ -45,4 +44,11 @@ public abstract class BaseEntity implements Serializable {
      */
     @TableField(value = "remark")
     private String remark;
+
+    /**
+     * 删除标识（1-正常,-1-删除）
+     */
+    @TableField(value = "del_flag")
+    private Integer delFlag;
+
 }

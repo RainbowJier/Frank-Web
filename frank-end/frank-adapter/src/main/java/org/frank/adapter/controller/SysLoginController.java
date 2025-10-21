@@ -2,7 +2,7 @@ package org.frank.adapter.controller;
 
 
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.frank.app.service.SysLoginService;
@@ -11,6 +11,7 @@ import org.frank.common.core.domain.AjaxResult;
 import org.frank.common.core.domain.LoginUser;
 import org.frank.shared.sysLogin.req.LoginReq;
 import org.frank.shared.sysLogin.resp.LoginResp;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,16 +29,19 @@ public class SysLoginController extends BaseController {
     private TokenService tokenService;
 
     @PostMapping("/login")
-    @ApiModelProperty("Common Login")
+    @ApiOperation("Common Login")
     public AjaxResult<?> login(@RequestBody @Valid LoginReq loginReq) {
         String token = service.login(loginReq);
         return AjaxResult.success(new LoginResp(token));
     }
 
     @PostMapping("/logout")
-    @ApiModelProperty("Common Logout")
+    @ApiOperation("Common Logout")
     public AjaxResult<?> logout() {
         LoginUser loginUser = getLoginUser();
+        if(ObjectUtils.isEmpty(loginUser)){
+            return AjaxResult.success("用户未登录");
+        }
 
         // delete login user from cache
         tokenService.delLoginUser(loginUser.getToken());

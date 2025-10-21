@@ -15,12 +15,6 @@
     <description>FRANK项目领域层 - 包含实体类和Gateway接口定义</description>
 
     <dependencies>
-        <!-- 引入 shared 模块 -->
-        <dependency>
-            <groupId>com.frank</groupId>
-            <artifactId>frank-common</artifactId>
-        </dependency>
-
         <!-- MyBatis Plus -->
         <dependency>
             <groupId>com.baomidou</groupId>

@@ -1,9 +1,8 @@
 package org.frank.app.service;
 
-import org.frank.domain.entity.SysMenu;
 import org.frank.domain.entity.SysUser;
-import org.frank.shared.UserPermission.resp.RouterResp;
-import org.frank.shared.UserPermission.resp.SysMenuResp;
+import org.frank.shared.userPermission.resp.RouterResp;
+import org.frank.shared.userPermission.resp.SysMenuResp;
 
 import java.util.List;
 import java.util.Set;

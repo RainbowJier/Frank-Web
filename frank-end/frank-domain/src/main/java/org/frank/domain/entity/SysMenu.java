@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.frank.common.core.domain.BaseEntity;
 
 import java.util.ArrayList;
 import java.util.List;

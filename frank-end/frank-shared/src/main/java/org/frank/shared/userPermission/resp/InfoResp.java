@@ -1,4 +1,4 @@
-package org.frank.shared.UserPermission.resp;
+package org.frank.shared.userPermission.resp;
 
 
 import io.swagger.annotations.ApiModel;

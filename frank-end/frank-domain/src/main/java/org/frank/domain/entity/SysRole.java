@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.frank.common.core.domain.BaseEntity;
 
 /**
  * 角色信息表
@@ -58,12 +57,6 @@ public class SysRole extends BaseEntity {
      */
     @TableField(value = "dept_check_strictly")
     private Integer deptCheckStrictly;
-
-    /**
-     *
-     */
-    @TableField(value = "del_flag")
-    private Integer delFlag;
 
     public static boolean isAdmin(Long roleId) {
         return roleId != null && 1L == roleId;

@@ -59,6 +59,7 @@ token:
 interceptor:
   exclude:
     - /frankweb/sys-login/login
+    - /frankweb/sys-login/logout
     - /frankweb/captcha
     - /frankweb/doc.html
     - /frankweb/doc.html/**
