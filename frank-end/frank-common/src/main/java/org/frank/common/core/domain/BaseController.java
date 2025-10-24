@@ -1,18 +1,20 @@
-package org.frank.adapter.controller;
+package org.frank.common.core.domain;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.frank.common.components.TokenService;
-import org.frank.common.core.domain.LoginUser;
 import org.frank.common.util.ServletUtil;
 import org.frank.domain.entity.SysUser;
-import org.frank.domain.gateway.ISysRoleGateway;
 import org.frank.domain.gateway.ISysUserGateway;
 import org.frank.domain.gateway.ISysUserRelRoleGateway;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 
 @Slf4j
+@Component
 public class BaseController {
 
     @Resource
@@ -24,7 +26,7 @@ public class BaseController {
     @Resource
     private ISysUserRelRoleGateway sysUserRelRoleGateway;
 
-    protected LoginUser getLoginUser() {
+    public LoginUser getLoginUser() {
         HttpServletRequest request = ServletUtil.getRequest();
         return tokenService.getLoginUser(request);
     }
@@ -34,7 +36,7 @@ public class BaseController {
      *
      * @return true if is admin, false otherwise.
      */
-    protected boolean isAdmin() {
+    public boolean isAdmin() {
         LoginUser loginUser = getLoginUser();
         return sysUserRelRoleGateway.isAdmin(loginUser.getUserId());
     }
@@ -45,7 +47,7 @@ public class BaseController {
      *
      * @return User id
      */
-    protected Long getUserId() {
+    public Long getUserId() {
         LoginUser loginUser = getLoginUser();
         return loginUser != null ? loginUser.getUserId() : null;
     }
@@ -55,7 +57,16 @@ public class BaseController {
      *
      * @return SysUser
      */
-    protected SysUser getSysUser() {
+    public SysUser getSysUser() {
         return sysUserGateway.getById(getUserId());
+    }
+
+    /**
+     * get role id list by user id.
+     *
+     * @return role id list.
+     */
+    public List<Long> getRoleIds() {
+        return sysUserRelRoleGateway.selectRoleIdsByUserId(getUserId());
     }
 }

@@ -1,8 +1,6 @@
-package org.frank.shared;
+package org.frank.common.core.domain;
 
 import io.swagger.annotations.ApiModelProperty;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,4 +18,7 @@ public class BaseReq {
 
     @ApiModelProperty(value = "role id list")
     private List<Long> roleIds;
+
+    @ApiModelProperty(value = "is admin")
+    private Boolean isAdmin;
 }

@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import jakarta.annotation.Resource;
 import org.frank.app.service.SysDictDataService;
 import org.frank.common.core.domain.AjaxResult;
+import org.frank.common.core.domain.BaseController;
 import org.frank.shared.sysDictData.resp.SysDictDataResp;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

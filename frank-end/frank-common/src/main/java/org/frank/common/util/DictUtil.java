@@ -1,6 +1,6 @@
 package org.frank.common.util;
 
-import cn.hutool.json.JSONArray;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.frank.common.constant.CacheConstants;
 import org.frank.common.core.redis.RedisCache;
@@ -16,6 +16,7 @@ import java.util.List;
  *
  * @author Frank
  */
+@Slf4j
 public class DictUtil {
     /**
      * 分隔符
@@ -38,10 +39,11 @@ public class DictUtil {
      * @param key 参数键
      * @return dictDatas 字典数据列表
      */
+    @SuppressWarnings("unchecked")
     public static List<SysDictData> getDictCache(String key) {
-        JSONArray arrayCache = SpringUtils.getBean(RedisCache.class).getCacheObject(getCacheKey(key));
-        if (StringUtil.isNotNull(arrayCache)) {
-            return arrayCache.toList(SysDictData.class);
+        Object cacheObject = SpringUtils.getBean(RedisCache.class).getCacheObject(getCacheKey(key));
+        if (cacheObject instanceof List) {
+            return (List<SysDictData>) cacheObject;
         }
         return Collections.emptyList();
     }

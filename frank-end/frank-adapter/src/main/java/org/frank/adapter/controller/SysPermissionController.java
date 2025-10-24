@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import jakarta.annotation.Resource;
 import org.frank.app.service.SysPermissionService;
 import org.frank.common.core.domain.AjaxResult;
+import org.frank.common.core.domain.BaseController;
 import org.frank.common.core.domain.LoginUser;
 import org.frank.domain.entity.SysUser;
 import org.frank.shared.sysLogin.resp.SysUserResp;

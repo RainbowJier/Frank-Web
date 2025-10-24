@@ -2,12 +2,14 @@ package org.frank.client.serviceImpl;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.frank.app.service.SysPermissionService;
 import org.frank.common.constant.Constants;
 import org.frank.common.constant.UserConstants;
+import org.frank.common.enums.MenuEnum;
 import org.frank.common.util.StringUtil;
 import org.frank.domain.entity.SysMenu;
 import org.frank.domain.entity.SysRole;
@@ -72,10 +74,11 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     public List<SysMenuResp> selectMenuList(SysUser sysUser) {
         List<SysMenu> menus;
 
+        List<String> menuTypeList = Arrays.asList(MenuEnum.MENU.getCode(), MenuEnum.CAIDAN.getCode());
         if (sysUser.isAdmin()) {
-            menus = sysMenuGateway.selectMenuTreeAll();
+            menus = sysMenuGateway.selectList(new SysMenu(), menuTypeList);
         } else {
-            menus = getMenuTreeByUserId(sysUser.getUserId());
+            menus = getMenuTreeByUserId(sysUser.getUserId(), menuTypeList);
         }
 
         List<SysMenuResp> list = BeanUtil.copyToList(menus, SysMenuResp.class);
@@ -148,9 +151,6 @@ public class SysPermissionServiceImpl implements SysPermissionService {
 
     /**
      * get menu permission by user id.
-     *
-     * @param userId
-     * @return menu permission list.
      */
     private List<String> getMenuPermsByUserId(Long userId) {
         return getPermsByRoleIds(sysUserRelRoleGateway.selectRoleIdsByUserId(userId));
@@ -158,9 +158,6 @@ public class SysPermissionServiceImpl implements SysPermissionService {
 
     /**
      * get menu permission by role ids.
-     *
-     * @param roleIds
-     * @return menu permission list.
      */
     private List<String> getPermsByRoleIds(List<Long> roleIds) {
         if (CollectionUtils.isEmpty(roleIds)) {
@@ -181,32 +178,26 @@ public class SysPermissionServiceImpl implements SysPermissionService {
 
     /**
      * get menu tree by user id.
-     *
-     * @param userId
-     * @return
      */
-    private List<SysMenu> getMenuTreeByUserId(Long userId) {
-        return getMenuTreeByRoleIds(sysUserRelRoleGateway.selectRoleIdsByUserId(userId));
+    private List<SysMenu> getMenuTreeByUserId(Long userId, List<String> menuTypeList) {
+        return getMenuTreeByRoleIds(sysUserRelRoleGateway.selectRoleIdsByUserId(userId), menuTypeList);
     }
 
 
     /**
      * get menu tree by role ids.
-     *
-     * @param roleIds
-     * @return menu list.
      */
-    private List<SysMenu> getMenuTreeByRoleIds(List<Long> roleIds) {
-        if (CollectionUtils.isEmpty(roleIds)) {
+    private List<SysMenu> getMenuTreeByRoleIds(List<Long> roleIds, List<String> menuTypeList) {
+        if (CollUtil.isEmpty(roleIds)) {
             return Collections.emptyList();
         }
 
         List<Long> menuIds = sysRoleRelMenuGateway.selectMenuIdsByRoleIds(roleIds);
-        if (CollectionUtils.isEmpty(menuIds)) {
+        if (CollUtil.isEmpty(menuIds)) {
             return Collections.emptyList();
         }
 
-        return sysMenuGateway.selectMenuTreeByIds(menuIds);
+        return sysMenuGateway.selectListByIds(menuIds, menuTypeList);
     }
 
 

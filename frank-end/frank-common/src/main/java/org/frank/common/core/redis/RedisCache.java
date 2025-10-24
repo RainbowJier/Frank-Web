@@ -106,7 +106,7 @@ public class RedisCache {
      * @param key 缓存键值
      * @return 缓存键值对应的数据
      */
-    public <T> T getCacheObject(final String key) {
+    public <T> T getCacheObject(String key) {
         try {
             ValueOperations<String, Object> operation = redisTemplate.opsForValue();
             return (T) operation.get(key);
@@ -174,7 +174,7 @@ public class RedisCache {
             throw new RedisOperationException("Set缓存设置失败", e);
         }
     }
-    
+
     /**
      * 获得缓存的Set
      *
@@ -266,9 +266,10 @@ public class RedisCache {
     public Collection<String> keys(final String pattern) {
         return redisTemplate.keys(pattern);
     }
-    
+
     /**
      * 使用scan命令获取键，避免在生产中使用keys
+     *
      * @param pattern
      * @return
      */
@@ -355,7 +356,7 @@ public class RedisCache {
             throw new RedisOperationException("递减操作失败", e);
         }
     }
-    
+
     // =========================== 分布式锁 ===========================
 
     /**

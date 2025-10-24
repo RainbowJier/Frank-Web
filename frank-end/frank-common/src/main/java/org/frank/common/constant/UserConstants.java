@@ -57,10 +57,10 @@ public class UserConstants {
     public static final String YES = "Y";
 
     /**
-     * 是否菜单外链：0-是，1-否
+     * 是否菜单外链：1-是，0-否
      */
-    public static final int YES_FRAME = 0;
-    public static final int NO_FRAME = 1;
+    public static final int YES_FRAME = 1;
+    public static final int NO_FRAME = 0;
 
     /**
      * 菜单缓存状态：1-启用，0-禁用

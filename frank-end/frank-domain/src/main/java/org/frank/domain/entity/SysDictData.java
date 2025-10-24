@@ -73,6 +73,15 @@ public class SysDictData extends BaseEntity {
     @TableField(value = "status")
     private Integer status;
 
+    /**
+     * 无参构造函数（Jackson反序列化需要）
+     */
+    public SysDictData() {
+    }
+
+    /**
+     * 带参数的构造函数
+     */
     public SysDictData(String dictType) {
         this.dictType = dictType;
     }

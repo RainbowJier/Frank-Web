@@ -5,11 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.frank.common.interceptor.TokenInterceptor;
 import org.frank.common.properties.CorsProperties;
 import org.frank.common.properties.ExcludePathsProperties;
+import org.frank.common.resolver.BaseReqArgumentResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 /**
  * Web MVC配置类
@@ -26,9 +30,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Resource
     private ExcludePathsProperties excludePathPatterns;
-    
+
     @Resource
     private CorsProperties corsProperties;
+
+    @Resource
+    private BaseReqArgumentResolver baseReqArgumentResolver;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -37,7 +44,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(tokenInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(excludePathPatterns.getExclude())
-                .order(1); 
+                .order(1);
 
         log.info("TokenInterceptor configured successfully");
     }
@@ -45,13 +52,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         log.info("Configuring CORS mappings with properties: {}", corsProperties);
-        
+
         // 解析允许的源
         String[] allowedOrigins = parseAllowedOrigins(corsProperties.getAllowedOrigins());
-        
+
         // 解析允许的HTTP方法
         String[] allowedMethods = StringUtils.commaDelimitedListToStringArray(corsProperties.getAllowedMethods());
-        
+
         registry.addMapping("/**")
                 .allowedOrigins(allowedOrigins)
                 .allowedMethods(allowedMethods)
@@ -59,11 +66,22 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .exposedHeaders(corsProperties.getExposedHeaders())
                 .allowCredentials(corsProperties.isAllowCredentials())
                 .maxAge(corsProperties.getMaxAge());
-        
-        log.info("CORS configured successfully with origins: {}, methods: {}, allowCredentials: {}", 
+
+        log.info("CORS configured successfully with origins: {}, methods: {}, allowCredentials: {}",
                 allowedOrigins, allowedMethods, corsProperties.isAllowCredentials());
     }
-    
+
+    /**
+     * 注册BaseReq参数自动解析器
+     *
+     * @param resolvers
+     */
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(baseReqArgumentResolver);
+    }
+
+
     /**
      * 解析允许的源配置
      * 支持通配符 * 和逗号分隔的多个源
@@ -72,11 +90,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
         if (!StringUtils.hasText(allowedOrigins)) {
             return new String[]{"*"};
         }
-        
+
         if ("*".equals(allowedOrigins.trim())) {
             return new String[]{"*"};
         }
-        
+
         return StringUtils.commaDelimitedListToStringArray(allowedOrigins);
     }
 }

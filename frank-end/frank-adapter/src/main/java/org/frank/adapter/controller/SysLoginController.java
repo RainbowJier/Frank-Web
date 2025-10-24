@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.frank.app.service.SysLoginService;
 import org.frank.common.components.TokenService;
 import org.frank.common.core.domain.AjaxResult;
+import org.frank.common.core.domain.BaseController;
 import org.frank.common.core.domain.LoginUser;
 import org.frank.shared.sysLogin.req.LoginReq;
 import org.frank.shared.sysLogin.resp.LoginResp;

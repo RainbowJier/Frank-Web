@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
  * - SQL 执行耗时统计
  * - 显示结果数量
  * - 可通过 application.yml 开关启用
+ * - 格式化输出包含表头信息
  */
 @Intercepts({
         @Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})

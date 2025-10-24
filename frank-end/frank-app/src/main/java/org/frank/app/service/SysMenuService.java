@@ -1,17 +1,36 @@
 package org.frank.app.service;
 
-import org.frank.domain.entity.SysMenu;
+import org.frank.shared.sysMenu.req.AddMenuReq;
+import org.frank.shared.sysMenu.req.MenuListReq;
+import org.frank.shared.sysMenu.req.UpdateMenuReq;
+import org.frank.shared.sysMenu.resp.SysMenuResp;
 
 import java.util.List;
 
 public interface SysMenuService {
 
     /**
-     * 获取菜单列表
-     *
-     * @param menu
-     * @param userId
-     * @return
+     * Get all menus M,C,F.
      */
-    List<SysMenu> selectMenuList(SysMenu menu, Long userId);
+    List<SysMenuResp> list(MenuListReq req);
+
+    /**
+     * Get menu detail info by id.
+     */
+    SysMenuResp getInfoById(Long menuId);
+
+    /**
+     * Update menu info.
+     */
+    void update(UpdateMenuReq req);
+
+    /**
+     * Add menu.
+     */
+    void add(AddMenuReq req);
+
+    /**
+     * Remove menu.
+     */
+    void remove(Long menuId);
 }

@@ -3,11 +3,10 @@ package org.frank.domain.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.ArrayList;
-import java.util.List;
+import lombok.NoArgsConstructor;
 
 /**
  * 菜单权限表
@@ -17,6 +16,8 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_menu")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SysMenu extends BaseEntity {
     /**
      * 菜单ID
@@ -91,6 +92,12 @@ public class SysMenu extends BaseEntity {
     private Integer visible;
 
     /**
+     * 菜单状态（1-启用 0-禁用）
+     */
+    @TableField(value = "status")
+    private Integer status;
+
+    /**
      * 权限标识
      */
     @TableField(value = "perms")
@@ -101,11 +108,4 @@ public class SysMenu extends BaseEntity {
      */
     @TableField(value = "icon")
     private String icon;
-
-    /**
-     * 子菜单
-     */
-    @TableField(exist = false)
-    private List<SysMenu> children = new ArrayList<SysMenu>();
-
 }

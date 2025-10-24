@@ -5,10 +5,13 @@ import io.swagger.annotations.ApiOperation;
 import jakarta.annotation.Resource;
 import org.frank.app.service.SysMenuService;
 import org.frank.common.core.domain.AjaxResult;
-import org.frank.domain.entity.SysMenu;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.frank.common.core.domain.BaseController;
+import org.frank.shared.sysMenu.req.AddMenuReq;
+import org.frank.shared.sysMenu.req.MenuListReq;
+import org.frank.shared.sysMenu.req.UpdateMenuReq;
+import org.frank.shared.sysMenu.resp.SysMenuResp;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,10 +28,37 @@ public class SysMenuController extends BaseController {
     private SysMenuService service;
 
     @GetMapping("/list")
-    @ApiOperation("获取菜单列表")
-    public AjaxResult<?> list(SysMenu menu) {
-        List<SysMenu> menus = service.selectMenuList(menu, getUserId());
-        return AjaxResult.success(menus);
+    @ApiOperation("Get menu list.")
+    public AjaxResult<List<SysMenuResp>> list(MenuListReq req) {
+        return AjaxResult.success(service.list(req));
+    }
+
+    @GetMapping(value = "/{menuId}")
+    @ApiOperation("Get menu detail info by id.")
+    public AjaxResult<SysMenuResp> getInfoById(@PathVariable("menuId") Long menuId) {
+        return AjaxResult.success(service.getInfoById(menuId));
+    }
+
+    @PostMapping("add")
+    @ApiOperation("Add menu")
+    public AjaxResult<Void> add(@Validated @RequestBody AddMenuReq req) {
+        service.add(req);
+        return AjaxResult.success();
+    }
+
+
+    @PostMapping("update")
+    @ApiOperation("Update menu")
+    public AjaxResult<Void> update(@Validated @RequestBody UpdateMenuReq req) {
+        service.update(req);
+        return AjaxResult.success();
+    }
+
+    @GetMapping("/remove/{menuId}")
+    @ApiOperation("Remove menu")
+    public AjaxResult<Void> remove(@PathVariable("menuId") Long menuId) {
+        service.remove(menuId);
+        return AjaxResult.success();
     }
 
 
