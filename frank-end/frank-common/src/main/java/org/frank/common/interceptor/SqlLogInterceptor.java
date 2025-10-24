@@ -1,15 +1,17 @@
 package org.frank.common.interceptor;
 
-import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
-import org.apache.ibatis.executor.statement.StatementHandler;
+import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
+import org.apache.ibatis.session.ResultHandler;
+import org.apache.ibatis.session.RowBounds;
 
-import java.sql.Connection;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -22,11 +24,13 @@ import java.util.regex.Matcher;
  * - 彩色输出
  * - SQL 执行耗时统计
  * - 显示结果数量
+ * - 显示执行方法名
  * - 可通过 application.yml 开关启用
  * - 格式化输出包含表头信息
  */
 @Intercepts({
-        @Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})
+        @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
+        @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class})
 })
 public class SqlLogInterceptor implements Interceptor {
 
@@ -38,21 +42,26 @@ public class SqlLogInterceptor implements Interceptor {
     private static final String YELLOW = "\u001B[33m";  // UPDATE
     private static final String RED = "\u001B[31m";     // DELETE
     private static final String CYAN = "\u001B[36m";    // 时间/前缀
+    private static final String WHITE = "\u001B[37m";   // 方法名
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         long start = System.currentTimeMillis();
 
-        // 获取真实 StatementHandler
-        StatementHandler statementHandler = PluginUtils.realTarget(invocation.getTarget());
-        BoundSql boundSql = statementHandler.getBoundSql();
-        Object parameterObject = boundSql.getParameterObject();
+        // 获取执行参数
+        Object[] args = invocation.getArgs();
+        MappedStatement mappedStatement = (MappedStatement) args[0];
+        Object parameter = args[1];
+
+        // 获取SQL和方法名
+        BoundSql boundSql = mappedStatement.getBoundSql(parameter);
+        String methodName = getMethodName(mappedStatement.getId());
 
         // 原始 SQL
         String sql = boundSql.getSql().replaceAll("[\\s]+", " ").trim();
 
         // 参数拼接
-        sql = getCompleteSql(sql, boundSql, parameterObject);
+        sql = getCompleteSql(sql, boundSql, parameter);
 
         // SQL 美化换行
         sql = formatSql(sql);
@@ -67,18 +76,13 @@ public class SqlLogInterceptor implements Interceptor {
         String color = getSqlColor(sql);
 
         // 统计结果数量
-        String countInfo = "";
-        if (result != null) {
-            if (result instanceof List) {
-                countInfo = " | result size: " + ((List<?>) result).size();
-            } else if (result instanceof Integer) {
-                countInfo = " | affected rows: " + result;
-            }
-        }
+        String countInfo = getResultCount(result);
 
-        // 打印彩色 SQL + 执行耗时 + 结果数量
+        // 打印彩色 SQL + 方法名 + 执行耗时 + 结果数量
         String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
         System.out.println(CYAN + "[" + now + "] " + RESET +
+                WHITE + "[" + methodName + "] " + RESET +
                 color + sql + RESET +
                 GRAY + " [" + time + "ms]" + countInfo + RESET);
 
@@ -87,7 +91,7 @@ public class SqlLogInterceptor implements Interceptor {
 
     @Override
     public Object plugin(Object target) {
-        if (target instanceof StatementHandler) {
+        if (target instanceof Executor) {
             return Plugin.wrap(target, this);
         }
         return target;
@@ -150,6 +154,49 @@ public class SqlLogInterceptor implements Interceptor {
         return RESET;
     }
 
+    
+    
+    /**
+     * 获取执行方法名
+     */
+    private String getMethodName(String mappedStatementId) {
+        try {
+            // 提取方法名（去掉包名和类名，只保留方法名）
+            int lastDot = mappedStatementId.lastIndexOf('.');
+            return lastDot != -1 ? mappedStatementId.substring(lastDot + 1) : mappedStatementId;
+        } catch (Exception e) {
+            return "Unknown";
+        }
+    }
+
+    /**
+     * 获取结果数量统计
+     */
+    private String getResultCount(Object result) {
+        try {
+            if (result == null) {
+                return "";
+            }
+            if (result instanceof List) {
+                int size = ((List<?>) result).size();
+                return " | result size: " + size;
+            }
+            if (result instanceof Integer) {
+                int count = (Integer) result;
+                return " | affected rows: " + count;
+            }
+            if (result instanceof Collection) {
+                int size = ((Collection<?>) result).size();
+                return " | result size: " + size;
+            }
+            // 其他类型不显示数量
+            return "";
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    
     /**
      * 简单 SQL 美化换行（根据关键字换行）
      */
@@ -165,6 +212,3 @@ public class SqlLogInterceptor implements Interceptor {
         return sql;
     }
 }
-
-
-
