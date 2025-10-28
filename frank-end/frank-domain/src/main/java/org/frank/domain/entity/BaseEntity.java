@@ -46,7 +46,7 @@ public abstract class BaseEntity implements Serializable {
     private String remark;
 
     /**
-     * 删除标识（1-正常,-1-删除）
+     * 删除标识（1-正常,0-删除）
      */
     @TableField(value = "del_flag")
     private Integer delFlag;

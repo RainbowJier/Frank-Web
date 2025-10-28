@@ -50,7 +50,7 @@ public class SysMenuGatewayImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         LambdaQueryWrapper<SysMenu> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(SysMenu::getMenuName, menuName)
                 .eq(SysMenu::getParentId, parentId);
-        return mapper.selectCount(queryWrapper) <= 0;
+        return mapper.selectCount(queryWrapper) > 0;
     }
 
     @Override

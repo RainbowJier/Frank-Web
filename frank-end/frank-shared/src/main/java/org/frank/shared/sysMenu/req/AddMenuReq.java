@@ -44,17 +44,17 @@ public class AddMenuReq extends BaseReq {
     @ApiModelProperty(value = "路由名称")
     private String routeName;
 
-    @ApiModelProperty(value = "是否为外链（0是 1否）")
+    @ApiModelProperty(value = "是否为外链（1是 0否）")
     private Integer isFrame;
 
-    @ApiModelProperty(value = "是否缓存（0缓存 1不缓存）")
+    @ApiModelProperty(value = "是否缓存（1缓存 0不缓存）")
     private Integer isCache;
 
     @ApiModelProperty(value = "菜单类型（M目录 C菜单 F按钮）")
     @NotBlank(message = "菜单类型不能为空")
     private String menuType;
 
-    @ApiModelProperty(value = "菜单状态（1显示 -1隐藏）")
+    @ApiModelProperty(value = "菜单状态（1显示 0隐藏）")
     private Integer visible;
 
     @ApiModelProperty(value = "菜单状态（1显示 0隐藏）")
