@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @TableName(value ="sys_user_rel_role")
 @Data
-public class SysUserRelRole {
+public class SysUserRelRole extends BaseEntity{
     /**
      * 用户ID
      */

@@ -17,17 +17,17 @@ spring:
       minEvictableIdleTimeMillis: 300000            # 连接最小空闲时间（毫秒）
       maxEvictableIdleTimeMillis: 900000            # 连接最大空闲时间（毫秒）
       webStatFilter:
-        enabled: true                               # 开启 Web 监控过滤器，监控接口请求时间
+        enabled: false                               # 开启 Web 监控过滤器，监控接口请求时间
       statViewServlet:
-        enabled: true                               # 启用 Druid 控制台
+        enabled: false                               # 启用 Druid 控制台
         allow:                                      # 白名单，空表示允许所有
         url-pattern: /druid/*                       # 控制台访问路径
         login-username: admin                    # 控制台用户名
         login-password: admin                      # 控制台密码
       filter:
         stat:
-          enabled: true                             # 启用 SQL 监控
-          log-slow-sql: true                        # 记录慢 SQL
+          enabled: false                             # 启用 SQL 监控
+          log-slow-sql: false                        # 记录慢 SQL
           slow-sql-millis: 1000                     # 慢 SQL 阈值（毫秒）
           merge-sql: true                           # 合并 SQL 统计
         wall:

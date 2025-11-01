@@ -19,11 +19,11 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
     public void insertFill(MetaObject metaObject) {
         log.info("start insert fill ....");
         // 获取当前登录用户
-        String currentUser = getCurrentUser();
+        Long userId = getCurrentUserId();
 
-        this.strictInsertFill(metaObject, "createBy", String.class, currentUser);
+        this.strictInsertFill(metaObject, "createBy", Long.class, userId);
         this.strictInsertFill(metaObject, "createTime", Date.class, new Date());
-        this.strictInsertFill(metaObject, "updateBy", String.class, currentUser);
+        this.strictInsertFill(metaObject, "updateBy", Long.class, userId);
         this.strictInsertFill(metaObject, "updateTime", Date.class, new Date());
     }
 
@@ -31,16 +31,16 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
     public void updateFill(MetaObject metaObject) {
         log.info("start update fill ....");
         // 获取当前登录用户
-        String currentUser = getCurrentUser();
+        Long userId = getCurrentUserId();
 
-        this.strictUpdateFill(metaObject, "updateBy", String.class, currentUser);
+        this.strictUpdateFill(metaObject, "updateBy", Long.class, userId);
         this.strictUpdateFill(metaObject, "updateTime", Date.class, new Date());
     }
 
     /**
      * 获取当前登录用户
      */
-    private String getCurrentUser() {
+    private Long getCurrentUserId() {
         try {
             // 方法2: 从自定义的上下文工具类获取
             // return SecurityUtils.getUsername();
@@ -48,10 +48,10 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
             // 方法3: 从 ThreadLocal 获取
             // return UserContextHolder.getCurrentUser();
 
-            return "admin"; // 默认用户
+            return 1L; // 默认用户
         } catch (Exception e) {
             log.error("获取当前用户失败", e);
-            return "system";
+            return 1L;
         }
     }
 }

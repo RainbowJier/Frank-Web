@@ -54,6 +54,15 @@ public class SysMenuGatewayImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     @Override
+    public boolean checkMenuNameUniqueExcludeCurrent(Long menuId, Long parentId, String menuName) {
+        LambdaQueryWrapper<SysMenu> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysMenu::getMenuName, menuName)
+                .eq(SysMenu::getParentId, parentId)
+                .ne(SysMenu::getMenuId, menuId);
+        return mapper.selectCount(queryWrapper) > 0;
+    }
+
+    @Override
     public boolean hasChildByMenuId(Long menuId) {
         LambdaQueryWrapper<SysMenu> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(SysMenu::getParentId, menuId);

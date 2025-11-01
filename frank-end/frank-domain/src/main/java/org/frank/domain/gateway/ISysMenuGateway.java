@@ -25,6 +25,11 @@ public interface ISysMenuGateway extends IService<SysMenu> {
     boolean checkMenuNameUnique(Long parentId, String menuName);
 
     /**
+     * check menu name unique exclude current menu.
+     */
+    boolean checkMenuNameUniqueExcludeCurrent(Long menuId, Long parentId, String menuName);
+
+    /**
      * check menu has child.
      */
     boolean hasChildByMenuId(Long menuId);

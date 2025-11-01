@@ -76,7 +76,7 @@ public class SysMenuServiceImpl implements SysMenuService {
         SysMenu menu = new SysMenu();
         BeanUtil.copyProperties(req, menu);
 
-        if (gateway.checkMenuNameUnique(menu.getParentId(), menu.getMenuName())) {
+        if (gateway.checkMenuNameUniqueExcludeCurrent(menu.getMenuId(), menu.getParentId(), menu.getMenuName())) {
             throw new BusinessException("Failed to update menu: " + menu.getMenuName() + ", Menu name exist");
         } else if (UserConstants.YES_FRAME == menu.getIsFrame() && !StringUtil.ishttp(menu.getPath())) {
             throw new BusinessException("Failed to update menu: " + menu.getMenuName() + ", The address must begin with http(s)://");
@@ -110,7 +110,7 @@ public class SysMenuServiceImpl implements SysMenuService {
     @Transactional
     public void remove(Long menuId) {
         if (gateway.hasChildByMenuId(menuId)) {
-            throw new BusinessException("Exist sub menu and can not be deleted.");
+            throw new BusinessException("Exist sub-menu and can not be deleted.");
         }
         List<Long> list = sysRoleRelMenuGateway.selectRoleIdsByMenuId(menuId);
         if (CollUtil.isEmpty(list)) {

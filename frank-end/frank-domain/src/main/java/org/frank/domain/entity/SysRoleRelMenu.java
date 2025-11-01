@@ -3,23 +3,19 @@ package org.frank.domain.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 角色和菜单关联表
  * @TableName sys_role_rel_menu
  */
-@TableName(value ="sys_role_rel_menu")
 @Data
-public class SysRoleRelMenu {
-    /**
-     * 角色ID
-     */
+@EqualsAndHashCode(callSuper = true)
+@TableName(value ="sys_role_rel_menu")
+public class SysRoleRelMenu extends BaseEntity{
     @TableField(value = "role_id")
     private Long roleId;
 
-    /**
-     * 菜单ID
-     */
     @TableField(value = "menu_id")
     private Long menuId;
 }
