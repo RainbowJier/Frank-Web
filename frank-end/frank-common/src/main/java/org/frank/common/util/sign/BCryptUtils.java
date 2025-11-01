@@ -75,7 +75,7 @@ public class BCryptUtils {
      * 测试
      */
     public static void main(String[] args) {
-        String original = "frank";
+        String original = "admin";
         
         // 哈希密码
         String hashed1 = hashPassword(original);

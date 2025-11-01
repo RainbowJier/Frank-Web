@@ -15,10 +15,10 @@ create table sys_user
     avatar       varchar(100) default '',
     password     varchar(100) default '',
     del_flag     int          default 1,
-    create_by    varchar(64)  default '',
     create_time  timestamp    default now(),
-    update_by    varchar(64)  default '',
     update_time  timestamp,
+    update_by    varchar(64)  default '',
+    create_by    varchar(64)  default '',
     remark       varchar(500) default null,
     primary key (user_id)
 );
@@ -35,10 +35,10 @@ comment on column sys_user.sex is '用户性别（1男 0女 2未知）';
 comment on column sys_user.avatar is '头像地址';
 comment on column sys_user.password is '密码';
 comment on column sys_user.del_flag is '删除标志（1-存在 0-删除）';
-comment on column sys_user.create_by is '创建者';
 comment on column sys_user.create_time is '创建时间';
-comment on column sys_user.update_by is '更新者';
 comment on column sys_user.update_time is '更新时间';
+comment on column sys_user.create_by is '创建者';
+comment on column sys_user.update_by is '更新者';
 comment on column sys_user.remark is '备注';
 
 -- ----------------------------
@@ -46,11 +46,11 @@ comment on column sys_user.remark is '备注';
 -- ----------------------------
 insert into sys_user overriding system value
 values (1, 103, 'admin', 'administrator', '00', 'frank@163.com', '', 1, '',
-        'euLUpj0cPhoYeh/Yn0ce9Q==', 1, 1, now(), now(), '管理员');
+        '$2a$12$HgMqFBFOt1rys5iMT8ShN.1/I6woV2jgaWV3DWcM5ffDzGiyZNsIa', 1, now(), now(), '','管理员');
 
 insert into sys_user overriding system value
 values (2, 103, 'frank', 'administrator', '00', 'frank@163.com', '', 1, '',
-        'euLUpj0cPhoYeh/Yn0ce9Q==', 1, 1, now(), now(), now(), '普通用户');
+        '$2a$12$FBdoXmm5xEi8ega0IPoYJO/gXb5BVeNo1xgUkGPt4C8oPGUnxuuFy', 1, now(), now(), '', '普通用户');
 
 
 
@@ -107,7 +107,7 @@ comment on column sys_role.role_sort is '显示顺序';
 comment on column sys_role.data_scope is '数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）';
 comment on column sys_role.menu_check_strictly is '菜单树选择项是否关联显示';
 comment on column sys_role.dept_check_strictly is '部门树选择项是否关联显示';
-comment on column sys_user.del_flag is '删除标志（1-存在 0-删除）';
+comment on column sys_role.del_flag is '删除标志（1-存在 0-删除）';
 comment on column sys_role.create_by is '创建者';
 comment on column sys_role.create_time is '创建时间';
 comment on column sys_role.update_by is '更新者';

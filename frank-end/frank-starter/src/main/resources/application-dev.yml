@@ -3,7 +3,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://117.72.203.229:5432/postgres
+    url: jdbc:postgresql://117.72.203.229:5432/frankweb
     username: frankweb
     password: frankweb
     druid:
