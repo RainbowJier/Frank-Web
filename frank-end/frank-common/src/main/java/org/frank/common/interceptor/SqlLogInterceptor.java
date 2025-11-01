@@ -1,9 +1,8 @@
 package org.frank.common.interceptor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.Executor;
-import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ParameterMapping;
+import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
@@ -11,204 +10,131 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-import java.util.regex.Matcher;
+import java.util.*;
+import java.util.regex.Pattern;
 
-/**
- * MyBatis-Plus SQL 彩色日志拦截器
- * 功能：
- * - 参数直接拼接
- * - 彩色输出
- * - SQL 执行耗时统计
- * - 显示结果数量
- * - 显示执行方法名
- * - 可通过 application.yml 开关启用
- * - 格式化输出包含表头信息
- */
+@Slf4j
 @Intercepts({
         @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
         @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class})
 })
 public class SqlLogInterceptor implements Interceptor {
 
-    // ANSI 颜色
-    private static final String RESET = "\u001B[0m";
-    private static final String GRAY = "\u001B[90m";
-    private static final String GREEN = "\u001B[32m";   // INSERT
-    private static final String BLUE = "\u001B[34m";    // SELECT
-    private static final String YELLOW = "\u001B[33m";  // UPDATE
-    private static final String RED = "\u001B[31m";     // DELETE
-    private static final String CYAN = "\u001B[36m";    // 时间/前缀
-    private static final String WHITE = "\u001B[37m";   // 方法名
+    private enum SqlColor {
+        RESET("\u001B[0m"), BLUE("\u001B[34m"), GREEN("\u001B[32m"),
+        YELLOW("\u001B[33m"), RED("\u001B[31m"), CYAN("\u001B[36m"), WHITE("\u001B[37m");
+
+        public final String v;
+        SqlColor(String v) { this.v = v; }
+    }
+
+    private static final Pattern PARAM_PATTERN = Pattern.compile("\\?");
+    private static final SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         long start = System.currentTimeMillis();
 
-        // 获取执行参数
-        Object[] args = invocation.getArgs();
-        MappedStatement mappedStatement = (MappedStatement) args[0];
-        Object parameter = args[1];
+        MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
+        Object param = invocation.getArgs()[1];
+        BoundSql boundSql = ms.getBoundSql(param);
 
-        // 获取SQL和方法名
-        BoundSql boundSql = mappedStatement.getBoundSql(parameter);
-        String methodName = getMethodName(mappedStatement.getId());
+        String sql = formatSql(bindSql(boundSql));
+        String method = getMethodName(ms.getId());
+        SqlColor color = getColor(sql);
 
-        // 原始 SQL
-        String sql = boundSql.getSql().replaceAll("[\\s]+", " ").trim();
-
-        // 参数拼接
-        sql = getCompleteSql(sql, boundSql, parameter);
-
-        // SQL 美化换行
-        sql = formatSql(sql);
-
-        // 执行 SQL
         Object result = invocation.proceed();
+        long cost = System.currentTimeMillis() - start;
 
-        long end = System.currentTimeMillis();
-        long time = end - start;
+        String now = DF.format(new Date());
+        String resultInfo = getResultInfo(result);
 
-        // SQL 类型颜色
-        String color = getSqlColor(sql);
+        String timeColor = cost < 100 ? SqlColor.GREEN.v : (cost < 500 ? SqlColor.YELLOW.v : SqlColor.RED.v);
 
-        // 统计结果数量
-        String countInfo = getResultCount(result);
+        StringBuilder sb = new StringBuilder(256)
+                .append(SqlColor.CYAN.v).append("\n━━━━━━━━━━━ SQL LOG ━━━━━━━━━━━\n")
+                .append("Time: ").append(now).append("\n")
+                .append("Method: ").append(SqlColor.WHITE.v).append(method).append("\n")
+                .append("SQL: ").append(color.v).append(sql).append(SqlColor.RESET.v).append("\n")
+                .append("Cost: ").append(timeColor).append(cost).append("ms").append(SqlColor.RESET.v)
+                .append(resultInfo).append("\n")
+                .append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+                .append(SqlColor.RESET.v);
 
-        // 打印彩色 SQL + 方法名 + 执行耗时 + 结果数量
-        String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-
-        System.out.println(CYAN + "[" + now + "] " + RESET +
-                WHITE + "[" + methodName + "] " + RESET +
-                color + sql + RESET +
-                GRAY + " [" + time + "ms]" + countInfo + RESET);
-
+        System.out.println(sb);
         return result;
+    }
+
+    /** 绑定 SQL 参数并输出完整 SQL */
+    private String bindSql(BoundSql boundSql) {
+        List<ParameterMapping> pm = boundSql.getParameterMappings();
+        Object paramObj = boundSql.getParameterObject();
+        if (pm == null || pm.isEmpty()) return boundSql.getSql();
+
+        MetaObject meta = SystemMetaObject.forObject(paramObj);
+        String sql = boundSql.getSql();
+
+        for (ParameterMapping mapping : pm) {
+            String property = mapping.getProperty();
+            Object value = boundSql.hasAdditionalParameter(property)
+                    ? boundSql.getAdditionalParameter(property)
+                    : meta.hasGetter(property) ? meta.getValue(property) : null;
+
+            sql = PARAM_PATTERN.matcher(sql).replaceFirst(formatValue(value));
+        }
+        return sql;
+    }
+
+    /** 格式 SQL */
+    private String formatSql(String sql) {
+        return sql.replaceAll("\n", " ")
+                .replaceAll("\\s+", " ")
+                .replaceAll("(?i)select ", "\nSELECT ")
+                .replaceAll("(?i) from ", "\nFROM ")
+                .replaceAll("(?i) where ", "\nWHERE ")
+                .replaceAll("(?i) order by ", "\nORDER BY ")
+                .replaceAll("(?i) group by ", "\nGROUP BY ")
+                .trim();
+    }
+
+    private String formatValue(Object v) {
+        if (v == null) return "NULL";
+        if (v instanceof String) return "'" + v.toString().replace("'", "''") + "'";
+        if (v instanceof Date) return "'" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(v) + "'";
+        if (v instanceof Boolean) return (Boolean) v ? "1" : "0";
+        if (v instanceof Collection<?>) {
+            StringBuilder sb = new StringBuilder("(");
+            Iterator<?> it = ((Collection<?>) v).iterator();
+            while (it.hasNext()) sb.append(formatValue(it.next())).append(it.hasNext() ? "," : "");
+            return sb.append(")").toString();
+        }
+        return v.toString();
+    }
+
+    private SqlColor getColor(String sql) {
+        sql = sql.trim().toUpperCase(Locale.ROOT);
+        if (sql.startsWith("SELECT")) return SqlColor.BLUE;
+        if (sql.startsWith("INSERT")) return SqlColor.GREEN;
+        if (sql.startsWith("UPDATE")) return SqlColor.YELLOW;
+        if (sql.startsWith("DELETE")) return SqlColor.RED;
+        return SqlColor.RESET;
+    }
+
+    private String getMethodName(String id) {
+        int dot = id.lastIndexOf('.');
+        return dot != -1 ? id.substring(dot + 1) : id;
+    }
+
+    private String getResultInfo(Object r) {
+        if (r instanceof Collection<?>) return " | rows: " + ((Collection<?>) r).size();
+        if (r instanceof Integer) return " | affected: " + r;
+        return "";
     }
 
     @Override
     public Object plugin(Object target) {
-        if (target instanceof Executor) {
-            return Plugin.wrap(target, this);
-        }
-        return target;
+        return target instanceof Executor ? Plugin.wrap(target, this) : target;
     }
 
-    @Override
-    public void setProperties(Properties properties) {
-    }
-
-    /**
-     * 参数拼接
-     */
-    private String getCompleteSql(String sql, BoundSql boundSql, Object parameterObject) {
-        if (parameterObject == null) return sql;
-
-        try {
-            MetaObject metaObject = SystemMetaObject.forObject(parameterObject);
-            List<ParameterMapping> mappings = boundSql.getParameterMappings();
-
-            for (ParameterMapping pm : mappings) {
-                String name = pm.getProperty();
-                Object value;
-
-                if (boundSql.hasAdditionalParameter(name)) {
-                    value = boundSql.getAdditionalParameter(name);
-                } else if (metaObject.hasGetter(name)) {
-                    value = metaObject.getValue(name);
-                } else {
-                    value = "?";
-                }
-
-                sql = sql.replaceFirst("\\?", Matcher.quoteReplacement(formatValue(value)));
-            }
-        } catch (Exception e) {
-            // 忽略异常
-        }
-
-        return sql;
-    }
-
-    /**
-     * 参数格式化
-     */
-    private String formatValue(Object obj) {
-        if (obj == null) return "NULL";
-        if (obj instanceof String) return "'" + obj.toString().replace("'", "''") + "'";
-        if (obj instanceof Date) return "'" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format((Date) obj) + "'";
-        return obj.toString();
-    }
-
-    /**
-     * SQL 类型颜色
-     */
-    private String getSqlColor(String sql) {
-        String sqlUpper = sql.trim().toUpperCase();
-        if (sqlUpper.startsWith("SELECT")) return BLUE;
-        if (sqlUpper.startsWith("INSERT")) return GREEN;
-        if (sqlUpper.startsWith("UPDATE")) return YELLOW;
-        if (sqlUpper.startsWith("DELETE")) return RED;
-        return RESET;
-    }
-
-    
-    
-    /**
-     * 获取执行方法名
-     */
-    private String getMethodName(String mappedStatementId) {
-        try {
-            // 提取方法名（去掉包名和类名，只保留方法名）
-            int lastDot = mappedStatementId.lastIndexOf('.');
-            return lastDot != -1 ? mappedStatementId.substring(lastDot + 1) : mappedStatementId;
-        } catch (Exception e) {
-            return "Unknown";
-        }
-    }
-
-    /**
-     * 获取结果数量统计
-     */
-    private String getResultCount(Object result) {
-        try {
-            if (result == null) {
-                return "";
-            }
-            if (result instanceof List) {
-                int size = ((List<?>) result).size();
-                return " | result size: " + size;
-            }
-            if (result instanceof Integer) {
-                int count = (Integer) result;
-                return " | affected rows: " + count;
-            }
-            if (result instanceof Collection) {
-                int size = ((Collection<?>) result).size();
-                return " | result size: " + size;
-            }
-            // 其他类型不显示数量
-            return "";
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
-    
-    /**
-     * 简单 SQL 美化换行（根据关键字换行）
-     */
-    private String formatSql(String sql) {
-        // 大写关键字换行
-        String[] keywords = {"SELECT", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "JOIN", "LEFT JOIN",
-                "RIGHT JOIN", "INNER JOIN", "OUTER JOIN", "ON", "AND", "OR", "VALUES", "SET"};
-        for (String keyword : keywords) {
-            sql = sql.replaceAll("(?i)\\b" + keyword + "\\b", "\n" + keyword);
-        }
-        // 去掉多余空行
-        sql = sql.replaceAll("\n\\s+", "\n");
-        return sql;
-    }
+    @Override public void setProperties(Properties properties) {}
 }

@@ -391,25 +391,6 @@ graph TD
 
 ## 开发指南
 
-### 构建和运行
-
-```bash
-# 编译整个项目
-mvn clean compile
-
-# 运行测试（如果存在）
-mvn test
-
-# 打包项目
-mvn clean package
-
-# 运行应用程序
-java -jar frank-starter/target/frank-starter-1.0.0.jar
-
-# 使用Spring Boot Maven插件运行
-mvn spring-boot:run -pl frank-starter
-```
-
 ### 数据库设置
 
 项目提供了MySQL和PostgreSQL的数据库脚本：
