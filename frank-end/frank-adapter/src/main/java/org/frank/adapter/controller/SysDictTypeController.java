@@ -6,7 +6,7 @@ import jakarta.annotation.Resource;
 import org.frank.app.service.SysDictTypeService;
 import org.frank.common.core.domain.AjaxResult;
 import org.frank.common.core.domain.BaseController;
-import org.frank.common.core.page.TableDataInfo;
+import org.frank.common.core.page.PageResult;
 import org.frank.shared.sysDictType.req.PageQuery;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +26,7 @@ public class SysDictTypeController extends BaseController {
 
     @GetMapping("/list")
     @ApiOperation("分页查询字典类型")
-    public AjaxResult<TableDataInfo> list(PageQuery params) {
+    public AjaxResult<PageResult> list(PageQuery params) {
         return AjaxResult.success(service.selectDictTypeList(params));
     }
 

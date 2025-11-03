@@ -1,6 +1,6 @@
 package org.frank.app.service;
 
-import org.frank.common.core.page.TableDataInfo;
+import org.frank.common.core.page.PageResult;
 import org.frank.shared.sysDictType.req.PageQuery;
 
 public interface SysDictTypeService {
@@ -8,5 +8,5 @@ public interface SysDictTypeService {
     /**
      * 分页查询字典数据列表
      */
-    TableDataInfo selectDictTypeList(PageQuery params);
+    PageResult selectDictTypeList(PageQuery params);
 }

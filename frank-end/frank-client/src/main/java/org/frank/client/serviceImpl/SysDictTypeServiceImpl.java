@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.frank.app.service.SysDictTypeService;
-import org.frank.common.core.page.TableDataInfo;
+import org.frank.common.core.page.PageResult;
 import org.frank.domain.entity.SysDictType;
 import org.frank.domain.gateway.ISysDictTypeGateway;
 import org.frank.shared.sysDictType.req.PageQuery;
@@ -25,7 +25,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     private ISysDictTypeGateway gateway;
 
     @Override
-    public TableDataInfo selectDictTypeList(PageQuery params) {
+    public PageResult selectDictTypeList(PageQuery params) {
         IPage<SysDictType> page = new Page<>(params.getPageNum(), params.getPageSize());
 
         LambdaQueryWrapper<SysDictType> wrapper = new LambdaQueryWrapper<>();
@@ -42,6 +42,6 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         List<SysDictType> list = gateway.list(page, wrapper);
         List<SysDictTypeResp> respList = BeanUtil.copyToList(list, SysDictTypeResp.class);
 
-        return new TableDataInfo(respList, list.size());
+        return new PageResult(respList, list.size());
     }
 }
