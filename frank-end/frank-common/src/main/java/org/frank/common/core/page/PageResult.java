@@ -21,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class PageResult<T> implements Serializable {
+public class PageResult implements Serializable {
     private Long total;
 
     private Long pageNum;
@@ -35,8 +35,8 @@ public class PageResult<T> implements Serializable {
         this.total = total;
     }
 
-    public static <T> PageResult<T> of(IPage<T> page) {
-        return new PageResult<>(
+    public static <T> PageResult of(IPage<T> page) {
+        return new PageResult(
                 page.getTotal(),
                 page.getCurrent(),
                 page.getSize(),
@@ -44,10 +44,10 @@ public class PageResult<T> implements Serializable {
         );
     }
 
-    public static <E, V> PageResult<V> ok(IPage<E> page, Class<V> voClass) {
+    public static <E, V> PageResult ok(IPage<E> page, Class<V> voClass) {
         List<V> voList = BeanUtil.copyToList(page.getRecords(), voClass);
 
-        return new PageResult<>(
+        return new PageResult(
                 page.getTotal(),
                 page.getCurrent(),
                 page.getSize(),
