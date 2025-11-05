@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class SysMenuResp {
     @ApiModelProperty(value = "菜单ID")
-    private Long menuId;
+    private String menuId;
 
     @ApiModelProperty(value = "菜单名称")
     private String menuName;

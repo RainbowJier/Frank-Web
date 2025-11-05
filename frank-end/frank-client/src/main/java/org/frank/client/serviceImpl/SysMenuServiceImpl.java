@@ -113,7 +113,7 @@ public class SysMenuServiceImpl implements SysMenuService {
             throw new BusinessException("Exist sub-menu and can not be deleted.");
         }
         List<Long> list = sysRoleRelMenuGateway.selectRoleIdsByMenuId(menuId);
-        if (CollUtil.isEmpty(list)) {
+        if (CollUtil.isNotEmpty(list)) {
             throw new BusinessException("The menu has been assigned and can not be deleted.");
         }
 

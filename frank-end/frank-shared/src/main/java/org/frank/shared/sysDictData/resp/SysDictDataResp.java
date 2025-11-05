@@ -16,7 +16,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class SysDictDataResp implements Serializable {
     @ApiModelProperty("字典编码")
-    private Long dictCode;
+    private String dictCode;
 
     @ApiModelProperty("字典排序")
     private Integer dictSort;

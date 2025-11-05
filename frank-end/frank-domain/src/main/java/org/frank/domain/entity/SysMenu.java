@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * 菜单权限表
+ * 菜单表
  *
  * @TableName sys_menu
  */

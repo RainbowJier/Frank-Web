@@ -13,12 +13,12 @@ public class SysUserResp {
     /**
      * 用户ID
      */
-    private Long userId;
+    private String userId;
 
     /**
      * 部门ID
      */
-    private Long deptId;
+    private String deptId;
 
     /**
      * 用户账号

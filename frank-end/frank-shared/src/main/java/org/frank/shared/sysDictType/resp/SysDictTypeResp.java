@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class SysDictTypeResp implements Serializable {
     @ApiModelProperty("字典主键")
-    private Long dictId;
+    private String dictId;
 
     @ApiModelProperty("字典名称")
     private String dictName;
