@@ -23,12 +23,6 @@ public class SysUser extends BaseEntity {
     private Long userId;
 
     /**
-     * 部门ID
-     */
-    @TableField(value = "dept_id")
-    private Long deptId;
-
-    /**
      * 用户账号
      */
     @TableField(value = "user_name")

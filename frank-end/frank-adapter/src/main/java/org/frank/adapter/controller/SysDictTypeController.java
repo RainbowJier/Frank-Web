@@ -23,12 +23,14 @@ public class SysDictTypeController extends BaseController {
     @Resource
     private SysDictTypeService service;
 
-
     @GetMapping("/list")
     @ApiOperation("分页查询字典类型")
     public AjaxResult<PageResult> list(PageQuery params) {
         return AjaxResult.success(service.selectDictTypeList(params));
     }
+
+
+
 
 
 

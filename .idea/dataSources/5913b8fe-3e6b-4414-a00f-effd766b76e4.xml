@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource name="mongo-frankweb">
+  <database-model serializer="dbm" dbms="MONGO" family-id="MONGO" format-version="4.53">
+    <root id="1">
+      <ServerVersion>8.0.13</ServerVersion>
+    </root>
+    <schema id="2" parent="1" name="frankweb">
+      <Current>1</Current>
+      <LastIntrospectionLocalTimestamp>2025-09-03.01:06:09</LastIntrospectionLocalTimestamp>
+    </schema>
+    <table id="3" parent="2" name="users"/>
+    <column id="4" parent="3" name="_id">
+      <Position>1</Position>
+      <StoredType>ObjectId|12s</StoredType>
+    </column>
+    <column id="5" parent="3" name="name">
+      <Position>2</Position>
+      <StoredType>String|12s</StoredType>
+    </column>
+    <index id="6" parent="3" name="_id_">
+      <ColNames>_id</ColNames>
+      <Unique>1</Unique>
+    </index>
+  </database-model>
+</dataSource>

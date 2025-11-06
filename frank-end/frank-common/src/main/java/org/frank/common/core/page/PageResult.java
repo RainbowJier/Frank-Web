@@ -35,7 +35,7 @@ public class PageResult implements Serializable {
         this.total = total;
     }
 
-    public static <T> PageResult of(IPage<T> page) {
+    public static <T> PageResult ok(IPage<T> page) {
         return new PageResult(
                 page.getTotal(),
                 page.getCurrent(),

@@ -1,0 +1,15 @@
+# SQL日志配置示例
+# 将以下配置添加到 application.yml 中
+
+# 启用SQL日志功能（可选，如果通过MyBatis Plus注册则不需要此配置）
+logging:
+  sql:
+    enabled: true
+
+# 也可以通过系统属性控制
+# -Dlogging.sql.enabled=true
+
+# 日志级别配置
+logging:
+  level:
+    org.frank: DEBUG

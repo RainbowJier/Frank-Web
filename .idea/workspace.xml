@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7c219f10-6c83-48ab-9da2-b484880ce795" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/frank-end/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-adapter/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-adapter/src/main/java/org/frank/adapter/controller/UserManagementController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-adapter/src/main/java/org/frank/adapter/controller/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-app/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-app/src/main/java/org/frank/app/service/UserManagementServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-app/src/main/java/org/frank/app/util/TokenUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-client/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-client/src/main/java/org/frank/client/service/IUserManagementService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-common/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-common/src/main/java/org/frank/common/FileUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-common/src/main/java/org/frank/common/FolderUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-common/src/main/java/org/frank/common/constant/AuthConstant.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-common/src/main/java/org/frank/common/core/AjaxResult.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-common/src/main/java/org/frank/common/core/Entity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-common/src/main/java/org/frank/common/enums/ResultCodeEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-domain/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-domain/src/main/java/org/frank/domain/entity/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-domain/src/main/java/org/frank/domain/gateway/IUserGateway.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-infrastructure/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-infrastructure/src/main/java/org/frank/infrastructure/gateway/IUserGatewayImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-infrastructure/src/main/java/org/frank/infrastructure/mapper/UserMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-shared/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-shared/src/main/java/org/frank/shared/userLogin/resp/UserResp.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-starter/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-starter/src/main/java/org/frank/starter/FrankStarterApplication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-starter/src/main/resources/application-dev.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-starter/src/main/resources/application-prod.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-starter/src/main/resources/application.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/frank-starter/src/main/resources/log4j2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frank-end/sql/frank-web.sql" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="322IqBHOd6KIKP7W0SsltUT9G1d" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "D:/Projects/Frank-Web",
+    "settings.editor.selected.configurable": "SQL Dialects"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql",
+      "mongo",
+      "redis"
+    ]
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7c219f10-6c83-48ab-9da2-b484880ce795" name="Changes" comment="" />
+      <created>1756612430817</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1756612430817</updated>
+    </task>
+    <servers />
+  </component>
+</project>
