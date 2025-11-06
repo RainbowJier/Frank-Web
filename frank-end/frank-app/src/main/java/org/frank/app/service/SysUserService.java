@@ -2,6 +2,7 @@ package org.frank.app.service;
 
 import org.frank.common.core.page.PageResult;
 import org.frank.shared.sysUser.req.SysUserReq;
+import org.frank.shared.sysUser.req.SysUserAddReq;
 import org.frank.shared.sysUser.resp.SysUserResp;
 
 public interface SysUserService {
@@ -14,4 +15,9 @@ public interface SysUserService {
      * Get user info by ID
      */
     SysUserResp getById(Long userId);
+
+    /**
+     * Add new user.
+     */
+    void addUser(SysUserAddReq req);
 }

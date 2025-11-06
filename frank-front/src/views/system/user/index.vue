@@ -137,25 +137,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="岗位">
-              <el-select v-model="form.postIds" multiple placeholder="请选择">
-                <el-option v-for="item in postOptions" :key="item.postId" :label="item.postName" :value="item.postId"
-                  :disabled="item.status == 1"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="角色">
-              <el-select v-model="form.roleIds" multiple placeholder="请选择">
-                <el-option v-for="item in roleOptions" :key="item.roleId" :label="item.roleName" :value="item.roleId"
-                  :disabled="item.status == 1"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
+            <el-row>
           <el-col :span="24">
             <el-form-item label="备注">
               <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>
@@ -193,8 +175,6 @@ const multiple = ref(true)
 const total = ref(0)
 const title = ref("")
 const dateRange = ref([])
-const postOptions = ref([])
-const roleOptions = ref([])
 // 列显隐信息
 const columns = ref({
   userId: { label: '用户编号', visible: true },
@@ -334,9 +314,7 @@ function reset() {
     email: undefined,
     sex: undefined,
     status: "1",
-    remark: undefined,
-    postIds: [],
-    roleIds: []
+    remark: undefined
   }
   proxy.resetForm("userRef")
 }
@@ -350,12 +328,8 @@ function cancel() {
 /** 新增按钮操作 */
 function handleAdd() {
   reset()
-  getUser().then(response => {
-    postOptions.value = response.posts
-    roleOptions.value = response.roles
-    open.value = true
-    title.value = "添加用户"
-  })
+  open.value = true
+  title.value = "添加用户"
 }
 
 /** 修改按钮操作 */
@@ -364,10 +338,6 @@ function handleUpdate(row) {
   const userId = row.userId || ids.value
   getUser(userId).then(response => {
     form.value = response.data
-    postOptions.value = response.posts
-    roleOptions.value = response.roles
-    form.value.postIds = response.postIds
-    form.value.roleIds = response.roleIds
     open.value = true
     title.value = "修改用户"
     form.password = ""

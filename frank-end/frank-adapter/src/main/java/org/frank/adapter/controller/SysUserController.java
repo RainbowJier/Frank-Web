@@ -7,12 +7,11 @@ import org.frank.app.service.SysUserService;
 import org.frank.common.core.domain.AjaxResult;
 import org.frank.common.core.domain.BaseController;
 import org.frank.common.core.page.PageResult;
+import org.frank.shared.sysUser.req.SysUserAddReq;
 import org.frank.shared.sysUser.req.SysUserReq;
 import org.frank.shared.sysUser.resp.SysUserResp;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 用户信息
@@ -38,6 +37,12 @@ public class SysUserController extends BaseController {
         return AjaxResult.success(service.getById(userId));
     }
 
+    @PostMapping()
+    @ApiOperation("Add new user.")
+    public AjaxResult<Void> add(@Validated @RequestBody SysUserAddReq req) {
+        service.addUser(req);
+        return AjaxResult.success();
+    }
 
 
 
