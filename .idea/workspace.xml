@@ -4,40 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c219f10-6c83-48ab-9da2-b484880ce795" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/frank-end/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-adapter/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-adapter/src/main/java/org/frank/adapter/controller/UserManagementController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-adapter/src/main/java/org/frank/adapter/controller/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-app/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-app/src/main/java/org/frank/app/service/UserManagementServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-app/src/main/java/org/frank/app/util/TokenUtils.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-client/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-client/src/main/java/org/frank/client/service/IUserManagementService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-common/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-common/src/main/java/org/frank/common/FileUtils.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-common/src/main/java/org/frank/common/FolderUtils.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-common/src/main/java/org/frank/common/constant/AuthConstant.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-common/src/main/java/org/frank/common/core/AjaxResult.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-common/src/main/java/org/frank/common/core/Entity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-common/src/main/java/org/frank/common/enums/ResultCodeEnum.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-domain/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-domain/src/main/java/org/frank/domain/entity/User.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-domain/src/main/java/org/frank/domain/gateway/IUserGateway.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-infrastructure/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-infrastructure/src/main/java/org/frank/infrastructure/gateway/IUserGatewayImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-infrastructure/src/main/java/org/frank/infrastructure/mapper/UserMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-shared/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-shared/src/main/java/org/frank/shared/userLogin/resp/UserResp.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-starter/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-starter/src/main/java/org/frank/starter/FrankStarterApplication.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-starter/src/main/resources/application-dev.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-starter/src/main/resources/application-prod.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-starter/src/main/resources/application.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/frank-starter/src/main/resources/log4j2.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frank-end/sql/frank-web.sql" afterDir="false" />
-    </list>
+    <list default="true" id="7c219f10-6c83-48ab-9da2-b484880ce795" name="Changes" comment="feat(project): 初始化项目基础配置和核心功能&#10;&#10;- 添加开发、生产和预发布环境配置文件&#10;- 配置 Git 忽略文件规则&#10;- 创建401 和404 错误页面组件&#10;- 添加应用状态管理和主题样式处理&#10;- 实现权限验证插件和用户认证工具&#10;- 集成缓存管理插件和自动导入功能&#10;- 添加监控缓存相关 API 接口&#10;- 创建系统用户和角色授权页面- 添加代码生成基础信息表单组件- 集成 Element Plus 按钮样式和图标资源&#10;- 添加 Claude AI 开发指导文档" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -54,24 +21,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "D:/Projects/Frank-Web",
-    "settings.editor.selected.configurable": "SQL Dialects"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Projects/Frank-Web&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;SQL Dialects&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql",
-      "mongo",
-      "redis"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;,
+      &quot;mongo&quot;,
+      &quot;redis&quot;
     ]
   }
-}]]></component>
+}</component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.27812.49" />
+      </set>
+    </attachedChunks>
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="7c219f10-6c83-48ab-9da2-b484880ce795" name="Changes" comment="" />
@@ -79,7 +53,21 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1756612430817</updated>
+      <workItem from="1762400338593" duration="80000" />
     </task>
+    <task id="LOCAL-00001" summary="feat(project): 初始化项目基础配置和核心功能&#10;&#10;- 添加开发、生产和预发布环境配置文件&#10;- 配置 Git 忽略文件规则&#10;- 创建401 和404 错误页面组件&#10;- 添加应用状态管理和主题样式处理&#10;- 实现权限验证插件和用户认证工具&#10;- 集成缓存管理插件和自动导入功能&#10;- 添加监控缓存相关 API 接口&#10;- 创建系统用户和角色授权页面- 添加代码生成基础信息表单组件- 集成 Element Plus 按钮样式和图标资源&#10;- 添加 Claude AI 开发指导文档">
+      <option name="closed" value="true" />
+      <created>1762400373464</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1762400373464</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="feat(project): 初始化项目基础配置和核心功能&#10;&#10;- 添加开发、生产和预发布环境配置文件&#10;- 配置 Git 忽略文件规则&#10;- 创建401 和404 错误页面组件&#10;- 添加应用状态管理和主题样式处理&#10;- 实现权限验证插件和用户认证工具&#10;- 集成缓存管理插件和自动导入功能&#10;- 添加监控缓存相关 API 接口&#10;- 创建系统用户和角色授权页面- 添加代码生成基础信息表单组件- 集成 Element Plus 按钮样式和图标资源&#10;- 添加 Claude AI 开发指导文档" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(project): 初始化项目基础配置和核心功能&#10;&#10;- 添加开发、生产和预发布环境配置文件&#10;- 配置 Git 忽略文件规则&#10;- 创建401 和404 错误页面组件&#10;- 添加应用状态管理和主题样式处理&#10;- 实现权限验证插件和用户认证工具&#10;- 集成缓存管理插件和自动导入功能&#10;- 添加监控缓存相关 API 接口&#10;- 创建系统用户和角色授权页面- 添加代码生成基础信息表单组件- 集成 Element Plus 按钮样式和图标资源&#10;- 添加 Claude AI 开发指导文档" />
   </component>
 </project>

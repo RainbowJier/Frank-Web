@@ -81,7 +81,6 @@ service.interceptors.response.use(res => {
     return res.data
   }
 
-   console.log(res.data)
   if (code === 401) {
     if (!isRelogin.show) {
       isRelogin.show = true

@@ -5,7 +5,6 @@ drop table if exists sys_user;
 create table sys_user
 (
     user_id      bigint generated always as identity,
-    dept_id      bigint       default null,
     user_name    varchar(30) not null,
     nick_name    varchar(30) not null,
     user_type    varchar(2)   default '00',
@@ -14,6 +13,7 @@ create table sys_user
     sex          int          default null,
     avatar       varchar(100) default '',
     password     varchar(100) default '',
+    status      int          default 1,
     del_flag     int          default 1,
     create_by           bigint  default null,
     create_time         timestamp    default now(),
@@ -25,7 +25,6 @@ create table sys_user
 
 comment on table sys_user is '用户信息表';
 comment on column sys_user.user_id is '用户ID';
-comment on column sys_user.dept_id is '部门ID';
 comment on column sys_user.user_name is '用户账号';
 comment on column sys_user.nick_name is '用户昵称';
 comment on column sys_user.user_type is '用户类型（00系统用户）';
@@ -34,6 +33,7 @@ comment on column sys_user.phone_number is '手机号码';
 comment on column sys_user.sex is '用户性别（1男 0女 2未知）';
 comment on column sys_user.avatar is '头像地址';
 comment on column sys_user.password is '密码';
+comment on column sys_user.status is '帐号状态（1正常 0停用）';
 comment on column sys_user.del_flag is '删除标志（1-存在 0-删除）';
 comment on column sys_user.create_time is '创建时间';
 comment on column sys_user.update_time is '更新时间';
@@ -44,13 +44,15 @@ comment on column sys_user.remark is '备注';
 -- ----------------------------
 -- 初始化-用户信息表数据
 -- ----------------------------
-insert into sys_user overriding system value
-values (1, 103, 'admin', 'administrator', '00', 'frank@163.com', '', 1, '',
-        '$2a$12$HgMqFBFOt1rys5iMT8ShN.1/I6woV2jgaWV3DWcM5ffDzGiyZNsIa', 1, null, now(), null,now());
+insert into sys_user
+(user_id, user_name, nick_name, email, sex, password, create_time, update_time) overriding system value
+values (1, 'admin', 'administrator', 'frank@163.com',1,
+        '$2a$12$HgMqFBFOt1rys5iMT8ShN.1/I6woV2jgaWV3DWcM5ffDzGiyZNsIa', now(), now());
 
-insert into sys_user overriding system value
-values (2, 103, 'frank', 'administrator', '00', 'frank@163.com', '', 1, '',
-        '$2a$12$FBdoXmm5xEi8ega0IPoYJO/gXb5BVeNo1xgUkGPt4C8oPGUnxuuFy', 1, null, now(), null,now());
+insert into sys_user
+(user_id, user_name, nick_name, email, sex, password, create_time, update_time)  overriding system value
+values (2, 'frank', 'administrator',  'frank@163.com',1,
+        '$2a$12$FBdoXmm5xEi8ega0IPoYJO/gXb5BVeNo1xgUkGPt4C8oPGUnxuuFy', now(), now());
 
 
 
@@ -434,8 +436,8 @@ comment on column sys_dict_data.dict_type is '字典类型';
 comment on column sys_dict_data.css_class is '样式属性（其他样式扩展）';
 comment on column sys_dict_data.list_class is '表格回显样式';
 comment on column sys_dict_data.is_default is '是否默认（Y是 N否）';
-comment on column sys_dict_data.status is '状态（1正常，-1停用）';
-comment on column sys_dict_data.del_flag is '删除标志（1代表存在 -1代表删除）';
+comment on column sys_dict_data.status is '状态（1正常，0停用）';
+comment on column sys_dict_data.del_flag is '删除标志（1代表存在 0代表删除）';
 comment on column sys_dict_data.create_by is '创建者';
 comment on column sys_dict_data.create_time is '创建时间';
 comment on column sys_dict_data.update_by is '更新者';
@@ -450,11 +452,11 @@ VALUES (1, 1, '男', '0', 'sys_user_sex', '', '', 'Y', 1, now(), now(), '性别�
        (2, 2, '女', '1', 'sys_user_sex', '', '', 'N', 1, now(), now(), '性别女'),
        (3, 3, '未知', '2', 'sys_user_sex', '', '', 'N', 1, now(), now(), '性别未知'),
        (4, 1, '显示', '1', 'sys_show_hide', '', 'primary', 'Y', 1, now(), now(), '显示菜单'),
-       (5, 2, '隐藏', '-1', 'sys_show_hide', '', 'danger', 'N', 1, now(), now(), '隐藏菜单'),
+       (5, 2, '隐藏', '0', 'sys_show_hide', '', 'danger', 'N', 1, now(), now(), '隐藏菜单'),
        (6, 1, '正常', '1', 'sys_normal_disable', '', 'primary', 'Y', 1, now(), now(), '正常状态'),
-       (7, 2, '停用', '-1', 'sys_normal_disable', '', 'danger', 'N', 1, now(), now(), '停用状态'),
+       (7, 2, '停用', '0', 'sys_normal_disable', '', 'danger', 'N', 1, now(), now(), '停用状态'),
        (8, 1, '正常', '1', 'sys_job_status', '', 'primary', 'Y', 1, now(), now(), '正常状态'),
-       (9, 2, '暂停', '-1', 'sys_job_status', '', 'danger', 'N', 1, now(), now(), '停用状态'),
+       (9, 2, '暂停', '0', 'sys_job_status', '', 'danger', 'N', 1, now(), now(), '停用状态'),
        (10, 1, '默认', 'DEFAULT', 'sys_job_group', '', '', 'Y', 1, now(), now(), '默认分组'),
        (11, 2, '系统', 'SYSTEM', 'sys_job_group', '', '', 'N', 1, now(), now(), '系统分组'),
        (12, 1, '是', 'Y', 'sys_yes_no', '', 'primary', 'Y', 1, now(), now(), '系统默认是'),
@@ -462,7 +464,7 @@ VALUES (1, 1, '男', '0', 'sys_user_sex', '', '', 'Y', 1, now(), now(), '性别�
        (14, 1, '通知', '1', 'sys_notice_type', '', 'warning', 'Y', 1, now(), now(), '通知'),
        (15, 2, '公告', '2', 'sys_notice_type', '', 'success', 'N', 1, now(), now(), '公告'),
        (16, 1, '正常', '1', 'sys_notice_status', '', 'primary', 'Y', 1, now(), now(), '正常状态'),
-       (17, 2, '关闭', '-1', 'sys_notice_status', '', 'danger', 'N', 1, now(), now(), '关闭状态'),
+       (17, 2, '关闭', '0', 'sys_notice_status', '', 'danger', 'N', 1, now(), now(), '关闭状态'),
        (18, 99, '其他', '0', 'sys_oper_type', '', 'info', 'N', 1, now(), now(), '其他操作'),
        (19, 1, '新增', '1', 'sys_oper_type', '', 'info', 'N', 1, now(), now(), '新增操作'),
        (20, 2, '修改', '2', 'sys_oper_type', '', 'info', 'N', 1, now(), now(), '修改操作'),
@@ -474,7 +476,7 @@ VALUES (1, 1, '男', '0', 'sys_user_sex', '', '', 'Y', 1, now(), now(), '性别�
        (26, 8, '生成代码', '8', 'sys_oper_type', '', 'warning', 'N', 1, now(), now(), '生成操作'),
        (27, 9, '清空数据', '9', 'sys_oper_type', '', 'danger', 'N', 1, now(), now(), '清空操作'),
        (28, 1, '成功', '1', 'sys_common_status', '', 'primary', 'N', 1, now(), now(), '正常状态'),
-       (29, 2, '失败', '-1', 'sys_common_status', '', 'danger', 'N', 1, now(), now(), '停用状态');
+       (29, 2, '失败', '0', 'sys_common_status', '', 'danger', 'N', 1, now(), now(), '停用状态');
 -- ----------------------------
 -- 字典类型表
 -- ----------------------------

@@ -1,5 +1,6 @@
 package org.frank.client.serviceImpl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -11,6 +12,7 @@ import org.frank.domain.gateway.ISysUserGateway;
 import org.frank.shared.sysUser.req.SysUserReq;
 import org.frank.shared.sysUser.resp.SysUserResp;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -33,5 +35,14 @@ public class SysUserServiceImpl implements SysUserService {
 
         IPage<SysUser> pageRes = gateway.page(page, wrapper);
         return PageResult.ok(pageRes, SysUserResp.class);
+    }
+
+    @Override
+    public SysUserResp getById(Long userId) {
+        SysUser sysUser = gateway.getById(userId);
+        if(ObjectUtils.isEmpty(sysUser)){
+            return null;
+        }
+        return BeanUtil.copyProperties(sysUser, SysUserResp.class);
     }
 }

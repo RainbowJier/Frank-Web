@@ -16,59 +16,47 @@ import lombok.EqualsAndHashCode;
 @TableName(value = "sys_user")
 @Data
 public class SysUser extends BaseEntity {
-    /**
-     * 用户ID
-     */
     @TableId(value = "user_id", type = IdType.AUTO)
     private Long userId;
 
-    /**
-     * 用户账号
-     */
     @TableField(value = "user_name")
     private String userName;
 
-    /**
-     * 用户昵称
-     */
     @TableField(value = "nick_name")
     private String nickName;
 
     /**
-     * 用户类型（00系统用户）
+     * user type(00 is system user.)
      */
     @TableField(value = "user_type")
     private String userType;
 
-    /**
-     * 用户邮箱
-     */
     @TableField(value = "email")
     private String email;
 
-    /**
-     * 手机号码
-     */
     @TableField(value = "phone_number")
     private String phoneNumber;
 
     /**
-     * 用户性别（1男 0女 2未知）
+     * 1-male, 0-female, 2-unknown.
      */
     @TableField(value = "sex")
     private Integer sex;
 
     /**
-     * 头像地址
+     * address of avatar.
      */
     @TableField(value = "avatar")
     private String avatar;
 
-    /**
-     * 密码
-     */
     @TableField(value = "password")
     private String password;
+
+    /**
+     * 1-able, 0-disable
+     */
+    @TableField(value = "status")
+    private Integer status;
 
     @TableField(exist = false)
     private boolean isAdmin;

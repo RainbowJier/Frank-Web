@@ -4,7 +4,7 @@ import { parseStrEmpty } from "@/utils/ruoyi";
 // 查询用户列表
 export function listUser(query) {
   return request({
-    url: '/system/user/list',
+    url: '/sys-user/list',
     method: 'get',
     params: query
   })
@@ -13,7 +13,7 @@ export function listUser(query) {
 // 查询用户详细
 export function getUser(userId) {
   return request({
-    url: '/system/user/' + parseStrEmpty(userId),
+    url: '/sys-user/' + parseStrEmpty(userId),
     method: 'get'
   })
 }
@@ -21,7 +21,7 @@ export function getUser(userId) {
 // 新增用户
 export function addUser(data) {
   return request({
-    url: '/system/user',
+    url: '/sys-user',
     method: 'post',
     data: data
   })

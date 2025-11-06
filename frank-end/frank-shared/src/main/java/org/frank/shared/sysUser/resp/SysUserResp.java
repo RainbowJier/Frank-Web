@@ -10,27 +10,33 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SysUserResp {
-    @ApiModelProperty(value = "用户ID")
+    @ApiModelProperty(value = "user ID")
     private String userId;
 
-    @ApiModelProperty(value = "用户账号")
+    @ApiModelProperty(value = "user name")
     private String userName;
 
-    @ApiModelProperty(value = "用户昵称")
+    @ApiModelProperty(value = "nick name")
     private String nickName;
 
-    @ApiModelProperty(value = "用户类型（00系统用户）")
+    @ApiModelProperty(value = "user type")
     private String userType;
 
-    @ApiModelProperty(value = "用户邮箱")
+    @ApiModelProperty(value = "email")
     private String email;
 
-    @ApiModelProperty(value = "手机号码")
+    @ApiModelProperty(value = "phone number")
     private String phoneNumber;
 
-    @ApiModelProperty(value = "用户性别（1男 0女 2未知）")
+    @ApiModelProperty(value = "password")
+    private String password;
+
+    @ApiModelProperty(value = "1-able, 0-disable.")
+    private Integer status;
+
+    @ApiModelProperty(value = "sex")
     private Integer sex;
 
-    @ApiModelProperty(value = "头像地址")
+    @ApiModelProperty(value = "address of avatar")
     private String avatar;
 }
