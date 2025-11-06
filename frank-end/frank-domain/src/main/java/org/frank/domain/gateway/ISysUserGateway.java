@@ -21,7 +21,17 @@ public interface ISysUserGateway extends IService<SysUser> {
     boolean checkPhoneUnique(String phoneNumber);
 
     /**
+     * Check phone number unique excluding specific user.
+     */
+    boolean checkPhoneUniqueExcludeCurrent(String phoneNumber, Long excludeUserId);
+
+    /**
      * Check email unique.
      */
     boolean checkEmailUnique(String email);
+
+    /**
+     * Check email unique excluding specific user.
+     */
+    boolean checkEmailUniqueExcludeCurrent(String email, Long excludeUserId);
 }

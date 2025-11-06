@@ -43,6 +43,22 @@ public class SysUserGatewayImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         queryWrapper.eq(SysUser::getEmail, email);
         return count(queryWrapper) == 0;
     }
+
+    @Override
+    public boolean checkPhoneUniqueExcludeCurrent(String phoneNumber, Long excludeUserId) {
+        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysUser::getPhoneNumber, phoneNumber)
+                    .ne(SysUser::getUserId, excludeUserId);
+        return count(queryWrapper) == 0;
+    }
+
+    @Override
+    public boolean checkEmailUniqueExcludeCurrent(String email, Long excludeUserId) {
+        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysUser::getEmail, email)
+                    .ne(SysUser::getUserId, excludeUserId);
+        return count(queryWrapper) == 0;
+    }
 }
 
 

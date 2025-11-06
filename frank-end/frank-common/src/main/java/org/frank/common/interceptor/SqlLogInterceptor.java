@@ -11,7 +11,6 @@ import org.apache.ibatis.session.RowBounds;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Pattern;
 
 @Slf4j
 @Intercepts({
@@ -28,7 +27,6 @@ public class SqlLogInterceptor implements Interceptor {
         SqlColor(String v) { this.v = v; }
     }
 
-    private static final Pattern PARAM_PATTERN = Pattern.compile("\\?");
     private static final SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     @Override
@@ -73,16 +71,27 @@ public class SqlLogInterceptor implements Interceptor {
 
         MetaObject meta = SystemMetaObject.forObject(paramObj);
         String sql = boundSql.getSql();
+        StringBuilder result = new StringBuilder();
+        int paramIndex = 0;
 
-        for (ParameterMapping mapping : pm) {
-            String property = mapping.getProperty();
-            Object value = boundSql.hasAdditionalParameter(property)
-                    ? boundSql.getAdditionalParameter(property)
-                    : meta.hasGetter(property) ? meta.getValue(property) : null;
+        // 使用String的indexOf和substring来处理，避免正则表达式的问题
+        for (int i = 0; i < sql.length(); i++) {
+            char c = sql.charAt(i);
+            if (c == '?' && paramIndex < pm.size()) {
+                ParameterMapping mapping = pm.get(paramIndex);
+                String property = mapping.getProperty();
+                Object value = boundSql.hasAdditionalParameter(property)
+                        ? boundSql.getAdditionalParameter(property)
+                        : meta.hasGetter(property) ? meta.getValue(property) : null;
 
-            sql = PARAM_PATTERN.matcher(sql).replaceFirst(formatValue(value));
+                result.append(formatValue(value));
+                paramIndex++;
+            } else {
+                result.append(c);
+            }
         }
-        return sql;
+
+        return result.toString();
     }
 
     /** 格式 SQL */

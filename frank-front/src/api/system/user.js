@@ -21,7 +21,7 @@ export function getUser(userId) {
 // 新增用户
 export function addUser(data) {
   return request({
-    url: '/sys-user',
+    url: '/sys-user/add',
     method: 'post',
     data: data
   })
@@ -30,8 +30,8 @@ export function addUser(data) {
 // 修改用户
 export function updateUser(data) {
   return request({
-    url: '/system/user',
-    method: 'put',
+    url: '/sys-user/update',
+    method: 'post',
     data: data
   })
 }
@@ -39,10 +39,13 @@ export function updateUser(data) {
 // 删除用户
 export function delUser(userId) {
   return request({
-    url: '/system/user/' + userId,
-    method: 'delete'
+    url: '/sys-user/delete',
+    method: 'post',
+    data: userId
   })
 }
+
+// todo:
 
 // 用户密码重置
 export function resetUserPwd(userId, password) {

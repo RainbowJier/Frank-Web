@@ -14,11 +14,14 @@ import org.frank.domain.entity.SysUser;
 import org.frank.domain.gateway.ISysUserGateway;
 import org.frank.shared.sysUser.req.SysUserAddReq;
 import org.frank.shared.sysUser.req.SysUserReq;
+import org.frank.shared.sysUser.req.SysUserUpdateReq;
 import org.frank.shared.sysUser.resp.SysUserResp;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 @Service
 public class SysUserServiceImpl implements SysUserService {
@@ -34,7 +37,7 @@ public class SysUserServiceImpl implements SysUserService {
                 .like(StringUtils.hasText(params.getUserName()), SysUser::getUserName, params.getUserName())
                 .like(StringUtils.hasText(params.getPhoneNumber()), SysUser::getPhoneNumber, params.getPhoneNumber());
 
-        if(params.getBeginTime() != null && params.getEndTime() != null){
+        if (params.getBeginTime() != null && params.getEndTime() != null) {
             wrapper.between(SysUser::getCreateTime, params.getBeginTime(), params.getEndTime());
         }
 
@@ -45,7 +48,7 @@ public class SysUserServiceImpl implements SysUserService {
     @Override
     public SysUserResp getById(Long userId) {
         SysUser sysUser = gateway.getById(userId);
-        if(ObjectUtils.isEmpty(sysUser)){
+        if (ObjectUtils.isEmpty(sysUser)) {
             return null;
         }
         return BeanUtil.copyProperties(sysUser, SysUserResp.class);
@@ -69,8 +72,56 @@ public class SysUserServiceImpl implements SysUserService {
         SysUser user = BeanUtil.copyProperties(req, SysUser.class);
         user.setPassword(BCryptUtils.hashPassword(req.getPassword()));
 
-        if(BooleanUtils.isFalse(gateway.save(user))){
-            throw new BusinessException("新增用户失败");
+        if (BooleanUtils.isFalse(gateway.save(user))) {
+            throw new BusinessException("Fail to add.");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateUser(SysUserUpdateReq req) {
+        SysUser existingUser = gateway.getById(req.getUserId());
+        if (ObjectUtils.isEmpty(existingUser)) {
+            throw new BusinessException("The user is not existed.");
+        }
+
+        // 校验手机号格式（如果提供了手机号）
+        if (StringUtils.hasText(req.getPhoneNumber())) {
+            if (!req.getPhoneNumber().matches("^1[3-9]\\d{9}$")) {
+                throw new BusinessException("format of phone number is incorrect.");
+            }
+            if (!req.getPhoneNumber().equals(existingUser.getPhoneNumber()) &&
+                !gateway.checkPhoneUniqueExcludeCurrent(req.getPhoneNumber(), req.getUserId())) {
+                throw new BusinessException("Phone number is already existed.");
+            }
+        }
+
+        // 校验邮箱格式（如果提供了邮箱）
+        if (StringUtils.hasText(req.getEmail())) {
+            if (!req.getEmail().matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+                throw new BusinessException("format of mail is incorrect");
+            }
+            if (!req.getEmail().equals(existingUser.getEmail()) &&
+                !gateway.checkEmailUniqueExcludeCurrent(req.getEmail(), req.getUserId())) {
+                throw new BusinessException("Mail is already existed.");
+            }
+        }
+
+        SysUser user = BeanUtil.copyProperties(req, SysUser.class);
+        // 确保不会覆盖自动填充的字段
+        user.setCreateBy(null);
+        user.setCreateTime(null);
+
+        if (BooleanUtils.isFalse(gateway.updateById(user))) {
+            throw new BusinessException("Fail to update user info.");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteByIds(List<Long> userIds) {
+        if (BooleanUtils.isFalse(gateway.removeByIds(userIds))) {
+            throw new BusinessException("Fail to delete users.");
         }
     }
 }
