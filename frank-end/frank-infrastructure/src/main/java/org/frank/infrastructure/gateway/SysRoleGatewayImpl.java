@@ -14,6 +14,11 @@ import java.util.List;
 public class SysRoleGatewayImpl extends ServiceImpl<SysRoleMapper, SysRole> implements ISysRoleGateway {
 
     @Resource
-    private SysRoleMapper sysRoleMapper;
+    private SysRoleMapper mapper;
 
+    @Override
+    public List<SysRole> selectListByIds(List<Long> roleIds) {
+        LambdaQueryWrapper<SysRole> queryWrapper = new LambdaQueryWrapper<>();
+        return mapper.selectList(queryWrapper.in(SysRole::getRoleId, roleIds));
+    }
 }

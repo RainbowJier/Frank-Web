@@ -16,11 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * 用户信息
- *
- * @author Frank
- */
 @RestController
 @RequestMapping("/sys-user")
 public class SysUserController extends BaseController {

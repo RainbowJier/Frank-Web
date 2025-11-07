@@ -112,9 +112,9 @@ export function uploadAvatar(data) {
 }
 
 // 查询授权角色
-export function getAuthRole(userId) {
+export function getAuthRoleList(userId) {
   return request({
-    url: '/system/user/authRole/' + userId,
+    url: '/sys-role/roleList/' + userId,
     method: 'get'
   })
 }
@@ -122,16 +122,8 @@ export function getAuthRole(userId) {
 // 保存授权角色
 export function updateAuthRole(data) {
   return request({
-    url: '/system/user/authRole',
+    url: '/sys-user/authRole',
     method: 'put',
     params: data
-  })
-}
-
-// 查询部门下拉树结构
-export function deptTreeSelect() {
-  return request({
-    url: '/system/user/deptTree',
-    method: 'get'
   })
 }

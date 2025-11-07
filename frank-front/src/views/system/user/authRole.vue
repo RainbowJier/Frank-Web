@@ -46,11 +46,12 @@
 </template>
 
 <script setup name="AuthRole">
-import { getAuthRole, updateAuthRole } from "@/api/system/user"
+import { getUser, updateAuthRole, getAuthRoleList } from "@/api/system/user"
 
 const route = useRoute()
 const { proxy } = getCurrentInstance()
 
+// 响应式数据
 const loading = ref(true)
 const total = ref(0)
 const pageNum = ref(1)
@@ -58,66 +59,82 @@ const pageSize = ref(10)
 const roleIds = ref([])
 const roles = ref([])
 const form = ref({
-  nickName: undefined,
-  userName: undefined,
-  userId: undefined
+  nickName: '',
+  userName: '',
+  userId: ''
 })
 
-/** 单击选中行数据 */
-function clickRow(row) {
+// 方法定义
+const clickRow = (row) => {
   if (checkSelectable(row)) {
-    proxy.$refs["roleRef"].toggleRowSelection(row)
+    proxy.$refs.roleRef.toggleRowSelection(row)
   }
 }
 
-/** 多选框选中数据 */
-function handleSelectionChange(selection) {
+const handleSelectionChange = (selection) => {
   roleIds.value = selection.map(item => item.roleId)
 }
 
-/** 保存选中的数据编号 */
-function getRowKey(row) {
-  return row.roleId
+const getRowKey = (row) => row.roleId
+
+const checkSelectable = (row) => row.status === "1"
+
+const close = () => {
+  proxy.$tab.closeOpenPage({ path: "/system/user" })
 }
 
-// 检查角色状态
-function checkSelectable(row) {
-  return row.status === "0" ? true : false
-}
-
-/** 关闭按钮 */
-function close() {
-  const obj = { path: "/system/user" }
-  proxy.$tab.closeOpenPage(obj)
-}
-
-/** 提交按钮 */
-function submitForm() {
-  const userId = form.value.userId
-  const rIds = roleIds.value.join(",")
-  updateAuthRole({ userId: userId, roleIds: rIds }).then(response => {
+const submitForm = async () => {
+  try {
+    await updateAuthRole({
+      userId: form.value.userId,
+      roleIds: roleIds.value.join(",")
+    })
     proxy.$modal.msgSuccess("授权成功")
     close()
-  })
+  } catch (error) {
+    console.error('授权失败:', error)
+  }
 }
 
-(() => {
-  const userId = route.params && route.params.userId
-  if (userId) {
-    loading.value = true
-    getAuthRole(userId).then(response => {
-      form.value = response.user
-      roles.value = response.roles
-      total.value = roles.value.length
-      nextTick(() => {
-        roles.value.forEach(row => {
-          if (row.flag) {
-            proxy.$refs["roleRef"].toggleRowSelection(row)
-          }
-        })
-      })
-      loading.value = false
+// 数据初始化
+const initData = async () => {
+  const userId = route.params?.userId
+  if (!userId) return
+
+  loading.value = true
+
+  try {
+    // 并行获取用户信息和角色列表
+    const [userResponse, roleResponse] = await Promise.all([
+      getUser(userId),
+      getAuthRoleList(userId)
+    ])
+
+    // 设置用户信息
+    form.value = userResponse.data
+
+    // 设置角色列表
+    roles.value = roleResponse.data
+    total.value = roles.value.length
+
+    // 设置已选中的角色
+    await nextTick()
+    const userRoleIds = form.value.roles?.map(role => role.roleId) || []
+    roles.value.forEach(row => {
+      if (userRoleIds.includes(row.roleId)) {
+        proxy.$refs.roleRef.toggleRowSelection(row)
+      }
     })
+  } catch (error) {
+    console.error('数据初始化失败:', error)
+    proxy.$modal.msgError('数据加载失败')
+  } finally {
+    loading.value = false
   }
-})()
+}
+
+// 页面加载时初始化数据
+onMounted(() => {
+  initData()
+})
 </script>
