@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,9 +30,6 @@ public class SysUserResp {
     @ApiModelProperty(value = "phone number")
     private String phoneNumber;
 
-    @ApiModelProperty(value = "password")
-    private String password;
-
     @ApiModelProperty(value = "1-able, 0-disable.")
     private Integer status;
 
@@ -39,4 +38,7 @@ public class SysUserResp {
 
     @ApiModelProperty(value = "address of avatar")
     private String avatar;
+
+    @ApiModelProperty(value = "create time")
+    private Date createTime;
 }

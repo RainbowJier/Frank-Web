@@ -1,9 +1,7 @@
 package org.frank.app.service;
 
 import org.frank.common.core.page.PageResult;
-import org.frank.shared.sysUser.req.SysUserReq;
-import org.frank.shared.sysUser.req.SysUserAddReq;
-import org.frank.shared.sysUser.req.SysUserUpdateReq;
+import org.frank.shared.sysUser.req.*;
 import org.frank.shared.sysUser.resp.SysUserResp;
 
 import java.util.List;
@@ -12,7 +10,7 @@ public interface SysUserService {
     /**
      * Get user list through pagination.
      */
-    PageResult selectUserList(SysUserReq req);
+    PageResult selectUserList(SysUserQueryReq req);
 
     /**
      * Get user info by ID
@@ -33,4 +31,14 @@ public interface SysUserService {
      * Delete users by IDs.
      */
     void deleteByIds(List<Long> userIds);
+
+    /**
+     * Reset user password.
+     */
+    void resetPassword(ResetPasswordReq req);
+
+    /**
+     * Change user status.
+     */
+    void changeStatus(ChangeStatusReq req);
 }
