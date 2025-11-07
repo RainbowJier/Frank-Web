@@ -52,7 +52,7 @@
         <el-table-column label="状态" align="center" key="status" v-if="columns.status.visible">
           <template #default="scope">
             <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0"
-              @click="(value) => handleStatusChange(scope.row, value)"></el-switch>
+              @change="(value) => handleStatusChange(scope.row, value)"></el-switch>
           </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns.createTime.visible" width="160">
@@ -157,25 +157,49 @@
 </template>
 
 <script setup name="User">
-import useAppStore from '@/store/modules/app'
-import { changeUserStatus, listUser, resetUserPwd, delUser, getUser, updateUser, addUser } from "@/api/system/user"
+// ==================== Vue相关导入 ====================
+import { ref, reactive, toRefs, getCurrentInstance, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
+// ==================== 状态管理导入 ====================
+import useAppStore from '@/store/modules/app'
+
+// ==================== API接口导入 ====================
+import {
+  changeUserStatus,
+  listUser,
+  resetUserPwd,
+  delUser,
+  getUser,
+  updateUser,
+  addUser
+} from "@/api/system/user"
+
+// ==================== 初始化 ====================
 const router = useRouter()
 const appStore = useAppStore()
 const { proxy } = getCurrentInstance()
 const { sys_normal_disable, sys_user_sex } = proxy.useDict("sys_normal_disable", "sys_user_sex")
 
-const userList = ref([])
-const open = ref(false)
+// ==================== 响应式状态 ====================
+
+// 页面状态
 const loading = ref(true)
+const open = ref(false)
 const showSearch = ref(true)
+const title = ref("")
+
+// 数据状态
+const userList = ref([])
+const total = ref(0)
+const dateRange = ref([])
 const ids = ref([])
+
+// 选中状态
 const single = ref(true)
 const multiple = ref(true)
-const total = ref(0)
-const title = ref("")
-const dateRange = ref([])
-// 列显隐信息
+
+// 表格列配置
 const columns = ref({
   userId: { label: '用户编号', visible: true },
   userName: { label: '用户名称', visible: true },
@@ -185,8 +209,11 @@ const columns = ref({
   createTime: { label: '创建时间', visible: true }
 })
 
+// 响应式数据对象
 const data = reactive({
+  // 表单数据
   form: {},
+  // 查询参数
   queryParams: {
     pageNum: 1,
     pageSize: 10,
@@ -194,17 +221,36 @@ const data = reactive({
     phonenumber: undefined,
     status: undefined
   },
+  // 表单验证规则
   rules: {
-    userName: [{ required: true, message: "用户名称不能为空", trigger: "blur" }, { min: 2, max: 20, message: "用户名称长度必须介于 2 和 20 之间", trigger: "blur" }],
-    nickName: [{ required: true, message: "用户昵称不能为空", trigger: "blur" }],
-    password: [{ required: true, message: "用户密码不能为空", trigger: "blur" }, { min: 5, max: 20, message: "用户密码长度必须介于 5 和 20 之间", trigger: "blur" }, { pattern: /^[^<>"'|\\]+$/, message: "不能包含非法字符：< > \" ' \\\ |", trigger: "blur" }],
-    email: [{ type: "email", message: "请输入正确的邮箱地址", trigger: ["blur", "change"] }],
-    phonenumber: [{ pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/, message: "请输入正确的手机号码", trigger: "blur" }]
+    userName: [
+      { required: true, message: "用户名称不能为空", trigger: "blur" },
+      { min: 2, max: 20, message: "用户名称长度必须介于 2 和 20 之间", trigger: "blur" }
+    ],
+    nickName: [
+      { required: true, message: "用户昵称不能为空", trigger: "blur" }
+    ],
+    password: [
+      { required: true, message: "用户密码不能为空", trigger: "blur" },
+      { min: 5, max: 20, message: "用户密码长度必须介于 5 和 20 之间", trigger: "blur" },
+      { pattern: /^[^<>"'|\\]+$/, message: "不能包含非法字符：< > \" ' \\\ |", trigger: "blur" }
+    ],
+    email: [
+      { type: "email", message: "请输入正确的邮箱地址", trigger: ["blur", "change"] }
+    ],
+    phonenumber: [
+      { pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/, message: "请输入正确的手机号码", trigger: "blur" }
+    ]
   }
 })
 
+// 解构响应式数据
 const { queryParams, form, rules } = toRefs(data)
 
+
+// ==================== 方法 ====================
+
+// ==================== 数据查询相关方法 ====================
 
 /** 查询用户列表 */
 function getList() {
@@ -215,7 +261,6 @@ function getList() {
     total.value = res.data.total
   })
 }
-
 
 /** 搜索按钮操作 */
 function handleQuery() {
@@ -230,19 +275,16 @@ function resetQuery() {
   handleQuery()
 }
 
-/** 删除按钮操作 */
-function handleDelete(row) {
-  const userIds = row.userId || ids.value
-  proxy.$modal.confirm('是否确认删除用户编号为"' + userIds + '"的数据项？').then(function () {
-    return delUser(userIds)
-  }).then(() => {
-    getList()
-    proxy.$modal.msgSuccess("删除成功")
-  }).catch(() => { })
+// ==================== 表格操作相关方法 ====================
+
+/** 表格选择变化处理 */
+function handleSelectionChange(selection) {
+  ids.value = selection.map(item => item.userId)
+  single.value = selection.length != 1
+  multiple.value = !selection.length
 }
 
-
-/** 用户状态修改  */
+/** 用户状态修改 */
 function handleStatusChange(row, value) {
   let text = value === 1 ? "启用" : "停用"
   proxy.$modal.confirm('确认要"' + text + '""' + row.userName + '"用户吗?').then(function () {
@@ -255,53 +297,19 @@ function handleStatusChange(row, value) {
   })
 }
 
-/** 更多操作 */
-function handleCommand(command, row) {
-  switch (command) {
-    case "handleResetPwd":
-      handleResetPwd(row)
-      break
-    case "handleAuthRole":
-      handleAuthRole(row)
-      break
-    default:
-      break
-  }
-}
-
-/** 跳转角色分配 */
-function handleAuthRole(row) {
-  const userId = row.userId
-  router.push("/system/user-auth/role/" + userId)
-}
-
-/** 重置密码按钮操作 */
-function handleResetPwd(row) {
-  proxy.$prompt('请输入"' + row.userName + '"的新密码', "提示", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-    closeOnClickModal: false,
-    inputPattern: /^.{5,20}$/,
-    inputErrorMessage: "用户密码长度必须介于 5 和 20 之间",
-    inputValidator: (value) => {
-      if (/<|>|"|'|\||\\/.test(value)) {
-        return "不能包含非法字符：< > \" ' \\\ |"
-      }
-    },
-  }).then(({ value }) => {
-    resetUserPwd(row.userId, value).then(response => {
-      proxy.$modal.msgSuccess("修改成功，新密码是：" + value)
-    })
+/** 删除按钮操作 */
+function handleDelete(row) {
+  const userIds = row.userId ? [row.userId] : ids.value
+  const userIdsStr = Array.isArray(userIds) ? userIds.join(', ') : userIds
+  proxy.$modal.confirm('是否确认删除用户编号为"' + userIdsStr + '"的数据项？').then(function () {
+    return delUser(userIds)
+  }).then(() => {
+    getList()
+    proxy.$modal.msgSuccess("删除成功")
   }).catch(() => { })
 }
 
-/** 选择条数  */
-function handleSelectionChange(selection) {
-  ids.value = selection.map(item => item.userId)
-  single.value = selection.length != 1
-  multiple.value = !selection.length
-}
-
+// ==================== 表单操作相关方法 ====================
 
 /** 重置操作表单 */
 function reset() {
@@ -349,13 +357,13 @@ function submitForm() {
   proxy.$refs["userRef"].validate(valid => {
     if (valid) {
       if (form.value.userId != undefined) {
-        updateUser(form.value).then(response => {
+        updateUser(form.value).then(() => {
           proxy.$modal.msgSuccess("修改成功")
           open.value = false
           getList()
         })
       } else {
-        addUser(form.value).then(response => {
+        addUser(form.value).then(() => {
           proxy.$modal.msgSuccess("新增成功")
           open.value = false
           getList()
@@ -365,6 +373,51 @@ function submitForm() {
   })
 }
 
+// ==================== 用户特定操作方法 ====================
+
+/** 重置密码按钮操作 */
+function handleResetPwd(row) {
+  proxy.$prompt('请输入"' + row.userName + '"的新密码', "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    closeOnClickModal: false,
+    inputPattern: /^.{5,20}$/,
+    inputErrorMessage: "用户密码长度必须介于 5 和 20 之间",
+    inputValidator: (value) => {
+      if (/<|>|"|'|\||\\/.test(value)) {
+        return "不能包含非法字符：< > \" ' \\\ |"
+      }
+    },
+  }).then(({ value }) => {
+    resetUserPwd(row.userId, value).then(() => {
+      proxy.$modal.msgSuccess("修改成功，新密码是：" + value)
+    })
+  }).catch(() => { })
+}
+
+/** 跳转角色分配 */
+function handleAuthRole(row) {
+  const userId = row.userId
+  router.push("/system/user-auth/role/" + userId)
+}
+
+/** 更多操作 */
+function handleCommand(command, row) {
+  switch (command) {
+    case "handleResetPwd":
+      handleResetPwd(row)
+      break
+    case "handleAuthRole":
+      handleAuthRole(row)
+      break
+    default:
+      break
+  }
+}
+
+// ==================== 生命周期钩子 ====================
+
+/** 组件挂载时初始化数据 */
 onMounted(() => {
   getList()
 })

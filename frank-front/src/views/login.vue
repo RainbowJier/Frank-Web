@@ -1,41 +1,105 @@
 <template>
   <div class="login">
-    <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="login-form">
-      <h3 class="title">{{ title }}</h3>
-      <el-form-item prop="username">
-        <el-input v-model="loginForm.username" type="text" size="large" auto-complete="off" placeholder="账号">
-          <template #prefix><svg-icon icon-class="user" class="el-input__icon input-icon" /></template>
-        </el-input>
-      </el-form-item>
-      <el-form-item prop="password">
-        <el-input v-model="loginForm.password" type="password" size="large" auto-complete="off" placeholder="密码"
-          @keyup.enter="handleLogin">
-          <template #prefix><svg-icon icon-class="password" class="el-input__icon input-icon" /></template>
-        </el-input>
-      </el-form-item>
-      <el-form-item prop="code" v-if="captchaEnabled">
-        <el-input v-model="loginForm.code" size="large" auto-complete="off" placeholder="验证码" style="width: 63%"
-          @keyup.enter="handleLogin">
-          <template #prefix><svg-icon icon-class="validCode" class="el-input__icon input-icon" /></template>
-        </el-input>
-        <div class="login-code">
-          <img :src="codeUrl" @click="getCode" class="login-code-img" />
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="logo">
+            <div class="logo-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <h1 class="title">{{ title }}</h1>
+          <p class="subtitle">Welcome back! Please sign in to your account</p>
         </div>
-      </el-form-item>
-      <!-- <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox> -->
-      <el-form-item style="width:100%;">
-        <el-button :loading="loading" size="large" type="primary" style="width:100%;" @click.prevent="handleLogin">
-          <span v-if="!loading">登 录</span>
-          <span v-else>登 录 中...</span>
-        </el-button>
-        <div style="float: right;" v-if="register">
-          <router-link class="link-type" :to="'/register'">立即注册</router-link>
-        </div>
-      </el-form-item>
-    </el-form>
-    <!--  底部  -->
-    <div class="el-login-footer">
-      <span>Copyright © 2018-2025 ruoyi.vip All Rights Reserved.</span>
+
+        <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="login-form">
+          <el-form-item prop="username">
+            <el-input
+              v-model="loginForm.username"
+              type="text"
+              size="large"
+              auto-complete="off"
+              placeholder="Username"
+              class="custom-input"
+            >
+              <template #prefix>
+                <svg-icon icon-class="user" class="input-icon" />
+              </template>
+            </el-input>
+          </el-form-item>
+
+          <el-form-item prop="password">
+            <el-input
+              v-model="loginForm.password"
+              type="password"
+              size="large"
+              auto-complete="off"
+              placeholder="Password"
+              class="custom-input"
+              @keyup.enter="handleLogin"
+              show-password
+            >
+              <template #prefix>
+                <svg-icon icon-class="password" class="input-icon" />
+              </template>
+            </el-input>
+          </el-form-item>
+
+          <el-form-item prop="code" v-if="captchaEnabled" class="captcha-item">
+            <div class="captcha-container">
+              <el-input
+                v-model="loginForm.code"
+                size="large"
+                auto-complete="off"
+                placeholder="Verification Code"
+                class="custom-input captcha-input"
+                @keyup.enter="handleLogin"
+              >
+                <template #prefix>
+                  <svg-icon icon-class="validCode" class="input-icon" />
+                </template>
+              </el-input>
+              <div class="captcha-image" @click="getCode">
+                <img v-if="codeUrl" :src="codeUrl" alt="Verification Code" />
+                <div v-else class="captcha-placeholder">
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 4H20V20H4V4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M9 9H15V15H9V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Click to refresh
+                </div>
+              </div>
+            </div>
+          </el-form-item>
+
+          <el-form-item class="button-item">
+            <el-button
+              :loading="loading"
+              size="large"
+              type="primary"
+              class="login-button"
+              @click.prevent="handleLogin"
+            >
+              <span v-if="!loading">Sign In</span>
+              <span v-else>Signing in...</span>
+            </el-button>
+
+            <div class="register-link" v-if="register">
+              <span>Don't have an account? </span>
+              <router-link :to="'/register'">Sign up</router-link>
+            </div>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
+
+  
+    <div class="copyright">
+      <span>© 2025 {{ title }}. All rights reserved.</span>
     </div>
   </div>
 </template>
@@ -145,74 +209,195 @@ function handleLogin() {
 
 <style lang='scss' scoped>
 .login {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  padding: 20px;
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
-  background-image: url("../assets/images/login-background.jpg");
-  background-size: cover;
+}
+
+.login-card {
+  background: white;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.logo {
+  margin-bottom: 20px;
+}
+
+.logo-icon {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 15px;
+  background: #3b82f6;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .title {
-  margin: 0px auto 30px auto;
-  text-align: center;
-  color: #707070;
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: #6b7280;
 }
 
 .login-form {
-  border-radius: 6px;
-  background: #ffffff;
-  width: 400px;
-  padding: 25px 25px 5px 25px;
-  z-index: 1;
+  .el-form-item {
+    margin-bottom: 24px;
+  }
 
-  .el-input {
-    height: 40px;
+  .custom-input {
+    :deep(.el-input__wrapper) {
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 12px 16px;
 
-    input {
-      height: 40px;
+      &.is-focus {
+        border-color: #3b82f6;
+      }
+    }
+
+    :deep(.el-input__inner) {
+      font-size: 14px;
+      &::placeholder {
+        color: #9ca3af;
+      }
     }
   }
 
   .input-icon {
-    height: 39px;
-    width: 14px;
-    margin-left: 0px;
+    color: #9ca3af;
+    margin-right: 8px;
+  }
+
+  .captcha-item {
+    .captcha-container {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .captcha-input {
+      flex: 1;
+    }
+
+    .captcha-image {
+      width: 100px;
+      height: 40px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      cursor: pointer;
+      overflow: hidden;
+
+      &:hover {
+        border-color: #3b82f6;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .captcha-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+        font-size: 12px;
+        height: 100%;
+      }
+    }
+  }
+
+  .button-item {
+    margin-top: 32px;
+    margin-bottom: 0;
+  }
+
+  .login-button {
+    width: 100%;
+    height: 44px;
+    border-radius: 6px;
+    background: #3b82f6;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+
+    &:hover {
+      background: #2563eb;
+    }
+
+    &.is-loading {
+      background: #2563eb;
+    }
+  }
+
+  .register-link {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #6b7280;
+
+    a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: 500;
+
+      &:hover {
+        color: #2563eb;
+      }
+    }
   }
 }
 
-.login-tip {
-  font-size: 13px;
+.copyright {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   text-align: center;
-  color: #bfbfbf;
-}
-
-.login-code {
-  width: 33%;
-  height: 40px;
-  float: right;
-
-  img {
-    cursor: pointer;
-    vertical-align: middle;
-  }
-}
-
-.el-login-footer {
-  height: 40px;
-  line-height: 40px;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  color: #fff;
-  font-family: Arial;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 12px;
-  letter-spacing: 1px;
 }
 
-.login-code-img {
-  height: 40px;
-  padding-left: 12px;
+@media (max-width: 480px) {
+  .login-card {
+    padding: 24px;
+  }
+
+  .captcha-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .captcha-image {
+    width: 100%;
+  }
 }
 </style>

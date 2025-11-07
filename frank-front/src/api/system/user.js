@@ -5,8 +5,8 @@ import { parseStrEmpty } from "@/utils/ruoyi";
 export function listUser(query) {
   return request({
     url: '/sys-user/list',
-    method: 'get',
-    params: query
+    method: 'post',
+    data: query
   })
 }
 
@@ -37,15 +37,13 @@ export function updateUser(data) {
 }
 
 // 删除用户
-export function delUser(userId) {
+export function delUser(userIds) {
   return request({
     url: '/sys-user/delete',
     method: 'post',
-    data: userId
+    data: userIds
   })
 }
-
-// todo:
 
 // 用户密码重置
 export function resetUserPwd(userId, password) {
@@ -54,8 +52,8 @@ export function resetUserPwd(userId, password) {
     password
   }
   return request({
-    url: '/system/user/resetPwd',
-    method: 'put',
+    url: '/sys-user/reset-password',
+    method: 'post',
     data: data
   })
 }
@@ -67,8 +65,8 @@ export function changeUserStatus(userId, status) {
     status
   }
   return request({
-    url: '/system/user/changeStatus',
-    method: 'put',
+    url: '/sys-user/change-status',
+    method: 'post',
     data: data
   })
 }

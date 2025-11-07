@@ -1,7 +1,7 @@
 {
-  "name": "cbf",
+  "name": "frank-web",
   "version": "3.9.0",
-  "description": "CBF管理系统",
+  "description": "Frank-Web",
   "author": "Frank",
   "license": "MIT",
   "type": "module",
