@@ -91,7 +91,7 @@ public class SysUserServiceImpl implements SysUserService {
                 throw new BusinessException("format of phone number is incorrect.");
             }
             if (!req.getPhoneNumber().equals(existingUser.getPhoneNumber()) &&
-                !gateway.checkPhoneUniqueExcludeCurrent(req.getPhoneNumber(), req.getUserId())) {
+                    !gateway.checkPhoneUniqueExcludeCurrent(req.getPhoneNumber(), req.getUserId())) {
                 throw new BusinessException("Phone number is already existed.");
             }
         }
@@ -102,16 +102,12 @@ public class SysUserServiceImpl implements SysUserService {
                 throw new BusinessException("format of mail is incorrect");
             }
             if (!req.getEmail().equals(existingUser.getEmail()) &&
-                !gateway.checkEmailUniqueExcludeCurrent(req.getEmail(), req.getUserId())) {
+                    !gateway.checkEmailUniqueExcludeCurrent(req.getEmail(), req.getUserId())) {
                 throw new BusinessException("Mail is already existed.");
             }
         }
 
         SysUser user = BeanUtil.copyProperties(req, SysUser.class);
-        // 确保不会覆盖自动填充的字段
-        user.setCreateBy(null);
-        user.setCreateTime(null);
-
         if (BooleanUtils.isFalse(gateway.updateById(user))) {
             throw new BusinessException("Fail to update user info.");
         }
