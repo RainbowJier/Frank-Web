@@ -52,7 +52,8 @@
         <el-table-column label="状态" align="center" key="status" v-if="columns.status.visible">
           <template #default="scope">
             <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0"
-              @change="(value) => handleStatusChange(scope.row, value)"></el-switch>
+              @click="handleStatusChange(scope.row)">
+            </el-switch>
           </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns.createTime.visible" width="160">
@@ -132,12 +133,12 @@
             <el-form-item label="状态">
               <el-radio-group v-model="form.status">
                 <el-radio v-for="dict in sys_normal_disable" :key="dict.value" :value="dict.value">{{ dict.label
-                  }}</el-radio>
+                }}</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
         </el-row>
-            <el-row>
+        <el-row>
           <el-col :span="24">
             <el-form-item label="备注">
               <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>
@@ -153,7 +154,7 @@
       </template>
     </el-dialog>
 
-    </div>
+  </div>
 </template>
 
 <script setup name="User">
@@ -285,15 +286,15 @@ function handleSelectionChange(selection) {
 }
 
 /** 用户状态修改 */
-function handleStatusChange(row, value) {
-  let text = value === 1 ? "启用" : "停用"
+function handleStatusChange(row) {
+  let text = row.status === 1 ? "启用" : "停用"
   proxy.$modal.confirm('确认要"' + text + '""' + row.userName + '"用户吗?').then(function () {
-    return changeUserStatus(row.userId, value)
+    return changeUserStatus(row.userId, row.status)
   }).then(() => {
     proxy.$modal.msgSuccess(text + "成功")
   }).catch(function () {
     // 恢复原状态 - 修复逻辑错误
-    row.status = value === 1 ? 0 : 1
+    row.status = row.status === 1 ? 0 : 1
   })
 }
 

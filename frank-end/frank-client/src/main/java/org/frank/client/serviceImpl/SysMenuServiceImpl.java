@@ -3,6 +3,10 @@ package org.frank.client.serviceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.core.lang.tree.TreeUtil;
+import cn.hutool.core.lang.tree.TreeNodeConfig;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +21,7 @@ import org.frank.shared.sysMenu.req.AddMenuReq;
 import org.frank.shared.sysMenu.req.MenuListReq;
 import org.frank.shared.sysMenu.req.UpdateMenuReq;
 import org.frank.shared.sysMenu.resp.SysMenuResp;
+import org.frank.shared.sysMenu.resp.SysMenuTreeResp;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,21 +41,20 @@ public class SysMenuServiceImpl implements SysMenuService {
 
     @Override
     public List<SysMenuResp> list(MenuListReq req) {
+        return getMenuList(req.getIsAdmin(), req.getRoleIds(), req);
+    }
+
+    private List<SysMenuResp> getMenuList(boolean isAdmin, List<Long> roleIds, MenuListReq req) {
         List<SysMenu> menuList;
-
-        if (req.getIsAdmin()) {
-            SysMenu query = BeanUtil.copyProperties(req, SysMenu.class);
-            menuList = gateway.selectList(query, null);
+        SysMenu query = BeanUtil.copyProperties(req, SysMenu.class);
+        if (BooleanUtil.isTrue(isAdmin)) {
+            menuList = gateway.selectList(query);
         } else {
-            menuList = getByRoleIds(req.getRoleIds());
+            menuList = getByRoleIds(roleIds);
         }
-
         return BeanUtil.copyToList(menuList, SysMenuResp.class);
     }
 
-    /**
-     * get menu list by role ids.
-     */
     private List<SysMenu> getByRoleIds(List<Long> roleIds) {
         if (CollUtil.isEmpty(roleIds)) {
             return Collections.emptyList();
@@ -120,5 +124,46 @@ public class SysMenuServiceImpl implements SysMenuService {
         if (!gateway.removeById(menuId)) {
             throw new BusinessException("Failed to delete menu.");
         }
+    }
+
+    @Override
+    public List<Tree<Long>> tree() {
+        List<SysMenu> menuList = gateway.list();
+        if(CollUtil.isEmpty(menuList)){
+            return null;
+        }
+        List<SysMenuTreeResp> menuTreeList = BeanUtil.copyToList(menuList, SysMenuTreeResp.class);
+
+        // config tree
+        TreeNodeConfig config = TreeNodeConfig.DEFAULT_CONFIG
+                .setIdKey("id")
+                .setParentIdKey("parentId")
+                .setChildrenKey("children")
+                .setWeightKey("orderNum");
+
+        return TreeUtil.build(menuTreeList, 0L, config, (menu, tree) -> {
+            tree.setId(menu.getMenuId());
+            tree.setParentId(menu.getParentId());
+            tree.setName(menu.getMenuName());
+            tree.setWeight(menu.getOrderNum());
+            tree.putExtra("children", menu.getChildren());
+        });
+    }
+
+
+    // todo:修复条件查询
+    private List<SysMenuResp> getMenuList(Boolean isAdmin, List<Long> roleIds,SysMenu query) {
+        List<SysMenu> menuList;
+        if (BooleanUtil.isTrue(isAdmin)) {
+            menuList = gateway.selectList(query);
+        } else {
+            menuList = getByRoleIds(roleIds);
+        }
+        return BeanUtil.copyToList(menuList, SysMenuResp.class);
+    }
+
+    @Override
+    public List<Tree<Long>> roleTree() {
+        return List.of();
     }
 }

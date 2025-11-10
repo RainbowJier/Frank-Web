@@ -17,7 +17,7 @@ public interface ISysMenuGateway extends IService<SysMenu> {
     /**
      * get menu list by conditions.
      */
-    List<SysMenu> selectList(SysMenu query, List<String> menuTypeList);
+    List<SysMenu> selectList(SysMenu query);
 
     /**
      * check menu name unique.

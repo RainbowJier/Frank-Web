@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BaseReq {
-
     @ApiModelProperty(value = "user id")
     private Long userId;
 

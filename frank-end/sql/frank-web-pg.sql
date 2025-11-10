@@ -13,12 +13,12 @@ create table sys_user
     sex          int          default null,
     avatar       varchar(100) default '',
     password     varchar(100) default '',
-    status      int          default 1,
+    status       int          default 1,
     del_flag     int          default 1,
-    create_by           bigint  default null,
-    create_time         timestamp    default now(),
-    update_by           bigint  default null,
-    update_time         timestamp,
+    create_by    bigint       default null,
+    create_time  timestamp    default now(),
+    update_by    bigint       default null,
+    update_time  timestamp,
     remark       varchar(500) default null,
     primary key (user_id)
 );
@@ -46,12 +46,12 @@ comment on column sys_user.remark is '备注';
 -- ----------------------------
 insert into sys_user
 (user_id, user_name, nick_name, email, sex, password, create_time, update_time) overriding system value
-values (1, 'admin', 'administrator', 'frank@163.com',1,
+values (1, 'admin', 'administrator', 'frank@163.com', 1,
         '$2a$12$HgMqFBFOt1rys5iMT8ShN.1/I6woV2jgaWV3DWcM5ffDzGiyZNsIa', now(), now());
 
 insert into sys_user
-(user_id, user_name, nick_name, email, sex, password, create_time, update_time)  overriding system value
-values (2, 'frank', 'administrator',  'frank@163.com',1,
+(user_id, user_name, nick_name, email, sex, password, create_time, update_time) overriding system value
+values (2, 'frank', 'administrator', 'frank@163.com', 1,
         '$2a$12$FBdoXmm5xEi8ega0IPoYJO/gXb5BVeNo1xgUkGPt4C8oPGUnxuuFy', now(), now());
 
 
@@ -62,14 +62,14 @@ values (2, 'frank', 'administrator',  'frank@163.com',1,
 drop table if exists sys_user_rel_role;
 create table sys_user_rel_role
 (
-    user_id bigint not null,
-    role_id bigint not null,
-    del_flag int default 1,
-    create_by           bigint  default null,
-    create_time         timestamp    default now(),
-    update_by           bigint  default null,
-    update_time         timestamp,
-    remark       varchar(500) default null,
+    user_id     bigint not null,
+    role_id     bigint not null,
+    del_flag    int          default 1,
+    create_by   bigint       default null,
+    create_time timestamp    default now(),
+    update_by   bigint       default null,
+    update_time timestamp,
+    remark      varchar(500) default null,
     primary key (user_id, role_id)
 );
 
@@ -104,13 +104,12 @@ create table sys_role
     role_name           varchar(30)  not null,
     role_key            varchar(100) not null,
     role_sort           integer      not null,
-    data_scope          char(1)      default '1',
     menu_check_strictly smallint     default 1,
-    dept_check_strictly smallint     default 1,
+    status              int          default 1,
     del_flag            int          default 1,
-    create_by           bigint  default null,
+    create_by           bigint       default null,
     create_time         timestamp    default now(),
-    update_by           bigint  default null,
+    update_by           bigint       default null,
     update_time         timestamp,
     remark              varchar(500) default null
 );
@@ -120,9 +119,8 @@ comment on column sys_role.role_id is '角色ID';
 comment on column sys_role.role_name is '角色名称';
 comment on column sys_role.role_key is '角色权限字符串';
 comment on column sys_role.role_sort is '显示顺序';
-comment on column sys_role.data_scope is '数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）';
 comment on column sys_role.menu_check_strictly is '菜单树选择项是否关联显示';
-comment on column sys_role.dept_check_strictly is '部门树选择项是否关联显示';
+comment on column sys_role.status is '角色状态（1正常 0停用）';
 comment on column sys_role.del_flag is '删除标志（1-存在 0-删除）';
 comment on column sys_role.create_by is '创建者';
 comment on column sys_role.create_time is '创建时间';
@@ -132,11 +130,11 @@ comment on column sys_role.remark is '备注';
 
 -- 初始化-角色信息表数据
 insert into sys_role
-(role_name, role_key, role_sort, data_scope, menu_check_strictly, dept_check_strictly,create_time, update_time, remark)
-values ('超级管理员', 'admin', 1, '1', 1, 1, now(), now(), '超级管理员');
+    (role_name, role_key, role_sort, update_time, remark)
+values ('超级管理员', 'admin', 1, now(), '超级管理员');
 insert into sys_role
-(role_name, role_key, role_sort, data_scope, menu_check_strictly, dept_check_strictly,create_time, update_time, remark)
-values ('普通角色', 'common', 2, '2', 1, 1, now(), now(),  '普通角色');
+    (role_name, role_key, role_sort, update_time, remark)
+values ('普通角色', 'common', 2, now(), '普通角色');
 
 
 
@@ -146,14 +144,14 @@ values ('普通角色', 'common', 2, '2', 1, 1, now(), now(),  '普通角色');
 drop table if exists sys_role_rel_menu;
 create table sys_role_rel_menu
 (
-    role_id bigint not null,
-    menu_id bigint not null,
-    del_flag int          default 1,
-    create_by           bigint  default null,
-    create_time         timestamp    default now(),
-    update_by           bigint  default null,
-    update_time         timestamp,
-    remark       varchar(500) default null,
+    role_id     bigint not null,
+    menu_id     bigint not null,
+    del_flag    int          default 1,
+    create_by   bigint       default null,
+    create_time timestamp    default now(),
+    update_by   bigint       default null,
+    update_time timestamp,
+    remark      varchar(500) default null,
     primary key (role_id, menu_id)
 );
 
@@ -277,9 +275,9 @@ create table sys_menu
     status      int          default 1,
     perms       varchar(100) default null,
     icon        varchar(100) default '#',
-    create_by   bigint  default null,
+    create_by   bigint       default null,
     create_time timestamp    default now(),
-    update_by   bigint  default null,
+    update_by   bigint       default null,
     update_time timestamp,
     remark      varchar(500) default '',
     del_flag    int          default 1
@@ -313,92 +311,108 @@ comment on column sys_menu.del_flag is '删除标志（1-存在 0-删除）';
 -- ----------------------------
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, query, route_name, is_frame,
                       is_cache, menu_type, visible, perms, icon, create_time, update_time, remark)
-VALUES
-    (1, '系统管理', 0, 1, 'system', null, '', '', 0, 1, 'M', 1, '', 'system', now(), now(), '系统管理目录'),
-    (2, '系统监控', 0, 2, 'monitor', null, '', '', 0, 1, 'M', 1, '', 'monitor', now(), now(), '系统监控目录'),
-    (3, '系统工具', 0, 3, 'tool', null, '', '', 0, 1, 'M', 1, '', 'tool', now(), now(), '系统工具目录'),
-    (4, '若依官网', 0, 4, 'http://ruoyi.vip', null, '', '', 1, 1, 'M', 1, '', 'guide', now(), now(), '若依官网地址'),
-    (100, '用户管理', 1, 1, 'user', 'system/user/index', '', '', 0, 1, 'C', 1, 'system:user:list', 'user', now(), now(), '用户管理菜单'),
-    (101, '角色管理', 1, 2, 'role', 'system/role/index', '', '', 0, 1, 'C', 1, 'system:role:list', 'peoples', now(), now(), '角色管理菜单'),
-    (102, '菜单管理', 1, 3, 'menu', 'system/menu/index', '', '', 0, 1, 'C', 1, 'system:menu:list', 'tree-table', now(), now(), '菜单管理菜单'),
-    (103, '部门管理', 1, 4, 'dept', 'system/dept/index', '', '', 0, 1, 'C', 1, 'system:dept:list', 'tree', now(), now(), '部门管理菜单'),
-    (104, '岗位管理', 1, 5, 'post', 'system/post/index', '', '', 0, 1, 'C', 1, 'system:post:list', 'post', now(), now(), '岗位管理菜单'),
-    (105, '字典管理', 1, 6, 'dict', 'system/dict/index', '', '', 0, 1, 'C', 1, 'system:dict:list', 'dict', now(), now(), '字典管理菜单'),
-    (106, '参数设置', 1, 7, 'config', 'system/config/index', '', '', 0, 1, 'C', 1, 'system:config:list', 'edit', now(), now(), '参数设置菜单'),
-    (107, '通知公告', 1, 8, 'notice', 'system/notice/index', '', '', 0, 1, 'C', 1, 'system:notice:list', 'message', now(), now(), '通知公告菜单'),
-    (108, '日志管理', 1, 9, 'log', '', '', '', 0, 1, 'M', 1, '', 'log', now(), now(), '日志管理菜单'),
-    (109, '在线用户', 2, 1, 'online', 'monitor/online/index', '', '', 0, 1, 'C', 1, 'monitor:online:list', 'online', now(), now(), '在线用户菜单'),
-    (110, '定时任务', 2, 2, 'job', 'monitor/job/index', '', '', 0, 1, 'C', 1, 'monitor:job:list', 'job', now(), now(), '定时任务菜单'),
-    (111, '数据监控', 2, 3, 'druid', 'monitor/druid/index', '', '', 0, 1, 'C', 1, 'monitor:druid:list', 'druid', now(), now(), '数据监控菜单'),
-    (112, '服务监控', 2, 4, 'server', 'monitor/server/index', '', '', 0, 1, 'C', 1, 'monitor:server:list', 'server', now(), now(), '服务监控菜单'),
-    (113, '缓存监控', 2, 5, 'cache', 'monitor/cache/index', '', '', 0, 1, 'C', 1, 'monitor:cache:list', 'redis', now(), now(), '缓存监控菜单'),
-    (114, '缓存列表', 2, 6, 'cacheList', 'monitor/cache/list', '', '', 0, 1, 'C', 1, 'monitor:cache:list', 'redis-list', now(), now(), '缓存列表菜单'),
-    (115, '表单构建', 3, 1, 'build', 'tool/build/index', '', '', 0, 1, 'C', 1, 'tool:build:list', 'build', now(), now(), '表单构建菜单'),
-    (116, '代码生成', 3, 2, 'gen', 'tool/gen/index', '', '', 0, 1, 'C', 1, 'tool:gen:list', 'code', now(), now(), '代码生成菜单'),
-    (500, '操作日志', 108, 1, 'operlog', 'monitor/operlog/index', '', '', 0, 1, 'C', 1, 'monitor:operlog:list', 'form', now(), now(), '操作日志菜单'),
-    (501, '登录日志', 108, 2, 'logininfor', 'monitor/logininfor/index', '', '', 0, 1, 'C', 1, 'monitor:logininfor:list', 'logininfor', now(), now(), '登录日志菜单'),
-    (1000, '用户查询', 100, 1, '', '', '', '', 0, 1, 'F', 1, 'system:user:query', '#', now(), now(), ''),
-    (1001, '用户新增', 100, 2, '', '', '', '', 0, 1, 'F', 1, 'system:user:add', '#', now(), now(), ''),
-    (1002, '用户修改', 100, 3, '', '', '', '', 0, 1, 'F', 1, 'system:user:edit', '#', now(), now(), ''),
-    (1003, '用户删除', 100, 4, '', '', '', '', 0, 1, 'F', 1, 'system:user:remove', '#', now(), now(), ''),
-    (1004, '用户导出', 100, 5, '', '', '', '', 0, 1, 'F', 1, 'system:user:export', '#', now(), now(), ''),
-    (1005, '用户导入', 100, 6, '', '', '', '', 0, 1, 'F', 1, 'system:user:import', '#', now(), now(), ''),
-    (1006, '重置密码', 100, 7, '', '', '', '', 0, 1, 'F', 1, 'system:user:resetPwd', '#', now(), now(), ''),
-    (1007, '角色查询', 101, 1, '', '', '', '', 0, 1, 'F', 1, 'system:role:query', '#', now(), now(), ''),
-    (1008, '角色新增', 101, 2, '', '', '', '', 0, 1, 'F', 1, 'system:role:add', '#', now(), now(), ''),
-    (1009, '角色修改', 101, 3, '', '', '', '', 0, 1, 'F', 1, 'system:role:edit', '#', now(), now(), ''),
-    (1010, '角色删除', 101, 4, '', '', '', '', 0, 1, 'F', 1, 'system:role:remove', '#', now(), now(), ''),
-    (1011, '角色导出', 101, 5, '', '', '', '', 0, 1, 'F', 1, 'system:role:export', '#', now(), now(), ''),
-    (1012, '菜单查询', 102, 1, '', '', '', '', 0, 1, 'F', 1, 'system:menu:query', '#', now(), now(), ''),
-    (1013, '菜单新增', 102, 2, '', '', '', '', 0, 1, 'F', 1, 'system:menu:add', '#', now(), now(), ''),
-    (1014, '菜单修改', 102, 3, '', '', '', '', 0, 1, 'F', 1, 'system:menu:edit', '#', now(), now(), ''),
-    (1015, '菜单删除', 102, 4, '', '', '', '', 0, 1, 'F', 1, 'system:menu:remove', '#', now(), now(), ''),
-    (1016, '部门查询', 103, 1, '', '', '', '', 0, 1, 'F', 1, 'system:dept:query', '#', now(), now(), ''),
-    (1017, '部门新增', 103, 2, '', '', '', '', 0, 1, 'F', 1, 'system:dept:add', '#', now(), now(), ''),
-    (1018, '部门修改', 103, 3, '', '', '', '', 0, 1, 'F', 1, 'system:dept:edit', '#', now(), now(), ''),
-    (1019, '部门删除', 103, 4, '', '', '', '', 0, 1, 'F', 1, 'system:dept:remove', '#', now(), now(), ''),
-    (1020, '岗位查询', 104, 1, '', '', '', '', 0, 1, 'F', 1, 'system:post:query', '#', now(), now(), ''),
-    (1021, '岗位新增', 104, 2, '', '', '', '', 0, 1, 'F', 1, 'system:post:add', '#', now(), now(), ''),
-    (1022, '岗位修改', 104, 3, '', '', '', '', 0, 1, 'F', 1, 'system:post:edit', '#', now(), now(), ''),
-    (1023, '岗位删除', 104, 4, '', '', '', '', 0, 1, 'F', 1, 'system:post:remove', '#', now(), now(), ''),
-    (1024, '岗位导出', 104, 5, '', '', '', '', 0, 1, 'F', 1, 'system:post:export', '#', now(), now(), ''),
-    (1025, '字典查询', 105, 1, '#', '', '', '', 0, 1, 'F', 1, 'system:dict:query', '#', now(), now(), ''),
-    (1026, '字典新增', 105, 2, '#', '', '', '', 0, 1, 'F', 1, 'system:dict:add', '#', now(), now(), ''),
-    (1027, '字典修改', 105, 3, '#', '', '', '', 0, 1, 'F', 1, 'system:dict:edit', '#', now(), now(), ''),
-    (1028, '字典删除', 105, 4, '#', '', '', '', 0, 1, 'F', 1, 'system:dict:remove', '#', now(), now(), ''),
-    (1029, '字典导出', 105, 5, '#', '', '', '', 0, 1, 'F', 1, 'system:dict:export', '#', now(), now(), ''),
-    (1030, '参数查询', 106, 1, '#', '', '', '', 0, 1, 'F', 1, 'system:config:query', '#', now(), now(), ''),
-    (1031, '参数新增', 106, 2, '#', '', '', '', 0, 1, 'F', 1, 'system:config:add', '#', now(), now(), ''),
-    (1032, '参数修改', 106, 3, '#', '', '', '', 0, 1, 'F', 1, 'system:config:edit', '#', now(), now(), ''),
-    (1033, '参数删除', 106, 4, '#', '', '', '', 0, 1, 'F', 1, 'system:config:remove', '#', now(), now(), ''),
-    (1034, '参数导出', 106, 5, '#', '', '', '', 0, 1, 'F', 1, 'system:config:export', '#', now(), now(), ''),
-    (1035, '公告查询', 107, 1, '#', '', '', '', 0, 1, 'F', 1, 'system:notice:query', '#', now(), now(), ''),
-    (1036, '公告新增', 107, 2, '#', '', '', '', 0, 1, 'F', 1, 'system:notice:add', '#', now(), now(), ''),
-    (1037, '公告修改', 107, 3, '#', '', '', '', 0, 1, 'F', 1, 'system:notice:edit', '#', now(), now(), ''),
-    (1038, '公告删除', 107, 4, '#', '', '', '', 0, 1, 'F', 1, 'system:notice:remove', '#', now(), now(), ''),
-    (1039, '操作查询', 500, 1, '#', '', '', '', 0, 1, 'F', 1, 'monitor:operlog:query', '#', now(), now(), ''),
-    (1040, '操作删除', 500, 2, '#', '', '', '', 0, 1, 'F', 1, 'monitor:operlog:remove', '#', now(), now(), ''),
-    (1041, '日志导出', 500, 3, '#', '', '', '', 0, 1, 'F', 1, 'monitor:operlog:export', '#', now(), now(), ''),
-    (1042, '登录查询', 501, 1, '#', '', '', '', 0, 1, 'F', 1, 'monitor:logininfor:query', '#', now(), now(), ''),
-    (1043, '登录删除', 501, 2, '#', '', '', '', 0, 1, 'F', 1, 'monitor:logininfor:remove', '#', now(), now(), ''),
-    (1044, '日志导出', 501, 3, '#', '', '', '', 0, 1, 'F', 1, 'monitor:logininfor:export', '#', now(), now(), ''),
-    (1045, '账户解锁', 501, 4, '#', '', '', '', 0, 1, 'F', 1, 'monitor:logininfor:unlock', '#', now(), now(), ''),
-    (1046, '在线查询', 109, 1, '#', '', '', '', 0, 1, 'F', 1, 'monitor:online:query', '#', now(), now(), ''),
-    (1047, '批量强退', 109, 2, '#', '', '', '', 0, 1, 'F', 1, 'monitor:online:batchLogout', '#', now(), now(), ''),
-    (1048, '单条强退', 109, 3, '#', '', '', '', 0, 1, 'F', 1, 'monitor:online:forceLogout', '#', now(), now(), ''),
-    (1049, '任务查询', 110, 1, '#', '', '', '', 0, 1, 'F', 1, 'monitor:job:query', '#', now(), now(), ''),
-    (1050, '任务新增', 110, 2, '#', '', '', '', 0, 1, 'F', 1, 'monitor:job:add', '#', now(), now(), ''),
-    (1051, '任务修改', 110, 3, '#', '', '', '', 0, 1, 'F', 1, 'monitor:job:edit', '#', now(), now(), ''),
-    (1052, '任务删除', 110, 4, '#', '', '', '', 0, 1, 'F', 1, 'monitor:job:remove', '#', now(), now(), ''),
-    (1053, '状态修改', 110, 5, '#', '', '', '', 0, 1, 'F', 1, 'monitor:job:changeStatus', '#', now(), now(), ''),
-    (1054, '任务导出', 110, 6, '#', '', '', '', 0, 1, 'F', 1, 'monitor:job:export', '#', now(), now(), ''),
-    (1055, '生成查询', 116, 1, '#', '', '', '', 0, 1, 'F', 1, 'tool:gen:query', '#', now(), now(), ''),
-    (1056, '生成修改', 116, 2, '#', '', '', '', 0, 1, 'F', 1, 'tool:gen:edit', '#', now(), now(), ''),
-    (1057, '生成删除', 116, 3, '#', '', '', '', 0, 1, 'F', 1, 'tool:gen:remove', '#', now(), now(), ''),
-    (1058, '导入代码', 116, 4, '#', '', '', '', 0, 1, 'F', 1, 'tool:gen:import', '#', now(), now(), ''),
-    (1059, '预览代码', 116, 5, '#', '', '', '', 0, 1, 'F', 1, 'tool:gen:preview', '#', now(), now(), ''),
-    (1060, '生成代码', 116, 6, '#', '', '', '', 0, 1, 'F', 1, 'tool:gen:code', '#', now(), now(), '');
-
+VALUES (1, '系统管理', 0, 1, 'system', null, '', '', 0, 1, 'M', 1, '', 'system', now(), now(), '系统管理目录'),
+       (2, '系统监控', 0, 2, 'monitor', null, '', '', 0, 1, 'M', 1, '', 'monitor', now(), now(), '系统监控目录'),
+       (3, '系统工具', 0, 3, 'tool', null, '', '', 0, 1, 'M', 1, '', 'tool', now(), now(), '系统工具目录'),
+       (4, '若依官网', 0, 4, 'http://ruoyi.vip', null, '', '', 1, 1, 'M', 1, '', 'guide', now(), now(), '若依官网地址'),
+       (100, '用户管理', 1, 1, 'user', 'system/user/index', '', '', 0, 1, 'C', 1, 'system:user:list', 'user', now(),
+        now(), '用户管理菜单'),
+       (101, '角色管理', 1, 2, 'role', 'system/role/index', '', '', 0, 1, 'C', 1, 'system:role:list', 'peoples', now(),
+        now(), '角色管理菜单'),
+       (102, '菜单管理', 1, 3, 'menu', 'system/menu/index', '', '', 0, 1, 'C', 1, 'system:menu:list', 'tree-table',
+        now(), now(), '菜单管理菜单'),
+       (103, '部门管理', 1, 4, 'dept', 'system/dept/index', '', '', 0, 1, 'C', 1, 'system:dept:list', 'tree', now(),
+        now(), '部门管理菜单'),
+       (104, '岗位管理', 1, 5, 'post', 'system/post/index', '', '', 0, 1, 'C', 1, 'system:post:list', 'post', now(),
+        now(), '岗位管理菜单'),
+       (105, '字典管理', 1, 6, 'dict', 'system/dict/index', '', '', 0, 1, 'C', 1, 'system:dict:list', 'dict', now(),
+        now(), '字典管理菜单'),
+       (106, '参数设置', 1, 7, 'config', 'system/config/index', '', '', 0, 1, 'C', 1, 'system:config:list', 'edit',
+        now(), now(), '参数设置菜单'),
+       (107, '通知公告', 1, 8, 'notice', 'system/notice/index', '', '', 0, 1, 'C', 1, 'system:notice:list', 'message',
+        now(), now(), '通知公告菜单'),
+       (108, '日志管理', 1, 9, 'log', '', '', '', 0, 1, 'M', 1, '', 'log', now(), now(), '日志管理菜单'),
+       (109, '在线用户', 2, 1, 'online', 'monitor/online/index', '', '', 0, 1, 'C', 1, 'monitor:online:list', 'online',
+        now(), now(), '在线用户菜单'),
+       (110, '定时任务', 2, 2, 'job', 'monitor/job/index', '', '', 0, 1, 'C', 1, 'monitor:job:list', 'job', now(),
+        now(), '定时任务菜单'),
+       (111, '数据监控', 2, 3, 'druid', 'monitor/druid/index', '', '', 0, 1, 'C', 1, 'monitor:druid:list', 'druid',
+        now(), now(), '数据监控菜单'),
+       (112, '服务监控', 2, 4, 'server', 'monitor/server/index', '', '', 0, 1, 'C', 1, 'monitor:server:list', 'server',
+        now(), now(), '服务监控菜单'),
+       (113, '缓存监控', 2, 5, 'cache', 'monitor/cache/index', '', '', 0, 1, 'C', 1, 'monitor:cache:list', 'redis',
+        now(), now(), '缓存监控菜单'),
+       (114, '缓存列表', 2, 6, 'cacheList', 'monitor/cache/list', '', '', 0, 1, 'C', 1, 'monitor:cache:list',
+        'redis-list', now(), now(), '缓存列表菜单'),
+       (115, '表单构建', 3, 1, 'build', 'tool/build/index', '', '', 0, 1, 'C', 1, 'tool:build:list', 'build', now(),
+        now(), '表单构建菜单'),
+       (116, '代码生成', 3, 2, 'gen', 'tool/gen/index', '', '', 0, 1, 'C', 1, 'tool:gen:list', 'code', now(), now(),
+        '代码生成菜单'),
+       (500, '操作日志', 108, 1, 'operlog', 'monitor/operlog/index', '', '', 0, 1, 'C', 1, 'monitor:operlog:list',
+        'form', now(), now(), '操作日志菜单'),
+       (501, '登录日志', 108, 2, 'logininfor', 'monitor/logininfor/index', '', '', 0, 1, 'C', 1,
+        'monitor:logininfor:list', 'logininfor', now(), now(), '登录日志菜单'),
+       (1000, '用户查询', 100, 1, '', '', '', '', 0, 1, 'F', 1, 'system:user:query', '#', now(), now(), ''),
+       (1001, '用户新增', 100, 2, '', '', '', '', 0, 1, 'F', 1, 'system:user:add', '#', now(), now(), ''),
+       (1002, '用户修改', 100, 3, '', '', '', '', 0, 1, 'F', 1, 'system:user:edit', '#', now(), now(), ''),
+       (1003, '用户删除', 100, 4, '', '', '', '', 0, 1, 'F', 1, 'system:user:remove', '#', now(), now(), ''),
+       (1004, '用户导出', 100, 5, '', '', '', '', 0, 1, 'F', 1, 'system:user:export', '#', now(), now(), ''),
+       (1005, '用户导入', 100, 6, '', '', '', '', 0, 1, 'F', 1, 'system:user:import', '#', now(), now(), ''),
+       (1006, '重置密码', 100, 7, '', '', '', '', 0, 1, 'F', 1, 'system:user:resetPwd', '#', now(), now(), ''),
+       (1007, '角色查询', 101, 1, '', '', '', '', 0, 1, 'F', 1, 'system:role:query', '#', now(), now(), ''),
+       (1008, '角色新增', 101, 2, '', '', '', '', 0, 1, 'F', 1, 'system:role:add', '#', now(), now(), ''),
+       (1009, '角色修改', 101, 3, '', '', '', '', 0, 1, 'F', 1, 'system:role:edit', '#', now(), now(), ''),
+       (1010, '角色删除', 101, 4, '', '', '', '', 0, 1, 'F', 1, 'system:role:remove', '#', now(), now(), ''),
+       (1011, '角色导出', 101, 5, '', '', '', '', 0, 1, 'F', 1, 'system:role:export', '#', now(), now(), ''),
+       (1012, '菜单查询', 102, 1, '', '', '', '', 0, 1, 'F', 1, 'system:menu:query', '#', now(), now(), ''),
+       (1013, '菜单新增', 102, 2, '', '', '', '', 0, 1, 'F', 1, 'system:menu:add', '#', now(), now(), ''),
+       (1014, '菜单修改', 102, 3, '', '', '', '', 0, 1, 'F', 1, 'system:menu:edit', '#', now(), now(), ''),
+       (1015, '菜单删除', 102, 4, '', '', '', '', 0, 1, 'F', 1, 'system:menu:remove', '#', now(), now(), ''),
+       (1016, '部门查询', 103, 1, '', '', '', '', 0, 1, 'F', 1, 'system:dept:query', '#', now(), now(), ''),
+       (1017, '部门新增', 103, 2, '', '', '', '', 0, 1, 'F', 1, 'system:dept:add', '#', now(), now(), ''),
+       (1018, '部门修改', 103, 3, '', '', '', '', 0, 1, 'F', 1, 'system:dept:edit', '#', now(), now(), ''),
+       (1019, '部门删除', 103, 4, '', '', '', '', 0, 1, 'F', 1, 'system:dept:remove', '#', now(), now(), ''),
+       (1020, '岗位查询', 104, 1, '', '', '', '', 0, 1, 'F', 1, 'system:post:query', '#', now(), now(), ''),
+       (1021, '岗位新增', 104, 2, '', '', '', '', 0, 1, 'F', 1, 'system:post:add', '#', now(), now(), ''),
+       (1022, '岗位修改', 104, 3, '', '', '', '', 0, 1, 'F', 1, 'system:post:edit', '#', now(), now(), ''),
+       (1023, '岗位删除', 104, 4, '', '', '', '', 0, 1, 'F', 1, 'system:post:remove', '#', now(), now(), ''),
+       (1024, '岗位导出', 104, 5, '', '', '', '', 0, 1, 'F', 1, 'system:post:export', '#', now(), now(), ''),
+       (1025, '字典查询', 105, 1, '#', '', '', '', 0, 1, 'F', 1, 'system:dict:query', '#', now(), now(), ''),
+       (1026, '字典新增', 105, 2, '#', '', '', '', 0, 1, 'F', 1, 'system:dict:add', '#', now(), now(), ''),
+       (1027, '字典修改', 105, 3, '#', '', '', '', 0, 1, 'F', 1, 'system:dict:edit', '#', now(), now(), ''),
+       (1028, '字典删除', 105, 4, '#', '', '', '', 0, 1, 'F', 1, 'system:dict:remove', '#', now(), now(), ''),
+       (1029, '字典导出', 105, 5, '#', '', '', '', 0, 1, 'F', 1, 'system:dict:export', '#', now(), now(), ''),
+       (1030, '参数查询', 106, 1, '#', '', '', '', 0, 1, 'F', 1, 'system:config:query', '#', now(), now(), ''),
+       (1031, '参数新增', 106, 2, '#', '', '', '', 0, 1, 'F', 1, 'system:config:add', '#', now(), now(), ''),
+       (1032, '参数修改', 106, 3, '#', '', '', '', 0, 1, 'F', 1, 'system:config:edit', '#', now(), now(), ''),
+       (1033, '参数删除', 106, 4, '#', '', '', '', 0, 1, 'F', 1, 'system:config:remove', '#', now(), now(), ''),
+       (1034, '参数导出', 106, 5, '#', '', '', '', 0, 1, 'F', 1, 'system:config:export', '#', now(), now(), ''),
+       (1035, '公告查询', 107, 1, '#', '', '', '', 0, 1, 'F', 1, 'system:notice:query', '#', now(), now(), ''),
+       (1036, '公告新增', 107, 2, '#', '', '', '', 0, 1, 'F', 1, 'system:notice:add', '#', now(), now(), ''),
+       (1037, '公告修改', 107, 3, '#', '', '', '', 0, 1, 'F', 1, 'system:notice:edit', '#', now(), now(), ''),
+       (1038, '公告删除', 107, 4, '#', '', '', '', 0, 1, 'F', 1, 'system:notice:remove', '#', now(), now(), ''),
+       (1039, '操作查询', 500, 1, '#', '', '', '', 0, 1, 'F', 1, 'monitor:operlog:query', '#', now(), now(), ''),
+       (1040, '操作删除', 500, 2, '#', '', '', '', 0, 1, 'F', 1, 'monitor:operlog:remove', '#', now(), now(), ''),
+       (1041, '日志导出', 500, 3, '#', '', '', '', 0, 1, 'F', 1, 'monitor:operlog:export', '#', now(), now(), ''),
+       (1042, '登录查询', 501, 1, '#', '', '', '', 0, 1, 'F', 1, 'monitor:logininfor:query', '#', now(), now(), ''),
+       (1043, '登录删除', 501, 2, '#', '', '', '', 0, 1, 'F', 1, 'monitor:logininfor:remove', '#', now(), now(), ''),
+       (1044, '日志导出', 501, 3, '#', '', '', '', 0, 1, 'F', 1, 'monitor:logininfor:export', '#', now(), now(), ''),
+       (1045, '账户解锁', 501, 4, '#', '', '', '', 0, 1, 'F', 1, 'monitor:logininfor:unlock', '#', now(), now(), ''),
+       (1046, '在线查询', 109, 1, '#', '', '', '', 0, 1, 'F', 1, 'monitor:online:query', '#', now(), now(), ''),
+       (1047, '批量强退', 109, 2, '#', '', '', '', 0, 1, 'F', 1, 'monitor:online:batchLogout', '#', now(), now(), ''),
+       (1048, '单条强退', 109, 3, '#', '', '', '', 0, 1, 'F', 1, 'monitor:online:forceLogout', '#', now(), now(), ''),
+       (1049, '任务查询', 110, 1, '#', '', '', '', 0, 1, 'F', 1, 'monitor:job:query', '#', now(), now(), ''),
+       (1050, '任务新增', 110, 2, '#', '', '', '', 0, 1, 'F', 1, 'monitor:job:add', '#', now(), now(), ''),
+       (1051, '任务修改', 110, 3, '#', '', '', '', 0, 1, 'F', 1, 'monitor:job:edit', '#', now(), now(), ''),
+       (1052, '任务删除', 110, 4, '#', '', '', '', 0, 1, 'F', 1, 'monitor:job:remove', '#', now(), now(), ''),
+       (1053, '状态修改', 110, 5, '#', '', '', '', 0, 1, 'F', 1, 'monitor:job:changeStatus', '#', now(), now(), ''),
+       (1054, '任务导出', 110, 6, '#', '', '', '', 0, 1, 'F', 1, 'monitor:job:export', '#', now(), now(), ''),
+       (1055, '生成查询', 116, 1, '#', '', '', '', 0, 1, 'F', 1, 'tool:gen:query', '#', now(), now(), ''),
+       (1056, '生成修改', 116, 2, '#', '', '', '', 0, 1, 'F', 1, 'tool:gen:edit', '#', now(), now(), ''),
+       (1057, '生成删除', 116, 3, '#', '', '', '', 0, 1, 'F', 1, 'tool:gen:remove', '#', now(), now(), ''),
+       (1058, '导入代码', 116, 4, '#', '', '', '', 0, 1, 'F', 1, 'tool:gen:import', '#', now(), now(), ''),
+       (1059, '预览代码', 116, 5, '#', '', '', '', 0, 1, 'F', 1, 'tool:gen:preview', '#', now(), now(), ''),
+       (1060, '生成代码', 116, 6, '#', '', '', '', 0, 1, 'F', 1, 'tool:gen:code', '#', now(), now(), '');
 
 
 
@@ -418,11 +432,11 @@ create table sys_dict_data
     is_default  char(1)      default 'N',
     status      int          default 1,
     del_flag    int          default 1,
-    create_by           bigint  default null,
-    create_time         timestamp    default now(),
-    update_by           bigint  default null,
-    update_time         timestamp,
-    remark       varchar(500) default null
+    create_by   bigint       default null,
+    create_time timestamp    default now(),
+    update_by   bigint       default null,
+    update_time timestamp,
+    remark      varchar(500) default null
 );
 
 
@@ -488,11 +502,11 @@ create table sys_dict_type
     dict_type   varchar(100) default '',
     status      int          default 1,
     del_flag    int          default 1,
-    create_by           bigint  default null,
-    create_time         timestamp    default now(),
-    update_by           bigint  default null,
-    update_time         timestamp,
-    remark       varchar(500) default null,
+    create_by   bigint       default null,
+    create_time timestamp    default now(),
+    update_by   bigint       default null,
+    update_time timestamp,
+    remark      varchar(500) default null,
     unique (dict_type)
 );
 
@@ -510,16 +524,16 @@ comment on column sys_dict_type.remark is '备注';
 comment on column sys_dict_type.del_flag is '删除标志（1-存在 0-删除）';
 
 INSERT INTO sys_dict_type(dict_id, dict_name, dict_type, status, create_time, update_time, remark)
-VALUES (1, '用户性别', 'sys_user_sex', 1, now() ,  now(), '用户性别列表'),
-       (2, '菜单状态', 'sys_show_hide', 1,  now(),  now(), '菜单状态列表'),
-       (3, '系统开关', 'sys_normal_disable', 1,  now(),  now(), '系统开关列表'),
-       (4, '任务状态', 'sys_job_status', 1,  now(),  now(),  '任务状态列表'),
-       (5, '任务分组', 'sys_job_group', 1,  now(),  now(),  '任务分组列表'),
-       (6, '系统是否', 'sys_yes_no', 1,  now(),  now(), '系统是否列表'),
-       (7, '通知类型', 'sys_notice_type', 1,  now(),  now(),  '通知类型列表'),
-       (8, '通知状态', 'sys_notice_status', 1,  now(),  now(),  '通知状态列表'),
-       (9, '操作类型', 'sys_oper_type', 1,  now(),  now(), '操作类型列表'),
-       (10, '系统状态', 'sys_common_status', 1,  now(),  now(), '登录状态列表');
+VALUES (1, '用户性别', 'sys_user_sex', 1, now(), now(), '用户性别列表'),
+       (2, '菜单状态', 'sys_show_hide', 1, now(), now(), '菜单状态列表'),
+       (3, '系统开关', 'sys_normal_disable', 1, now(), now(), '系统开关列表'),
+       (4, '任务状态', 'sys_job_status', 1, now(), now(), '任务状态列表'),
+       (5, '任务分组', 'sys_job_group', 1, now(), now(), '任务分组列表'),
+       (6, '系统是否', 'sys_yes_no', 1, now(), now(), '系统是否列表'),
+       (7, '通知类型', 'sys_notice_type', 1, now(), now(), '通知类型列表'),
+       (8, '通知状态', 'sys_notice_status', 1, now(), now(), '通知状态列表'),
+       (9, '操作类型', 'sys_oper_type', 1, now(), now(), '操作类型列表'),
+       (10, '系统状态', 'sys_common_status', 1, now(), now(), '登录状态列表');
 
 
 

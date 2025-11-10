@@ -75,8 +75,11 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         List<SysMenu> menus;
 
         List<String> menuTypeList = Arrays.asList(MenuEnum.MENU.getCode(), MenuEnum.CAIDAN.getCode());
+        SysMenu sysMenu = new SysMenu();
+        sysMenu.setMenuTypeList(menuTypeList);
+        
         if (sysUser.isAdmin()) {
-            menus = sysMenuGateway.selectList(new SysMenu(), menuTypeList);
+            menus = sysMenuGateway.selectList(sysMenu);
         } else {
             menus = getMenuTreeByUserId(sysUser.getUserId(), menuTypeList);
         }

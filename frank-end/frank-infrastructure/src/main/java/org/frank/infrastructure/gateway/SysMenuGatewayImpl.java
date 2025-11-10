@@ -35,11 +35,11 @@ public class SysMenuGatewayImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     @Override
-    public List<SysMenu> selectList(SysMenu query, List<String> menuTypeList) {
+    public List<SysMenu> selectList(SysMenu query) {
         LambdaQueryWrapper<SysMenu> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(ObjectUtils.isNotEmpty(query.getMenuName()), SysMenu::getMenuName, query.getMenuName())
                 .eq(ObjectUtils.isNotEmpty(query.getStatus()), SysMenu::getStatus, query.getStatus())
-                .in(CollUtil.isNotEmpty(menuTypeList), SysMenu::getMenuType, menuTypeList)
+                .in(CollUtil.isNotEmpty(query.getMenuTypeList()), SysMenu::getMenuType, query.getMenuTypeList())
                 .orderByAsc(SysMenu::getParentId, SysMenu::getOrderNum);
 
         return mapper.selectList(queryWrapper);

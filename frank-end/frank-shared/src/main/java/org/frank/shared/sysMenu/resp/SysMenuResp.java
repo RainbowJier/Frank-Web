@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -38,16 +35,16 @@ public class SysMenuResp {
     @ApiModelProperty(value = "路由名称")
     private String routeName;
 
-    @ApiModelProperty(value = "是否为外链（0是 1否）")
+    @ApiModelProperty(value = "是否为外链（1是 0否）")
     private Integer isFrame;
 
-    @ApiModelProperty(value = "是否缓存（0缓存 1不缓存）")
+    @ApiModelProperty(value = "是否缓存（1缓存 0不缓存）")
     private Integer isCache;
 
     @ApiModelProperty(value = "菜单类型（M目录 C菜单 F按钮）")
     private String menuType;
 
-    @ApiModelProperty(value = "菜单状态（1显示 -1隐藏）")
+    @ApiModelProperty(value = "菜单状态（1显示 0隐藏）")
     private Integer visible;
 
     @ApiModelProperty(value = "菜单状态（1显示 0隐藏）")
@@ -69,15 +66,8 @@ public class SysMenuResp {
     private String updateBy;
 
     @ApiModelProperty(value = "更新时间")
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
     @ApiModelProperty(value = "备注")
     private String remark;
-
-    @ApiModelProperty(value = "删除标识（1-正常,-1-删除）")
-    private Integer delFlag;
-
-    @ApiModelProperty(value = "子菜单")
-    private List<SysMenuResp> children = new ArrayList<SysMenuResp>();
-
 }

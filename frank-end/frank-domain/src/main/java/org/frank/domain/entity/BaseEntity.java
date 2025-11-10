@@ -8,9 +8,6 @@ import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * 实体基类
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public abstract class BaseEntity implements Serializable {

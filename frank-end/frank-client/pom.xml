@@ -32,6 +32,12 @@
             <artifactId>frank-shared</artifactId>
         </dependency>
 
+        <!-- 引入 common 模块 -->
+        <dependency>
+            <groupId>com.frank</groupId>
+            <artifactId>frank-common</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

@@ -1,5 +1,6 @@
 package org.frank.domain.entity;
 
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -16,20 +17,14 @@ import lombok.EqualsAndHashCode;
 @TableName(value = "sys_role")
 @Data
 public class SysRole extends BaseEntity {
-    /**
-     * 角色ID
-     */
     @TableId(value = "role_id", type = IdType.AUTO)
     private Long roleId;
 
-    /**
-     * 角色名称
-     */
     @TableField(value = "role_name")
     private String roleName;
 
     /**
-     * 角色权限字符串
+     * permission key(sys:role:list, sys:user:list)
      */
     @TableField(value = "role_key")
     private String roleKey;
@@ -41,22 +36,16 @@ public class SysRole extends BaseEntity {
     private Integer roleSort;
 
     /**
-     * 数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）
-     */
-    @TableField(value = "data_scope")
-    private String dataScope;
-
-    /**
      * 菜单树选择项是否关联显示
      */
     @TableField(value = "menu_check_strictly")
     private Integer menuCheckStrictly;
 
     /**
-     * 部门树选择项是否关联显示
+     * role status, 1-normal, 0-disable.
      */
-    @TableField(value = "dept_check_strictly")
-    private Integer deptCheckStrictly;
+    @TableField(value = "status")
+    private Integer status;
 
     public static boolean isAdmin(Long roleId) {
         return roleId != null && 1L == roleId;

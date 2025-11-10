@@ -20,4 +20,7 @@ public class SysRoleResp {
 
     @ApiModelProperty(value = "Whether menu tree selection items are associated")
     private Integer menuCheckStrictly;
+
+    @ApiModelProperty(value = "Role status (1 normal 0 disabled)")
+    private Integer status;
 }

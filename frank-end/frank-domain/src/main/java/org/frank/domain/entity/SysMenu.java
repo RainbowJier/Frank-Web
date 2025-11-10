@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * 菜单表
  *
@@ -84,6 +86,9 @@ public class SysMenu extends BaseEntity {
      */
     @TableField(value = "menu_type")
     private String menuType;
+
+    @TableField(exist = false)
+    private List<String> menuTypeList;
 
     /**
      * 菜单状态（1显示 -1隐藏）

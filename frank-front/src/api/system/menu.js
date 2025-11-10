@@ -53,9 +53,9 @@ export function roleMenuTreeselect(roleId) {
 
 
 // 查询菜单下拉树结构
-export function treeselect() {
+export function tree() {
   return request({
-    url: '/sys-menu/treeDropDown',
+    url: '/sys-menu/tree',
     method: 'get'
   })
 }

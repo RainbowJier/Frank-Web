@@ -1,6 +1,7 @@
 package org.frank.adapter.controller;
 
 
+import cn.hutool.core.lang.tree.Tree;
 import io.swagger.annotations.ApiOperation;
 import jakarta.annotation.Resource;
 import org.frank.app.service.SysMenuService;
@@ -59,6 +60,22 @@ public class SysMenuController extends BaseController {
     public AjaxResult<Void> remove(@PathVariable("menuId") Long menuId) {
         service.remove(menuId);
         return AjaxResult.success();
+    }
+
+
+    @GetMapping("/tree")
+    @ApiOperation("Get menu tree select.")
+    public AjaxResult<List<Tree<Long>>> tree() {
+        return AjaxResult.success(service.tree());
+    }
+
+
+    @GetMapping("/roleTree")
+    @ApiOperation("Get menu tree containing the selection nodes of the role.")
+    public AjaxResult<List<Tree<Long>>> roleTree() {
+        List<Long> roleIds = getRoleIds();
+        boolean admin = isAdmin();
+        return AjaxResult.success(service.roleTree());
     }
 
 
