@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(mvn:*)",
-      "mcp__sequential-thinking__sequentialthinking"
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []
