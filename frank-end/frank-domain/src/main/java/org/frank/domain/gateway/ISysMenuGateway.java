@@ -20,6 +20,11 @@ public interface ISysMenuGateway extends IService<SysMenu> {
     List<SysMenu> selectList(SysMenu query);
 
     /**
+     * get menu list by conditions.
+     */
+    List<SysMenu> selectListByIdsAndCondition(List<Long> menuIds, SysMenu query);
+
+    /**
      * check menu name unique.
      */
     boolean checkMenuNameUnique(Long parentId, String menuName);
@@ -33,4 +38,5 @@ public interface ISysMenuGateway extends IService<SysMenu> {
      * check menu has child.
      */
     boolean hasChildByMenuId(Long menuId);
+
 }

@@ -3,6 +3,8 @@ package org.frank.shared.sysRole.resp;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.Date;
+
 
 @Data
 public class SysRoleResp {
@@ -20,6 +22,9 @@ public class SysRoleResp {
 
     @ApiModelProperty(value = "Whether menu tree selection items are associated")
     private Integer menuCheckStrictly;
+
+    @ApiModelProperty(value = "Role creation time")
+    private Date createTime;
 
     @ApiModelProperty(value = "Role status (1 normal 0 disabled)")
     private Integer status;

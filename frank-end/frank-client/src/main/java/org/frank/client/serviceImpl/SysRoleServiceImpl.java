@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.frank.app.service.SysRoleService;
 import org.frank.common.core.page.PageResult;
 import org.frank.common.exception.BusinessException;
@@ -18,8 +19,11 @@ import org.frank.shared.sysRole.req.SysRoleAddReq;
 import org.frank.shared.sysRole.req.SysRoleQueryReq;
 import org.frank.shared.sysRole.resp.SysRoleResp;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
@@ -51,11 +55,14 @@ public class SysRoleServiceImpl implements SysRoleService {
         IPage<SysRole> page = new Page<>(params.getPageNum(), params.getPageSize());
 
         LambdaQueryWrapper<SysRole> wrapper = new LambdaQueryWrapper<>();
-        wrapper.like(StringUtils.hasText(params.getRoleName()), SysRole::getRoleName, params.getRoleName())
-                .like(StringUtils.hasText(params.getRoleKey()), SysRole::getRoleKey, params.getRoleKey())
+        wrapper.like(StringUtils.isNotBlank(params.getRoleName()), SysRole::getRoleName, params.getRoleName())
+                .like(StringUtils.isNotBlank(params.getRoleKey()), SysRole::getRoleKey, params.getRoleKey())
                 .eq(ObjectUtil.isNotEmpty(params.getStatus()), SysRole::getStatus, params.getStatus());
-        if (params.getBeginTime() != null && params.getEndTime() != null) {
-            wrapper.between(SysRole::getCreateTime, params.getBeginTime(), params.getEndTime());
+        if (StringUtils.isNotBlank(params.getBeginTime()) && StringUtils.isNotBlank(params.getEndTime())) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDateTime beginTime = LocalDate.parse(params.getBeginTime(), formatter).atStartOfDay();
+            LocalDateTime endTime = LocalDate.parse(params.getEndTime(), formatter).atTime(LocalTime.MAX);
+            wrapper.between(SysRole::getCreateTime, beginTime, endTime);
         }
 
         IPage<SysRole> pageRes = gateway.page(page, wrapper);

@@ -69,13 +69,10 @@ public class SysMenuController extends BaseController {
         return AjaxResult.success(service.tree());
     }
 
-
-    @GetMapping("/roleTree")
+    @GetMapping("/roleTree/{roleId}")
     @ApiOperation("Get menu tree containing the selection nodes of the role.")
-    public AjaxResult<List<Tree<Long>>> roleTree() {
-        List<Long> roleIds = getRoleIds();
-        boolean admin = isAdmin();
-        return AjaxResult.success(service.roleTree());
+    public AjaxResult<List<Tree<Long>>> roleTree(@PathVariable Long roleId) {
+        return AjaxResult.success(service.roleTree(getRoleIds(), isAdmin(), roleId));
     }
 
 

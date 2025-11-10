@@ -4,8 +4,8 @@ package org.frank.client.serviceImpl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.tree.Tree;
-import cn.hutool.core.lang.tree.TreeUtil;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
+import cn.hutool.core.lang.tree.TreeUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import jakarta.annotation.Resource;
@@ -41,21 +41,23 @@ public class SysMenuServiceImpl implements SysMenuService {
 
     @Override
     public List<SysMenuResp> list(MenuListReq req) {
-        return getMenuList(req.getIsAdmin(), req.getRoleIds(), req);
-    }
-
-    private List<SysMenuResp> getMenuList(boolean isAdmin, List<Long> roleIds, MenuListReq req) {
-        List<SysMenu> menuList;
         SysMenu query = BeanUtil.copyProperties(req, SysMenu.class);
-        if (BooleanUtil.isTrue(isAdmin)) {
-            menuList = gateway.selectList(query);
-        } else {
-            menuList = getByRoleIds(roleIds);
-        }
+        List<SysMenu> menuList = getMenuList(req.getIsAdmin(), req.getRoleIds(), query);
+
         return BeanUtil.copyToList(menuList, SysMenuResp.class);
     }
 
-    private List<SysMenu> getByRoleIds(List<Long> roleIds) {
+    private List<SysMenu> getMenuList(Boolean isAdmin, List<Long> roleIds, SysMenu query) {
+        List<SysMenu> menuList;
+        if (BooleanUtil.isTrue(isAdmin)) {
+            menuList = gateway.selectList(query);
+        } else {
+            menuList = getByRoleIds(roleIds, query);
+        }
+        return menuList;
+    }
+
+    private List<SysMenu> getByRoleIds(List<Long> roleIds, SysMenu query) {
         if (CollUtil.isEmpty(roleIds)) {
             return Collections.emptyList();
         }
@@ -65,7 +67,7 @@ public class SysMenuServiceImpl implements SysMenuService {
             return Collections.emptyList();
         }
 
-        return gateway.selectListByIds(menuIds, null);
+        return gateway.selectListByIdsAndCondition(menuIds, query);
     }
 
     @Override
@@ -129,12 +131,11 @@ public class SysMenuServiceImpl implements SysMenuService {
     @Override
     public List<Tree<Long>> tree() {
         List<SysMenu> menuList = gateway.list();
-        if(CollUtil.isEmpty(menuList)){
+        if (CollUtil.isEmpty(menuList)) {
             return null;
         }
         List<SysMenuTreeResp> menuTreeList = BeanUtil.copyToList(menuList, SysMenuTreeResp.class);
 
-        // config tree
         TreeNodeConfig config = TreeNodeConfig.DEFAULT_CONFIG
                 .setIdKey("id")
                 .setParentIdKey("parentId")
@@ -150,20 +151,23 @@ public class SysMenuServiceImpl implements SysMenuService {
         });
     }
 
-
-    // todo:修复条件查询
-    private List<SysMenuResp> getMenuList(Boolean isAdmin, List<Long> roleIds,SysMenu query) {
-        List<SysMenu> menuList;
-        if (BooleanUtil.isTrue(isAdmin)) {
-            menuList = gateway.selectList(query);
-        } else {
-            menuList = getByRoleIds(roleIds);
-        }
-        return BeanUtil.copyToList(menuList, SysMenuResp.class);
-    }
-
     @Override
-    public List<Tree<Long>> roleTree() {
-        return List.of();
+    public List<Tree<Long>> roleTree(List<Long> roleIds, Boolean isAdmin, Long roleId) {
+        List<SysMenu> menuList = getMenuList(isAdmin, roleIds, null);
+        List<SysMenuTreeResp> menuTreeList = BeanUtil.copyToList(menuList, SysMenuTreeResp.class);
+
+        TreeNodeConfig config = TreeNodeConfig.DEFAULT_CONFIG
+                .setIdKey("id")
+                .setParentIdKey("parentId")
+                .setChildrenKey("children")
+                .setWeightKey("orderNum");
+
+        return TreeUtil.build(menuTreeList, 0L, config, (menu, tree) -> {
+            tree.setId(menu.getMenuId());
+            tree.setParentId(menu.getParentId());
+            tree.setName(menu.getMenuName());
+            tree.setWeight(menu.getOrderNum());
+            tree.putExtra("children", menu.getChildren());
+        });
     }
 }

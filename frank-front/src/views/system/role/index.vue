@@ -168,7 +168,6 @@ const single = ref(true)
 const multiple = ref(true)
 const total = ref(0)
 const title = ref("")
-const dateRange = ref([])
 const menuOptions = ref([])
 const menuExpand = ref(false)
 const menuNodeAll = ref(false)
@@ -188,7 +187,9 @@ const data = reactive({
     pageSize: 10,
     roleName: undefined,
     roleKey: undefined,
-    status: undefined
+    status: undefined,
+    beginTime: undefined,
+    endTime: undefined
   },
   rules: {
     roleName: [{ required: true, message: "角色名称不能为空", trigger: "blur" }],
@@ -199,10 +200,28 @@ const data = reactive({
 
 const { queryParams, form, rules } = toRefs(data)
 
+/** 日期范围计算属性 */
+const dateRange = computed({
+  get() {
+    return queryParams.value.beginTime && queryParams.value.endTime
+      ? [queryParams.value.beginTime, queryParams.value.endTime]
+      : []
+  },
+  set(dates) {
+    if (dates && dates.length === 2) {
+      queryParams.value.beginTime = dates[0]
+      queryParams.value.endTime = dates[1]
+    } else {
+      queryParams.value.beginTime = undefined
+      queryParams.value.endTime = undefined
+    }
+  }
+})
+
 /** 查询角色列表 */
 function getList() {
   loading.value = true
-  listRole(proxy.addDateRange(queryParams.value, dateRange.value)).then(response => {
+  listRole(queryParams.value).then(response => {
     roleList.value = response.data.rows
     total.value = response.data.total
     loading.value = false
@@ -217,7 +236,8 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  dateRange.value = []
+  queryParams.value.beginTime = undefined
+  queryParams.value.endTime = undefined
   proxy.resetForm("queryRef")
   handleQuery()
 }

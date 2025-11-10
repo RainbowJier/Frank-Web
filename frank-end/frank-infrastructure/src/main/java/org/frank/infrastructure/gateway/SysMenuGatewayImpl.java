@@ -11,6 +11,7 @@ import org.frank.domain.gateway.ISysMenuGateway;
 import org.frank.infrastructure.mapper.SysMenuMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -42,7 +43,21 @@ public class SysMenuGatewayImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 .in(CollUtil.isNotEmpty(query.getMenuTypeList()), SysMenu::getMenuType, query.getMenuTypeList())
                 .orderByAsc(SysMenu::getParentId, SysMenu::getOrderNum);
 
-        return mapper.selectList(queryWrapper);
+        List<SysMenu> list = mapper.selectList(queryWrapper);
+        return CollUtil.isEmpty(list) ? Collections.emptyList() : list;
+    }
+
+    @Override
+    public List<SysMenu> selectListByIdsAndCondition(List<Long> menuIds, SysMenu query) {
+        LambdaQueryWrapper<SysMenu> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(CollUtil.isNotEmpty(menuIds), SysMenu::getMenuId, menuIds)
+                .like(ObjectUtils.isNotEmpty(query.getMenuName()), SysMenu::getMenuName, query.getMenuName())
+                .eq(ObjectUtils.isNotEmpty(query.getStatus()), SysMenu::getStatus, query.getStatus())
+                .in(CollUtil.isNotEmpty(query.getMenuTypeList()), SysMenu::getMenuType, query.getMenuTypeList())
+                .orderByAsc(SysMenu::getParentId, SysMenu::getOrderNum);
+
+        List<SysMenu> list = mapper.selectList(queryWrapper);
+        return CollUtil.isEmpty(list) ? Collections.emptyList() : list;
     }
 
     @Override
