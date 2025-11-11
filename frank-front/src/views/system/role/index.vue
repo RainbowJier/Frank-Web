@@ -244,7 +244,7 @@ function resetQuery() {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const roleIds = row.roleId || ids.value
+  const roleIds = row.roleId ? [row.roleId] : ids.value
   proxy.$modal.confirm('是否确认删除角色编号为"' + roleIds + '"的数据项?').then(function () {
     return delRole(roleIds)
   }).then(() => {
@@ -263,14 +263,14 @@ function handleSelectionChange(selection) {
 
 /** 角色状态修改 */
 function handleStatusChange(row) {
-  let text = row.status === "1" ? "启用" : "停用"
+  let text = row.status === 1 ? "启用" : "停用"
   proxy.$modal.confirm('确认要"' + text + '""' + row.roleName + '"角色吗?').then(function () {
     return changeRoleStatus(row.roleId, row.status)
   }).then(() => {
     proxy.$modal.msgSuccess(text + "成功")
   }).catch(function () {
     // 恢复原状态 - 修复逻辑错误
-    row.status = row.status === "1" ? "0" : "1"
+    row.status = row.status === 1 ? 0 : 1
   })
 }
 
@@ -313,7 +313,7 @@ function reset() {
     roleName: undefined,
     roleKey: undefined,
     roleSort: 0,
-    status: "0",
+    status: 1,
     menuIds: [],
     remark: undefined
   }
@@ -336,10 +336,14 @@ function handleUpdate(row) {
   getRole(roleId).then(response => {
     form.value = response.data
     form.value.roleSort = Number(form.value.roleSort)
+    // 确保 status 字段类型正确
+    if (form.value.status !== undefined) {
+      form.value.status = String(form.value.status)
+    }
     open.value = true
     nextTick(() => {
       roleMenu.then((res) => {
-        let checkedKeys = res.checkedKeys
+        let checkedKeys = res.data.checkedKeys
         checkedKeys.forEach((v) => {
           nextTick(() => {
             menuRef.value.setChecked(v, true, false)
@@ -354,7 +358,7 @@ function handleUpdate(row) {
 /** 根据角色ID查询菜单树结构 */
 function getRoleMenuTreeselect(roleId) {
   return roleMenuTreeselect(roleId).then(response => {
-    menuOptions.value = response.data
+    menuOptions.value = response.data.tree
     return response
   })
 }

@@ -35,12 +35,12 @@ export function updateRole(data) {
   })
 }
 
-// 角色数据权限
-export function dataScope(data) {
+// 删除角色
+export function delRole(roleIds) {
   return request({
-    url: '/system/role/dataScope',
-    method: 'put',
-    data: data
+    url: '/sys-role/remove',
+    method: 'post',
+    data: roleIds
   })
 }
 
@@ -51,17 +51,9 @@ export function changeRoleStatus(roleId, status) {
     status
   }
   return request({
-    url: '/system/role/changeStatus',
-    method: 'put',
+    url: '/sys-role/changeStatus',
+    method: 'post',
     data: data
-  })
-}
-
-// 删除角色
-export function delRole(roleId) {
-  return request({
-    url: '/system/role/' + roleId,
-    method: 'delete'
   })
 }
 
@@ -115,5 +107,15 @@ export function deptTreeSelect(roleId) {
   return request({
     url: '/system/role/deptTree/' + roleId,
     method: 'get'
+  })
+}
+
+
+// 角色数据权限
+export function dataScope(data) {
+  return request({
+    url: '/system/role/dataScope',
+    method: 'put',
+    data: data
   })
 }

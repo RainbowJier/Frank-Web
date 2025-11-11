@@ -11,6 +11,7 @@ import org.frank.shared.sysMenu.req.AddMenuReq;
 import org.frank.shared.sysMenu.req.MenuListReq;
 import org.frank.shared.sysMenu.req.UpdateMenuReq;
 import org.frank.shared.sysMenu.resp.SysMenuResp;
+import org.frank.shared.sysMenu.resp.SysMenuRoleTreeResp;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,8 +72,11 @@ public class SysMenuController extends BaseController {
 
     @GetMapping("/roleTree/{roleId}")
     @ApiOperation("Get menu tree containing the selection nodes of the role.")
-    public AjaxResult<List<Tree<Long>>> roleTree(@PathVariable Long roleId) {
-        return AjaxResult.success(service.roleTree(getRoleIds(), isAdmin(), roleId));
+    public AjaxResult<SysMenuRoleTreeResp> roleTree(@PathVariable("roleId") Long roleId) {
+        List<Tree<Long>> trees = service.roleTree(getRoleIds(), isAdmin(), roleId);
+        List<Long> checkedKeys = service.selectMenuListByRoleId(roleId);
+
+        return AjaxResult.success(new SysMenuRoleTreeResp(trees, checkedKeys));
     }
 
 

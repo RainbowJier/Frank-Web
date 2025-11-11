@@ -6,23 +6,18 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.frank.common.core.domain.BaseReq;
 
 import java.util.List;
 
-/**
- * Add role request object
- *
- * @author Frank
- * @since 2025-11-07
- */
 @Data
-@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class SysRoleAddReq extends BaseReq {
+public class SysRoleUpdateReq {
+    @ApiModelProperty(value = "Role ID", required = true)
+    @NotNull(message = "Role ID cannot be empty")
+    private Long roleId;
+
     @ApiModelProperty(value = "Role name", required = true)
     @NotBlank(message = "Role name cannot be empty")
     @Size(max = 30, message = "Role name length cannot exceed 30 characters")

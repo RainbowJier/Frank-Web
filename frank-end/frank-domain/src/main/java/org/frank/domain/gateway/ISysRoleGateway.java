@@ -18,4 +18,14 @@ public interface ISysRoleGateway extends IService<SysRole> {
      * Check if role key is unique
      */
     boolean checkRoleKeyUnique(String roleKey);
+
+    /**
+     * Check if role name is unique (exclude current role)
+     */
+    boolean checkRoleNameUniqueExcludeCur(Long roleId, String roleName);
+
+    /**
+     * Check if role key is unique (exclude current role)
+     */
+    boolean checkRoleKeyUniqueExcludeCur(Long roleId, String roleKey);
 }

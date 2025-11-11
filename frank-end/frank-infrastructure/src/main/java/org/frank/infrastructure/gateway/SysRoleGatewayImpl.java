@@ -42,4 +42,20 @@ public class SysRoleGatewayImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         queryWrapper.eq(SysRole::getRoleKey, roleKey);
         return count(queryWrapper) == 0;
     }
+
+    @Override
+    public boolean checkRoleNameUniqueExcludeCur(Long roleId, String roleName) {
+        LambdaQueryWrapper<SysRole> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysRole::getRoleName, roleName)
+                .ne(SysRole::getRoleId, roleId);
+        return count(queryWrapper) == 0;
+    }
+
+    @Override
+    public boolean checkRoleKeyUniqueExcludeCur(Long roleId, String roleKey) {
+        LambdaQueryWrapper<SysRole> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysRole::getRoleKey, roleKey)
+                .ne(SysRole::getRoleId, roleId);
+        return count(queryWrapper) == 0;
+    }
 }

@@ -20,7 +20,14 @@ public interface ISysRoleRelMenuGateway extends IService<SysRoleRelMenu> {
      * @param roleId 角色ID
      * @return 删除结果
      */
-    boolean deleteByRoleId(Long roleId);
+    boolean removeByRoleId(Long roleId);
+
+    /**
+     * 根据角色ID列表批量删除角色菜单关联
+     * @param roleIds 角色ID列表
+     * @return 删除结果
+     */
+    boolean removeBatchByRoleIds(List<Long> roleIds);
 
     /**
      * 根据菜单ID删除角色菜单关联
@@ -57,4 +64,6 @@ public interface ISysRoleRelMenuGateway extends IService<SysRoleRelMenu> {
      * @return
      */
     List<Long> selectMenuTreeByUserId(List<Long> roleIds);
+
+
 }

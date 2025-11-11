@@ -44,4 +44,9 @@ public interface SysMenuService {
      * Get menu tree select.
      */
     List<Tree<Long>> roleTree(List<Long> roleIds, Boolean isAdmin, Long roleId);
+
+    /**
+     * Get menu tree that selected by current role.
+     */
+    List<Long> selectMenuListByRoleId(Long roleId);
 }

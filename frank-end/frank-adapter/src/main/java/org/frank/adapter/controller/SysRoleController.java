@@ -1,12 +1,15 @@
 package org.frank.adapter.controller;
 
+import cn.hutool.core.collection.CollUtil;
 import io.swagger.annotations.ApiOperation;
 import jakarta.annotation.Resource;
 import org.frank.app.service.SysRoleService;
 import org.frank.common.core.domain.AjaxResult;
 import org.frank.common.core.page.PageResult;
 import org.frank.shared.sysRole.req.SysRoleAddReq;
+import org.frank.shared.sysRole.req.SysRoleChangeStatusReq;
 import org.frank.shared.sysRole.req.SysRoleQueryReq;
+import org.frank.shared.sysRole.req.SysRoleUpdateReq;
 import org.frank.shared.sysRole.resp.SysRoleResp;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -24,10 +27,7 @@ public class SysRoleController {
     @GetMapping("/roleList/{userId}")
     @ApiOperation("Get role list by user id.")
     public AjaxResult<List<SysRoleResp>> roleList(@PathVariable("userId") Long userId) {
-        if (userId == null) {
-            return AjaxResult.failed("User id can not be empty.");
-        }
-
+        if (userId == null) return AjaxResult.failed("User id can not be empty.");
         return AjaxResult.success(service.getRoleList(userId));
     }
 
@@ -39,11 +39,8 @@ public class SysRoleController {
 
     @GetMapping(value = "/{roleId}")
     @ApiOperation("Get role detail by ID.")
-    public AjaxResult<SysRoleResp> getInfo(@PathVariable Long roleId) {
-        if (roleId == null) {
-            return AjaxResult.failed("Role id can not be empty.");
-        }
-
+    public AjaxResult<SysRoleResp> getInfo(@PathVariable("roleId") Long roleId) {
+        if (roleId == null) return AjaxResult.failed("Role id can not be empty.");
         return AjaxResult.success(service.getById(roleId));
     }
 
@@ -54,6 +51,26 @@ public class SysRoleController {
         return AjaxResult.success();
     }
 
+    @PostMapping("update")
+    @ApiOperation("Update role.")
+    public AjaxResult<Void> update(@Validated @RequestBody SysRoleUpdateReq req) {
+        service.updateRole(req);
+        return AjaxResult.success();
+    }
 
+    @PostMapping("/remove")
+    @ApiOperation("Remove role.")
+    public AjaxResult<Void> remove(@RequestBody List<Long> roleIds) {
+        if (CollUtil.isEmpty(roleIds)) return AjaxResult.failed("Role id list can not be empty.");
+        service.removeRole(roleIds);
+        return AjaxResult.success();
+    }
+
+    @PostMapping("/changeStatus")
+    @ApiOperation("todo: Change role status.")
+    public AjaxResult<Void> changeStatus(@Validated @RequestBody SysRoleChangeStatusReq req) {
+        service.changeStatus(req);
+        return AjaxResult.success();
+    }
 
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.ObjectUtils;
+import org.frank.common.util.StringUtil;
 import org.frank.domain.entity.SysMenu;
 import org.frank.domain.gateway.ISysMenuGateway;
 import org.frank.infrastructure.mapper.SysMenuMapper;
@@ -38,7 +39,7 @@ public class SysMenuGatewayImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Override
     public List<SysMenu> selectList(SysMenu query) {
         LambdaQueryWrapper<SysMenu> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.like(ObjectUtils.isNotEmpty(query.getMenuName()), SysMenu::getMenuName, query.getMenuName())
+        queryWrapper.like(StringUtil.hasText(query.getMenuName()), SysMenu::getMenuName, query.getMenuName())
                 .eq(ObjectUtils.isNotEmpty(query.getStatus()), SysMenu::getStatus, query.getStatus())
                 .in(CollUtil.isNotEmpty(query.getMenuTypeList()), SysMenu::getMenuType, query.getMenuTypeList())
                 .orderByAsc(SysMenu::getParentId, SysMenu::getOrderNum);

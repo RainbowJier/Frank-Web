@@ -153,7 +153,7 @@ public class SysMenuServiceImpl implements SysMenuService {
 
     @Override
     public List<Tree<Long>> roleTree(List<Long> roleIds, Boolean isAdmin, Long roleId) {
-        List<SysMenu> menuList = getMenuList(isAdmin, roleIds, null);
+        List<SysMenu> menuList = getMenuList(isAdmin, roleIds, new SysMenu());
         List<SysMenuTreeResp> menuTreeList = BeanUtil.copyToList(menuList, SysMenuTreeResp.class);
 
         TreeNodeConfig config = TreeNodeConfig.DEFAULT_CONFIG
@@ -169,5 +169,10 @@ public class SysMenuServiceImpl implements SysMenuService {
             tree.setWeight(menu.getOrderNum());
             tree.putExtra("children", menu.getChildren());
         });
+    }
+
+    @Override
+    public List<Long> selectMenuListByRoleId(Long roleId) {
+        return sysRoleRelMenuGateway.selectMenuIdsByRoleId(roleId);
     }
 }

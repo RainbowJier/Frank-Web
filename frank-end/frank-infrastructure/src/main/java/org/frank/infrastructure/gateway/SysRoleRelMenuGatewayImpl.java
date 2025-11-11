@@ -1,5 +1,6 @@
 package org.frank.infrastructure.gateway;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
@@ -8,7 +9,6 @@ import org.frank.domain.entity.SysRoleRelMenu;
 import org.frank.domain.gateway.ISysRoleRelMenuGateway;
 import org.frank.infrastructure.mapper.SysRoleRelMenuMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,35 +22,28 @@ public class SysRoleRelMenuGatewayImpl extends ServiceImpl<SysRoleRelMenuMapper,
     private SysRoleRelMenuMapper sysRoleRelMenuMapper;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public boolean saveBatchRoleMenu(Long roleId, List<Long> menuIds) {
-        try {
-            // 先删除原有的角色菜单关联
-            deleteByRoleId(roleId);
+        removeByRoleId(roleId);
 
-            if (menuIds == null || menuIds.isEmpty()) {
-                return true;
-            }
-
-            // 批量插入新的角色菜单关联
-            List<SysRoleRelMenu> roleMenuList = menuIds.stream()
-                    .map(menuId -> {
-                        SysRoleRelMenu roleMenu = new SysRoleRelMenu();
-                        roleMenu.setRoleId(roleId);
-                        roleMenu.setMenuId(menuId);
-                        return roleMenu;
-                    })
-                    .collect(Collectors.toList());
-
-            return saveBatch(roleMenuList);
-        } catch (Exception e) {
-            log.error("批量保存角色菜单关联失败，roleId: {}, menuIds: {}", roleId, menuIds, e);
-            throw new RuntimeException("批量保存角色菜单关联失败", e);
+        if (CollUtil.isEmpty(menuIds)) {
+            return true;
         }
+
+        // 批量插入新的角色菜单关联
+        List<SysRoleRelMenu> roleMenuList = menuIds.stream()
+                .map(menuId -> {
+                    SysRoleRelMenu roleMenu = new SysRoleRelMenu();
+                    roleMenu.setRoleId(roleId);
+                    roleMenu.setMenuId(menuId);
+                    return roleMenu;
+                })
+                .collect(Collectors.toList());
+
+        return saveBatch(roleMenuList);
     }
 
     @Override
-    public boolean deleteByRoleId(Long roleId) {
+    public boolean removeByRoleId(Long roleId) {
         if (roleId == null) {
             return false;
         }
@@ -58,6 +51,17 @@ public class SysRoleRelMenuGatewayImpl extends ServiceImpl<SysRoleRelMenuMapper,
         LambdaQueryWrapper<SysRoleRelMenu> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(SysRoleRelMenu::getRoleId, roleId);
 
+        return remove(queryWrapper);
+    }
+
+    @Override
+    public boolean removeBatchByRoleIds(List<Long> roleIds) {
+        if (CollUtil.isEmpty(roleIds)) {
+            return false;
+        }
+
+        LambdaQueryWrapper<SysRoleRelMenu> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(SysRoleRelMenu::getRoleId, roleIds);
         return remove(queryWrapper);
     }
 
@@ -118,8 +122,6 @@ public class SysRoleRelMenuGatewayImpl extends ServiceImpl<SysRoleRelMenuMapper,
 
     @Override
     public List<Long> selectMenuTreeByUserId(List<Long> roleIds) {
-
-
         return List.of();
     }
 }
