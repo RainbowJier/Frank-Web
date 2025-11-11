@@ -41,4 +41,14 @@ public interface SysUserService {
      * Change user status.
      */
     void changeStatus(ChangeStatusReq req);
+
+    /**
+     * Get allocated user list by role id.
+     */
+    PageResult selectAllocatedUserList(AllocatedUserQueryReq req);
+
+    /**
+     * Get unallocated user list by role id.
+     */
+    PageResult selectUnallocatedUserList(AllocatedUserQueryReq req);
 }

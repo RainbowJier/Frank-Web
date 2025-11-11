@@ -67,7 +67,7 @@ public class SysRoleController {
     }
 
     @PostMapping("/changeStatus")
-    @ApiOperation("todo: Change role status.")
+    @ApiOperation("change role status.")
     public AjaxResult<Void> changeStatus(@Validated @RequestBody SysRoleChangeStatusReq req) {
         service.changeStatus(req);
         return AjaxResult.success();

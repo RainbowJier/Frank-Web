@@ -8,7 +8,6 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.frank.common.components.TokenService;
 import org.frank.common.core.domain.LoginUser;
 import org.frank.common.util.ServletUtil;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -16,21 +15,16 @@ import java.util.Date;
 @Component
 @Slf4j
 public class MyMetaObjectHandler implements MetaObjectHandler {
+
     @Resource
-    @Lazy
     private TokenService tokenService;
 
-    /**
-     * 获取当前登录用户ID
-     * 避免依赖BaseController造成循环依赖
-     */
     private Long getCurrentUserId() {
         try {
             HttpServletRequest request = ServletUtil.getRequest();
             LoginUser loginUser = tokenService.getLoginUser(request);
             return loginUser != null ? loginUser.getUserId() : null;
-        } catch (
-                Exception e) {
+        } catch (Exception e) {
             log.warn("获取用户ID失败: {}", e.getMessage());
             return null;
         }
@@ -42,10 +36,17 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         Long userId = getCurrentUserId();
         log.info("当前操作用户ID: {}", userId);
 
+        // 确保时间字段不为null
+        Date now = new Date();
+
+        // 使用严格的插入填充，如果字段存在才填充
         this.strictInsertFill(metaObject, "createBy", Long.class, userId);
-        this.strictInsertFill(metaObject, "createTime", Date.class, new Date());
+        this.strictInsertFill(metaObject, "createTime", Date.class, now);
         this.strictInsertFill(metaObject, "updateBy", Long.class, userId);
-        this.strictInsertFill(metaObject, "updateTime", Date.class, new Date());
+        this.strictInsertFill(metaObject, "updateTime", Date.class, now);
+
+        // 为del_flag设置默认值（正常状态）
+        this.strictInsertFill(metaObject, "delFlag", Integer.class, 1);
     }
 
     @Override

@@ -274,20 +274,6 @@ function handleStatusChange(row) {
   })
 }
 
-/** 更多操作 */
-function handleCommand(command, row) {
-  switch (command) {
-    case "handleDataScope":
-      handleDataScope(row)
-      break
-    case "handleAuthUser":
-      handleAuthUser(row)
-      break
-    default:
-      break
-  }
-}
-
 /** 分配用户 */
 function handleAuthUser(row) {
   router.push("/system/role-auth/user/" + row.roleId)
@@ -313,7 +299,7 @@ function reset() {
     roleName: undefined,
     roleKey: undefined,
     roleSort: 0,
-    status: 1,
+    status: "1",
     menuIds: [],
     remark: undefined
   }

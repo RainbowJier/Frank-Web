@@ -109,14 +109,6 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     private void relatedMenu(List<Long> menuIds, Long roleId) {
-        // 先删除原有的角色菜单关联
-        roleMenuGateway.removeByRoleId(roleId);
-
-        if (CollUtil.isEmpty(menuIds)) {
-            return;
-        }
-
-        // 重新建立角色菜单关联
         if (BooleanUtil.isFalse(roleMenuGateway.saveBatchRoleMenu(roleId, menuIds))) {
             throw new BusinessException("Fail to related menu.");
         }
@@ -128,14 +120,6 @@ public class SysRoleServiceImpl implements SysRoleService {
         for (Long roleId : roleIds) {
             if (SysRole.isAdmin(roleId)) {
                 throw new BusinessException("Administrator cannot be deleted.");
-            }
-        }
-
-        // Check if there are any users currently using these roles.
-        for (Long roleId : roleIds) {
-            List<Long> userIds = userRoleGateway.selectUserIdsByRoleId(roleId);
-            if (CollUtil.isNotEmpty(userIds)) {
-                throw new BusinessException("There are users currently using these roles.");
             }
         }
 

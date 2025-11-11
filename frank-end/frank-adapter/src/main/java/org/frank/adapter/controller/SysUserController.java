@@ -84,5 +84,17 @@ public class SysUserController extends BaseController {
         return AjaxResult.success();
     }
 
+    @GetMapping("/authUser/allocatedList")
+    @ApiOperation("Get allocated user list.")
+    public AjaxResult<PageResult> allocatedList(AllocatedUserQueryReq req) {
+        return AjaxResult.success(service.selectAllocatedUserList(req));
+    }
+
+    @GetMapping("/authUser/unallocatedList")
+    @ApiOperation("Get unallocated user list.")
+    public AjaxResult<PageResult> unallocated(AllocatedUserQueryReq req) {
+        return AjaxResult.success(service.selectUnallocatedUserList(req));
+    }
+
 
 }

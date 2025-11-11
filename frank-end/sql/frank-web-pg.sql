@@ -49,12 +49,6 @@ insert into sys_user
 values (1, 'admin', 'administrator', 'frank@163.com', 1,
         '$2a$12$HgMqFBFOt1rys5iMT8ShN.1/I6woV2jgaWV3DWcM5ffDzGiyZNsIa', now(), now());
 
-insert into sys_user
-(user_id, user_name, nick_name, email, sex, password, create_time, update_time) overriding system value
-values (2, 'frank', 'administrator', 'frank@163.com', 1,
-        '$2a$12$FBdoXmm5xEi8ega0IPoYJO/gXb5BVeNo1xgUkGPt4C8oPGUnxuuFy', now(), now());
-
-
 
 -- ----------------------------
 -- 用户和角色关联表  用户N-1角色

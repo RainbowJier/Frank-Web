@@ -1,6 +1,7 @@
 package org.frank.client.serviceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -13,6 +14,7 @@ import org.frank.common.exception.BusinessException;
 import org.frank.common.util.sign.BCryptUtils;
 import org.frank.domain.entity.SysUser;
 import org.frank.domain.gateway.ISysUserGateway;
+import org.frank.domain.gateway.ISysUserRelRoleGateway;
 import org.frank.shared.sysUser.req.*;
 import org.frank.shared.sysUser.resp.SysUserResp;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,9 @@ import java.util.List;
 public class SysUserServiceImpl implements SysUserService {
     @Resource
     private ISysUserGateway gateway;
+
+    @Resource
+    private ISysUserRelRoleGateway userRelRoleGateway;
 
     @Override
     public PageResult selectUserList(SysUserQueryReq params) {
@@ -138,6 +143,43 @@ public class SysUserServiceImpl implements SysUserService {
         if (BooleanUtils.isFalse(gateway.updateById(user))) {
             throw new BusinessException("Fail to change status.");
         }
+    }
+
+    @Override
+    public PageResult selectAllocatedUserList(AllocatedUserQueryReq req) {
+        List<Long> userIds = userRelRoleGateway.selectUserIdsByRoleId(req.getRoleId());
+        if (userIds.isEmpty()) {
+            return new PageResult(0L, Long.valueOf(req.getPageNum()), Long.valueOf(req.getPageSize()), List.of());
+        }
+
+        IPage<SysUser> page = new Page<>(req.getPageNum(), req.getPageSize());
+
+        LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(SysUser::getUserId, userIds)
+                .like(StringUtils.hasText(req.getUserName()), SysUser::getUserName, req.getUserName())
+                .like(StringUtils.hasText(req.getPhoneNumber()), SysUser::getPhoneNumber, req.getPhoneNumber());
+
+        IPage<SysUser> pageRes = gateway.page(page, wrapper);
+        return PageResult.ok(pageRes, SysUserResp.class);
+    }
+
+    @Override
+    public PageResult selectUnallocatedUserList(AllocatedUserQueryReq req) {
+        List<Long> allocatedUserIds = userRelRoleGateway.selectUserIdsByRoleId(req.getRoleId());
+        allocatedUserIds.add(0L);
+
+        IPage<SysUser> page = new Page<>(req.getPageNum(), req.getPageSize());
+
+        LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(StringUtils.hasText(req.getUserName()), SysUser::getUserName, req.getUserName())
+                .like(StringUtils.hasText(req.getPhoneNumber()), SysUser::getPhoneNumber, req.getPhoneNumber());
+
+        if (CollUtil.isNotEmpty(allocatedUserIds)) {
+            wrapper.notIn(SysUser::getUserId, allocatedUserIds);
+        }
+
+        IPage<SysUser> pageRes = gateway.page(page, wrapper);
+        return PageResult.ok(pageRes, SysUserResp.class);
     }
 
 
