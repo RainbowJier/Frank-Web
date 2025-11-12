@@ -105,8 +105,8 @@ function handleSelectionChange(selection) {
 // 查询表数据
 function getList() {
   unallocatedUserList(queryParams).then(res => {
-    userList.value = res.rows
-    total.value = res.total
+    userList.value = res.data.rows
+    total.value = res.data.total
   })
 }
 
@@ -126,12 +126,11 @@ const emit = defineEmits(["ok"])
 /** 选择授权用户操作 */
 function handleSelectUser() {
   const roleId = queryParams.roleId
-  const uIds = userIds.value.join(",")
-  if (uIds == "") {
+  if (userIds.value.length == 0) {
     proxy.$modal.msgError("请选择要分配的用户")
     return
   }
-  authUserSelectAll({ roleId: roleId, userIds: uIds }).then(res => {
+  authUserSelectAll({ roleId: roleId, userIds: userIds.value }).then(res => {
     proxy.$modal.msgSuccess(res.msg)
     visible.value = false
     emit("ok")

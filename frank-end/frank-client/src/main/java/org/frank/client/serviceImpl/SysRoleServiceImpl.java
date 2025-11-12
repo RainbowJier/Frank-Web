@@ -18,10 +18,7 @@ import org.frank.domain.entity.SysRole;
 import org.frank.domain.gateway.ISysRoleGateway;
 import org.frank.domain.gateway.ISysRoleRelMenuGateway;
 import org.frank.domain.gateway.ISysUserRelRoleGateway;
-import org.frank.shared.sysRole.req.SysRoleAddReq;
-import org.frank.shared.sysRole.req.SysRoleChangeStatusReq;
-import org.frank.shared.sysRole.req.SysRoleQueryReq;
-import org.frank.shared.sysRole.req.SysRoleUpdateReq;
+import org.frank.shared.sysRole.req.*;
 import org.frank.shared.sysRole.resp.SysRoleResp;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,14 +37,14 @@ public class SysRoleServiceImpl implements SysRoleService {
     private ISysRoleGateway gateway;
 
     @Resource
-    private ISysUserRelRoleGateway userRoleGateway;
+    private ISysUserRelRoleGateway sysUserRelRoleGateway;
 
     @Resource
-    private ISysRoleRelMenuGateway roleMenuGateway;
+    private ISysRoleRelMenuGateway sysRoleRelMenuGateway;
 
     @Override
     public List<SysRoleResp> getRoleList(Long userId) {
-        List<Long> roleIds = userRoleGateway.selectRoleIdsByUserId(userId);
+        List<Long> roleIds = sysUserRelRoleGateway.selectRoleIdsByUserId(userId);
         if (CollUtil.isEmpty(roleIds)) {
             return Collections.emptyList();
         }
@@ -109,7 +106,7 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     private void relatedMenu(List<Long> menuIds, Long roleId) {
-        if (BooleanUtil.isFalse(roleMenuGateway.saveBatchRoleMenu(roleId, menuIds))) {
+        if (BooleanUtil.isFalse(sysRoleRelMenuGateway.saveBatchRoleMenu(roleId, menuIds))) {
             throw new BusinessException("Fail to related menu.");
         }
     }
@@ -124,7 +121,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         }
 
         // remove role-menu relation
-        roleMenuGateway.removeBatchByRoleIds(roleIds);
+        sysRoleRelMenuGateway.removeBatchByRoleIds(roleIds);
 
         // remove role
         gateway.removeByIds(roleIds);
@@ -184,5 +181,22 @@ public class SysRoleServiceImpl implements SysRoleService {
         }
 
         log.info("Successfully changed role status, roleId: {}, status: {}", req.getRoleId(), req.getStatus());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void allocateUser(AllocateUserReq req) {
+        Long roleId = req.getRoleId();
+        List<Long> userIds = req.getUserIds();
+
+        sysUserRelRoleGateway.saveBatchUsersRole(roleId, userIds);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void CancelAllocateUser(CancelAllocateUserReq req) {
+        Long roleId = req.getRoleId();
+        List<Long> userIds = req.getUserIds();
+        sysUserRelRoleGateway.removeBatchUsersRole(roleId, userIds);
     }
 }

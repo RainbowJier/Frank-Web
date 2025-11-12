@@ -42,7 +42,7 @@
                plain
                icon="CircleClose"
                :disabled="multiple"
-               @click="cancelAuthUserAll"
+               @click="cancelAuthUser()"
                v-hasPermi="['system:role:remove']"
             >批量取消授权</el-button>
          </el-col>
@@ -93,87 +93,115 @@
 
 <script setup name="AuthUser">
 import selectUser from "./selectUser"
-import { allocatedUserList, authUserCancel, authUserCancelAll } from "@/api/system/role"
+import { allocatedUserList, authUserCancelAll } from "@/api/system/role"
 
+// 响应式数据定义
 const route = useRoute()
 const { proxy } = getCurrentInstance()
 const { sys_normal_disable } = proxy.useDict("sys_normal_disable")
 
+// 表格数据相关
 const userList = ref([])
-const loading = ref(true)
-const showSearch = ref(true)
-const multiple = ref(true)
+const loading = ref(false)
 const total = ref(0)
-const userIds = ref([])
+const selectedUsers = ref([])
 
+// 搜索相关
+const showSearch = ref(true)
+const queryRef = ref()
+const selectRef = ref()
+
+// 计算属性
+const multiple = computed(() => !selectedUsers.value.length)
 const queryParams = reactive({
   pageNum: 1,
   pageSize: 10,
   roleId: route.params.roleId,
-  userName: undefined,
-  phonenumber: undefined,
+  userName: "",
+  phonenumber: "",
 })
 
-/** 查询授权用户列表 */
-function getList() {
-  loading.value = true
-  allocatedUserList(queryParams).then(response => {
-    userList.value = response.data.rows
-    total.value = response.data.total
+// 获取已分配用户列表
+async function getList() {
+  try {
+    loading.value = true
+    const response = await allocatedUserList(queryParams)
+    userList.value = response.data?.rows || []
+    total.value = response.data?.total || 0
+  } catch (error) {
+    console.error("获取用户列表失败:", error)
+    proxy.$modal.msgError("获取用户列表失败")
+    userList.value = []
+    total.value = 0
+  } finally {
     loading.value = false
-  })
+  }
 }
 
-/** 返回按钮 */
+// 返回角色列表
 function handleClose() {
   const obj = { path: "/system/role" }
   proxy.$tab.closeOpenPage(obj)
 }
 
-/** 搜索按钮操作 */
+// 查询操作
 function handleQuery() {
   queryParams.pageNum = 1
   getList()
 }
 
-/** 重置按钮操作 */
+// 重置查询条件
 function resetQuery() {
   proxy.resetForm("queryRef")
+  queryParams.userName = ""
+  queryParams.phonenumber = ""
   handleQuery()
 }
 
-/** 多选框选中数据 */
+// 表格选择变化
 function handleSelectionChange(selection) {
-  userIds.value = selection.map(item => item.userId)
-  multiple.value = !selection.length
+  selectedUsers.value = selection
 }
 
-/** 打开授权用户表弹窗 */
+// 打开用户选择弹窗
 function openSelectUser() {
   proxy.$refs["selectRef"].show()
 }
 
-/** 取消授权按钮操作 */
-function cancelAuthUser(row) {
-  proxy.$modal.confirm('确认要取消该用户"' + row.userName + '"角色吗？').then(function () {
-    return authUserCancel({ userId: row.userId, roleId: queryParams.roleId })
-  }).then(() => {
-    getList()
-    proxy.$modal.msgSuccess("取消授权成功")
-  }).catch(() => {})
-}
-
-/** 批量取消授权按钮操作 */
-function cancelAuthUserAll(row) {
+// 取消用户授权
+async function cancelAuthUser(row) {
   const roleId = queryParams.roleId
-  const uIds = userIds.value.join(",")
-  proxy.$modal.confirm("是否取消选中用户授权数据项?").then(function () {
-    return authUserCancelAll({ roleId: roleId, userIds: uIds })
-  }).then(() => {
-    getList()
+  const cancelUserIds = row ? [row.userId] : selectedUsers.value.map(user => user.userId)
+
+  if (!cancelUserIds?.length) {
+    proxy.$modal.msgError("请选择要取消授权的用户")
+    return
+  }
+
+  const confirmMessage = row
+    ? `确认要取消用户"${row.userName}"的角色授权吗？`
+    : `确认要取消选中的 ${cancelUserIds.length} 个用户的角色授权吗？`
+
+  try {
+    await proxy.$modal.confirm(confirmMessage)
+    await authUserCancelAll({ roleId, userIds: cancelUserIds })
     proxy.$modal.msgSuccess("取消授权成功")
-  }).catch(() => {})
+    await getList()
+  } catch (error) {
+    if (error !== "cancel") {
+      console.error("取消授权失败:", error)
+      proxy.$modal.msgError("取消授权失败")
+    }
+  }
 }
 
-getList()
+// 页面加载时获取数据
+onMounted(() => {
+  if (!queryParams.roleId) {
+    proxy.$modal.msgError("角色ID不能为空")
+    handleClose()
+    return
+  }
+  getList()
+})
 </script>

@@ -75,41 +75,23 @@ export function unallocatedUserList(query) {
   })
 }
 
-// 取消用户授权角色
-export function authUserCancel(data) {
-  return request({
-    url: '/system/role/authUser/cancel',
-    method: 'post',
-    data: data
-  })
-}
-
 // 批量取消用户授权角色
 export function authUserCancelAll(data) {
   return request({
-    url: '/system/role/authUser/cancelAll',
-    method: 'put',
-    params: data
+    url: '/sys-role/cancel-allocate-user',
+    method: 'post',
+    data: data
   })
 }
 
 // 授权用户选择
 export function authUserSelectAll(data) {
   return request({
-    url: '/system/role/authUser/selectAll',
-    method: 'put',
-    params: data
+    url: '/sys-role/allocate-user',
+    method: 'post',
+    data: data
   })
 }
-
-// 根据角色ID查询部门树结构
-export function deptTreeSelect(roleId) {
-  return request({
-    url: '/system/role/deptTree/' + roleId,
-    method: 'get'
-  })
-}
-
 
 // 角色数据权限
 export function dataScope(data) {
