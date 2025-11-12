@@ -6,10 +6,7 @@ import jakarta.annotation.Resource;
 import org.frank.app.service.SysRoleService;
 import org.frank.common.core.domain.AjaxResult;
 import org.frank.common.core.page.PageResult;
-import org.frank.shared.sysRole.req.SysRoleAddReq;
-import org.frank.shared.sysRole.req.SysRoleChangeStatusReq;
-import org.frank.shared.sysRole.req.SysRoleQueryReq;
-import org.frank.shared.sysRole.req.SysRoleUpdateReq;
+import org.frank.shared.sysRole.req.*;
 import org.frank.shared.sysRole.resp.SysRoleResp;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -70,6 +67,20 @@ public class SysRoleController {
     @ApiOperation("change role status.")
     public AjaxResult<Void> changeStatus(@Validated @RequestBody SysRoleChangeStatusReq req) {
         service.changeStatus(req);
+        return AjaxResult.success();
+    }
+
+    @PostMapping("/allocate-user")
+    @ApiOperation("Allocate users for role by batch.")
+    public AjaxResult<Void> allocateUser(@Validated @RequestBody AllocateUserReq req) {
+        service.allocateUser(req);
+        return AjaxResult.success();
+    }
+
+    @PostMapping("/cancel-allocate-user")
+    @ApiOperation("Cancel user role relation by batch.")
+    public AjaxResult<Void> CancelAllocateUser(@Validated @RequestBody CancelAllocateUserReq req) {
+        service.CancelAllocateUser(req);
         return AjaxResult.success();
     }
 

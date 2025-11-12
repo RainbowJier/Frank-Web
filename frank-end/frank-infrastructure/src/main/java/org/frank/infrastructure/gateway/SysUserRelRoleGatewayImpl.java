@@ -1,5 +1,6 @@
 package org.frank.infrastructure.gateway;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,17 +30,15 @@ public class SysUserRelRoleGatewayImpl extends ServiceImpl<SysUserRelRoleMapper,
             // 先删除原有的用户角色关联
             deleteByUserId(userId);
 
-            if (roleIds == null || roleIds.isEmpty())    return true;
+            if (roleIds == null || roleIds.isEmpty()) return true;
 
             // 批量插入新的用户角色关联
-            List<SysUserRelRole> userRoleList = roleIds.stream()
-                    .map(roleId -> {
-                        SysUserRelRole userRole = new SysUserRelRole();
-                        userRole.setUserId(userId);
-                        userRole.setRoleId(roleId);
-                        return userRole;
-                    })
-                    .collect(Collectors.toList());
+            List<SysUserRelRole> userRoleList = roleIds.stream().map(roleId -> {
+                SysUserRelRole userRole = new SysUserRelRole();
+                userRole.setUserId(userId);
+                userRole.setRoleId(roleId);
+                return userRole;
+            }).collect(Collectors.toList());
 
             return saveBatch(userRoleList);
         } catch (Exception e) {
@@ -79,9 +77,7 @@ public class SysUserRelRoleGatewayImpl extends ServiceImpl<SysUserRelRoleMapper,
         queryWrapper.eq(SysUserRelRole::getUserId, userId);
         List<SysUserRelRole> userRoleList = sysUserRelRoleMapper.selectList(queryWrapper);
 
-        return userRoleList.stream()
-                .map(SysUserRelRole::getRoleId)
-                .collect(Collectors.toList());
+        return userRoleList.stream().map(SysUserRelRole::getRoleId).collect(Collectors.toList());
     }
 
     @Override
@@ -95,9 +91,7 @@ public class SysUserRelRoleGatewayImpl extends ServiceImpl<SysUserRelRoleMapper,
         queryWrapper.select(SysUserRelRole::getUserId);
 
         List<SysUserRelRole> userRoleList = list(queryWrapper);
-        return userRoleList.stream()
-                .map(SysUserRelRole::getUserId)
-                .collect(Collectors.toList());
+        return userRoleList.stream().map(SysUserRelRole::getUserId).collect(Collectors.toList());
     }
 
     @Override
@@ -105,5 +99,36 @@ public class SysUserRelRoleGatewayImpl extends ServiceImpl<SysUserRelRoleMapper,
         if (userId == null) return false;
         List<Long> roleIds = selectRoleIdsByUserId(userId);
         return roleIds.contains(1L);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveBatchUsersRole(Long roleId, List<Long> userIds) {
+        // remove old relation of role.
+        deleteByRoleId(roleId);
+
+        if (CollUtil.isEmpty(userIds)) {
+            log.info("userIds is empty");
+            return;
+        }
+
+        List<SysUserRelRole> userRoleList = userIds.stream()
+                .map(userId -> {
+                    SysUserRelRole userRole = new SysUserRelRole();
+                    userRole.setUserId(userId);
+                    userRole.setRoleId(roleId);
+                    return userRole;
+                }).collect(Collectors.toList());
+
+        saveBatch(userRoleList);
+    }
+
+    @Override
+    public void removeBatchUsersRole(Long roleId, List<Long> userIds) {
+        LambdaQueryWrapper<SysUserRelRole> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysUserRelRole::getRoleId, roleId)
+                .in(SysUserRelRole::getUserId, userIds);
+
+        remove(queryWrapper);
     }
 }

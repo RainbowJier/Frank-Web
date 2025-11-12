@@ -9,51 +9,51 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 字典数据响应对象
+ * Dictionary data response object
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class SysDictDataResp implements Serializable {
-    @ApiModelProperty("字典编码")
+    @ApiModelProperty("Dictionary code")
     private String dictCode;
 
-    @ApiModelProperty("字典排序")
+    @ApiModelProperty("Dictionary sort order")
     private Integer dictSort;
 
-    @ApiModelProperty("字典标签")
+    @ApiModelProperty("Dictionary label")
     private String dictLabel;
 
-    @ApiModelProperty("字典键值")
+    @ApiModelProperty("Dictionary value")
     private String dictValue;
 
-    @ApiModelProperty("字典类型")
+    @ApiModelProperty("Dictionary type")
     private String dictType;
 
-    @ApiModelProperty("样式属性（其他样式扩展）")
+    @ApiModelProperty("CSS class (other style extensions)")
     private String cssClass;
 
-    @ApiModelProperty("表格回显样式")
+    @ApiModelProperty("Table display style")
     private String listClass;
 
-    @ApiModelProperty("是否默认（Y是 N否）")
+    @ApiModelProperty("Is default (Y yes N no)")
     private String isDefault;
 
-    @ApiModelProperty("状态（1正常，-1停用）")
+    @ApiModelProperty("Status (1 normal, 0 disabled)")
     private Integer status;
 
-    @ApiModelProperty("创建者")
+    @ApiModelProperty("Creator")
     private String createBy;
 
-    @ApiModelProperty("创建时间")
+    @ApiModelProperty("Create time")
     private Date createTime;
 
-    @ApiModelProperty("更新者")
+    @ApiModelProperty("Updater")
     private String updateBy;
 
-    @ApiModelProperty("更新时间")
+    @ApiModelProperty("Update time")
     private Date updateTime;
 
-    @ApiModelProperty("备注")
+    @ApiModelProperty("Remark")
     private String remark;
 }

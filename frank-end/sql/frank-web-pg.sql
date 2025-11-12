@@ -49,6 +49,10 @@ insert into sys_user
 values (1, 'admin', 'administrator', 'frank@163.com', 1,
         '$2a$12$HgMqFBFOt1rys5iMT8ShN.1/I6woV2jgaWV3DWcM5ffDzGiyZNsIa', now(), now());
 
+-- 更新序列，确保自动插入时，id值从当前最大值开始
+SELECT setval(pg_get_serial_sequence('sys_user', 'user_id'),
+              (SELECT MAX(user_id) FROM sys_user));
+
 
 -- ----------------------------
 -- 用户和角色关联表  用户N-1角色
@@ -77,16 +81,11 @@ comment on column sys_user_rel_role.update_time is '更新时间';
 comment on column sys_user_rel_role.update_by is '更新者';
 comment on column sys_user_rel_role.remark is '备注';
 
-
-
 -- ----------------------------
 -- 初始化-用户和角色关联表数据
 -- ----------------------------
 insert into sys_user_rel_role
 values ('1', '1');
-insert into sys_user_rel_role
-values ('2', '2');
-
 
 -- ----------------------------
 -- 角色信息表
@@ -123,13 +122,12 @@ comment on column sys_role.update_time is '更新时间';
 comment on column sys_role.remark is '备注';
 
 -- 初始化-角色信息表数据
-insert into sys_role
-    (role_name, role_key, role_sort, update_time, remark)
-values ('超级管理员', 'admin', 1, now(), '超级管理员');
-insert into sys_role
-    (role_name, role_key, role_sort, update_time, remark)
-values ('普通角色', 'common', 2, now(), '普通角色');
+insert into sys_role (role_id, role_name, role_key, role_sort, update_time, remark) overriding system value
+values (1, '超级管理员', 'admin', 1, now(), '超级管理员');
 
+-- 更新序列，确保自动插入时，id值从当前最大值开始
+SELECT setval(pg_get_serial_sequence('sys_role', 'role_id'),
+              (SELECT MAX(role_id) FROM sys_role));
 
 
 -- ----------------------------
@@ -408,7 +406,9 @@ VALUES (1, '系统管理', 0, 1, 'system', null, '', '', 0, 1, 'M', 1, '', 'syst
        (1059, '预览代码', 116, 5, '#', '', '', '', 0, 1, 'F', 1, 'tool:gen:preview', '#', now(), now(), ''),
        (1060, '生成代码', 116, 6, '#', '', '', '', 0, 1, 'F', 1, 'tool:gen:code', '#', now(), now(), '');
 
-
+-- 更新序列，确保自动插入时，id值从当前最大值开始
+SELECT setval(pg_get_serial_sequence('sys_menu', 'menu_id'),
+              (SELECT MAX(menu_id) FROM sys_menu));
 
 -- ----------------------------
 -- 字典数据表
@@ -485,6 +485,11 @@ VALUES (1, 1, '男', '0', 'sys_user_sex', '', '', 'Y', 1, now(), now(), '性别�
        (27, 9, '清空数据', '9', 'sys_oper_type', '', 'danger', 'N', 1, now(), now(), '清空操作'),
        (28, 1, '成功', '1', 'sys_common_status', '', 'primary', 'N', 1, now(), now(), '正常状态'),
        (29, 2, '失败', '0', 'sys_common_status', '', 'danger', 'N', 1, now(), now(), '停用状态');
+
+SELECT setval(pg_get_serial_sequence('sys_dict_data', 'dict_code'),
+              (SELECT MAX(dict_code) FROM sys_dict_data));
+
+
 -- ----------------------------
 -- 字典类型表
 -- ----------------------------
@@ -528,6 +533,10 @@ VALUES (1, '用户性别', 'sys_user_sex', 1, now(), now(), '用户性别列表'
        (8, '通知状态', 'sys_notice_status', 1, now(), now(), '通知状态列表'),
        (9, '操作类型', 'sys_oper_type', 1, now(), now(), '操作类型列表'),
        (10, '系统状态', 'sys_common_status', 1, now(), now(), '登录状态列表');
+
+-- 更新序列，确保自动插入时，id值从当前最大值开始
+SELECT setval(pg_get_serial_sequence('sys_dict_type', 'dict_id'),
+              (SELECT MAX(dict_id) FROM sys_dict_type));
 
 
 

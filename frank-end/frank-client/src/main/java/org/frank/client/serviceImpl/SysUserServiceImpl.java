@@ -166,7 +166,7 @@ public class SysUserServiceImpl implements SysUserService {
     @Override
     public PageResult selectUnallocatedUserList(AllocatedUserQueryReq req) {
         List<Long> allocatedUserIds = userRelRoleGateway.selectUserIdsByRoleId(req.getRoleId());
-        allocatedUserIds.add(0L);
+        allocatedUserIds.add(1L);   // exclude administrator.
 
         IPage<SysUser> page = new Page<>(req.getPageNum(), req.getPageSize());
 

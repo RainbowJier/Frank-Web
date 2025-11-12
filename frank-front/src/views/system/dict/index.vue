@@ -153,7 +153,7 @@
                   <el-radio
                      v-for="dict in sys_normal_disable"
                      :key="dict.value"
-                     :value="dict.value"
+                     :label="dict.value"
                   >{{ dict.label }}</el-radio>
                </el-radio-group>
             </el-form-item>
@@ -210,8 +210,8 @@ const { queryParams, form, rules } = toRefs(data)
 function getList() {
   loading.value = true
   listType(proxy.addDateRange(queryParams.value, dateRange.value)).then(response => {
-    typeList.value = response.rows
-    total.value = response.total
+    typeList.value = response.data.rows
+    total.value = response.data.total
     loading.value = false
   })
 }
@@ -228,10 +228,12 @@ function reset() {
     dictId: undefined,
     dictName: undefined,
     dictType: undefined,
-    status: "0",
+    status: "1",
     remark: undefined
   }
-  proxy.resetForm("dictRef")
+  if (proxy.$refs.dictRef) {
+    proxy.resetForm("dictRef")
+  }
 }
 
 /** 搜索按钮操作 */
@@ -267,6 +269,10 @@ function handleUpdate(row) {
   const dictId = row.dictId || ids.value
   getType(dictId).then(response => {
     form.value = response.data
+    // 将数值型的status转换为字符型，以便与sys_normal_disable字典中的字符型值匹配
+    if (form.value.status !== undefined) {
+      form.value.status = String(form.value.status)
+    }
     open.value = true
     title.value = "修改字典类型"
   })
@@ -319,5 +325,8 @@ function handleRefreshCache() {
   })
 }
 
-getList()
+/** 组件挂载时初始化数据 */
+onMounted(() => {
+  getList()
+})
 </script>

@@ -14,19 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * 数据字典信息
- *
- * @author Frank
- */
 @RestController
 @RequestMapping("/sys-dict-data")
+@ApiOperation("Dict Data")
 public class SysDictDataController extends BaseController {
     @Resource
     private SysDictDataService service;
 
     @GetMapping(value = "/type/{dictType}")
-    @ApiOperation("根据字典类型查询字典数据信息")
+    @ApiOperation("Get dict info by type.")
     public AjaxResult<List<SysDictDataResp>> dictType(@PathVariable("dictType") String dictType) {
         return AjaxResult.success(service.selectDictDataByType(dictType));
     }
