@@ -3,16 +3,16 @@ import request from '@/utils/request'
 // 查询字典数据列表
 export function listData(query) {
   return request({
-    url: '/system/dict/data/list',
-    method: 'get',
-    params: query
+    url: '/sys-dict-data/list',
+    method: 'post',
+    data: query
   })
 }
 
 // 查询字典数据详细
 export function getData(dictCode) {
   return request({
-    url: '/system/dict/data/' + dictCode,
+    url: '/sys-dict-data/' + dictCode,
     method: 'get'
   })
 }
@@ -28,7 +28,7 @@ export function getDicts(dictType) {
 // 新增字典数据
 export function addData(data) {
   return request({
-    url: '/system/dict/data',
+    url: '/sys-dict-data/add',
     method: 'post',
     data: data
   })
@@ -37,8 +37,8 @@ export function addData(data) {
 // 修改字典数据
 export function updateData(data) {
   return request({
-    url: '/system/dict/data',
-    method: 'put',
+    url: '/sys-dict-data/update',
+    method: 'post',
     data: data
   })
 }
@@ -46,7 +46,7 @@ export function updateData(data) {
 // 删除字典数据
 export function delData(dictCode) {
   return request({
-    url: '/system/dict/data/' + dictCode,
-    method: 'delete'
+    url: '/sys-dict-data/delete/' + dictCode,
+    method: 'get'
   })
 }

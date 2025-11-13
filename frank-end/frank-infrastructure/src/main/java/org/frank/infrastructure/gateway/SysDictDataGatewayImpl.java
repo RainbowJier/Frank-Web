@@ -30,6 +30,25 @@ public class SysDictDataGatewayImpl
                 .orderByAsc(SysDictData::getDictSort);
         return mapper.selectList(queryWrapper);
     }
+
+    @Override
+    public Boolean checkDictValueUnique(String dictType, String dictValue) {
+        LambdaQueryWrapper<SysDictData> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysDictData::getDictType, dictType)
+                .eq(SysDictData::getDictValue, dictValue);
+
+        return mapper.selectCount(queryWrapper) > 0;
+    }
+
+    @Override
+    public Boolean checkDictValueUniqueExcludeCur(String dictType, Long dictCode, String dictValue) {
+        LambdaQueryWrapper<SysDictData> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysDictData::getDictType, dictType)
+                .eq(SysDictData::getDictValue, dictValue)
+                .ne(SysDictData::getDictCode, dictCode);
+
+        return mapper.selectCount(queryWrapper) > 0;
+    }
 }
 
 

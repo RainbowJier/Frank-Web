@@ -87,9 +87,6 @@ public class DictUtil {
     public static String getDictLabel(String dictType, String dictValue, String separator) {
         StringBuilder propertyString = new StringBuilder();
         List<SysDictData> datas = getDictCache(dictType);
-        if (StringUtil.isNull(datas)) {
-            return StringUtils.EMPTY;
-        }
         if (StringUtils.containsAny(separator, dictValue)) {
             for (SysDictData dict : datas) {
                 for (String value : dictValue.split(separator)) {
@@ -120,9 +117,6 @@ public class DictUtil {
     public static String getDictValue(String dictType, String dictLabel, String separator) {
         StringBuilder propertyString = new StringBuilder();
         List<SysDictData> datas = getDictCache(dictType);
-        if (StringUtil.isNull(datas)) {
-            return StringUtils.EMPTY;
-        }
         if (StringUtils.containsAny(separator, dictLabel)) {
             for (SysDictData dict : datas) {
                 for (String label : dictLabel.split(separator)) {
@@ -168,11 +162,8 @@ public class DictUtil {
      */
     public static String getDictLabels(String dictType) {
         StringBuilder propertyString = new StringBuilder();
-        List<SysDictData> datas = getDictCache(dictType);
-        if (StringUtil.isNull(datas)) {
-            return StringUtils.EMPTY;
-        }
-        for (SysDictData dict : datas) {
+        List<SysDictData> list = getDictCache(dictType);
+        for (SysDictData dict : list) {
             propertyString.append(dict.getDictLabel()).append(SEPARATOR);
         }
         return StringUtils.stripEnd(propertyString.toString(), SEPARATOR);

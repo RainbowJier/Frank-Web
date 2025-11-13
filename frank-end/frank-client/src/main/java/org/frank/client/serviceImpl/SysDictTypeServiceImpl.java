@@ -2,6 +2,7 @@ package org.frank.client.serviceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -14,6 +15,8 @@ import org.frank.domain.entity.SysDictType;
 import org.frank.domain.gateway.ISysDictTypeGateway;
 import org.frank.shared.sysDictType.req.PageQuery;
 import org.frank.shared.sysDictType.req.SysDictTypeAddReq;
+import org.frank.shared.sysDictType.req.SysDictTypeUpdateReq;
+import org.frank.shared.sysDictType.resp.SysDictTypeOptionListResp;
 import org.frank.shared.sysDictType.resp.SysDictTypeResp;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -36,7 +39,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
                 .eq(params.getStatus() != null, SysDictType::getStatus, params.getStatus())
                 .like(StringUtils.hasText(params.getDictType()), SysDictType::getDictType, params.getDictType())
                 .orderByDesc(SysDictType::getCreateTime);
-        // 创建时间范围查询
+
         if (StringUtils.hasText(params.getBeginTime()) && StringUtils.hasText(params.getEndTime())) {
             wrapper.ge(StringUtils.hasText(params.getBeginTime()), SysDictType::getCreateTime, params.getBeginTime())
                     .le(StringUtils.hasText(params.getEndTime()), SysDictType::getCreateTime, params.getEndTime());
@@ -51,14 +54,12 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     @Override
     public void insertDictType(SysDictTypeAddReq req) {
         // Check if dict type is unique.
-        SysDictType existDictType = selectByDictType(req.getDictType());
-        if (existDictType != null) {
+        if (BooleanUtil.isTrue(gateway.checkDictTypeUnique(req.getDictType()))) {
             throw new BusinessException("Dict type [" + req.getDictType() + "] is already existed.");
         }
 
         // Check if dict name is unique.
-        SysDictType sysDictType = selectByDictName(req.getDictName());
-        if (sysDictType != null) {
+        if (BooleanUtil.isTrue(gateway.checkDictNameUnique(req.getDictName()))) {
             throw new BusinessException("Dict name [" + req.getDictName() + "] is already existed.");
         }
 
@@ -69,18 +70,8 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
                 .setRemark(req.getRemark());
 
         if (BooleanUtil.isFalse(gateway.save(dictType))) {
-            throw new BusinessException("新增字典类型失败");
+            throw new BusinessException("Fail to add new dict type.");
         }
-    }
-
-    @Override
-    public SysDictType selectByDictType(String type) {
-        return gateway.getOne(new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getDictType, type));
-    }
-
-    @Override
-    public SysDictType selectByDictName(String name) {
-        return gateway.getOne(new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getDictName, name));
     }
 
     @Override
@@ -90,20 +81,46 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     }
 
     @Override
-    public void deleteDictTypeById(Long dictId) {
-        if (dictId == null) {
-            throw new BusinessException("字典ID不能为空");
+    public void updateDictType(SysDictTypeUpdateReq req) {
+        // Check if dict type exists
+        if (ObjectUtil.isEmpty(gateway.getById(req.getDictId()))) {
+            throw new BusinessException("Dict type not found with ID: " + req.getDictId());
         }
 
-        SysDictType sysDictType = gateway.getById(dictId);
-        if (sysDictType == null) {
-            throw new BusinessException("字典类型不存在");
+        // Check if dict type is unique.
+        if (BooleanUtil.isTrue(gateway.checkDictTypeUniqueExcludeCur(req.getDictId(), req.getDictType()))) {
+            throw new BusinessException("Dict type [" + req.getDictType() + "] is already existed.");
         }
 
-        if (BooleanUtil.isFalse(gateway.removeById(dictId))) {
-            throw new BusinessException("删除字典类型失败");
+        // Check if dict name is unique.
+        if (BooleanUtil.isTrue(gateway.checkDictNameUniqueExcludeCur(req.getDictId(), req.getDictName()))) {
+            throw new BusinessException("Dict name [" + req.getDictName() + "] is already existed.");
         }
 
-        log.info("删除字典类型成功，dictId: {}, dictType: {}", dictId, sysDictType.getDictType());
+        // Update the dict type
+        SysDictType updateDictType = new SysDictType();
+        updateDictType.setDictId(req.getDictId());
+        updateDictType.setDictName(req.getDictName());
+        updateDictType.setDictType(req.getDictType());
+        updateDictType.setStatus(req.getStatus());
+        updateDictType.setRemark(req.getRemark());
+
+        if (BooleanUtil.isFalse(gateway.updateById(updateDictType))) {
+            throw new BusinessException("Update dict type failed");
+        }
+
+        log.info("Successfully updated dict type: {}", req.getDictId());
+    }
+
+    @Override
+    public void removeByIds(List<Long> dictIds) {
+        if (BooleanUtil.isFalse(gateway.removeByIds(dictIds))) {
+            throw new BusinessException("Fail to remove dict data by batch.");
+        }
+    }
+
+    @Override
+    public SysDictTypeOptionListResp selectDictTypeAll() {
+        return BeanUtil.copyProperties(gateway.list(), SysDictTypeOptionListResp.class);
     }
 }

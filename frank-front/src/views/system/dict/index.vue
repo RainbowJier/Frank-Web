@@ -228,7 +228,7 @@ function reset() {
     dictId: undefined,
     dictName: undefined,
     dictType: undefined,
-    status: "1",
+    status: 1,
     remark: undefined
   }
   if (proxy.$refs.dictRef) {

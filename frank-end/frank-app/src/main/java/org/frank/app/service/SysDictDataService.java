@@ -1,17 +1,41 @@
 package org.frank.app.service;
 
+import org.frank.common.core.page.PageResult;
+import org.frank.shared.sysDictData.req.SysDictDataAddReq;
+import org.frank.shared.sysDictData.req.SysDictDataListReq;
+import org.frank.shared.sysDictData.req.SysDictDataUpdateReq;
 import org.frank.shared.sysDictData.resp.SysDictDataResp;
 
 import java.util.List;
 
 public interface SysDictDataService {
     /**
-     * 根据字典类型查询字典数据
-     *
-     * @param dictType 字典类型
-     * @return 字典数据集合信息
+     * Get dict data info by dict type.
      */
-    List<SysDictDataResp> selectDictDataByType(String dictType);
+    List<SysDictDataResp> getDictDataByType(String dictType);
 
+    /**
+     * Query by pagination.
+     */
+    PageResult selectDictDataList(SysDictDataListReq params);
 
+    /**
+     * Get by dict code.
+     */
+    SysDictDataResp getDictDataByDictCode(Long dictCode);
+
+    /**
+     * Add dict data.
+     */
+    void addDictData(SysDictDataAddReq req);
+
+    /**
+     * Update dict data.
+     */
+    void updateDictData(SysDictDataUpdateReq req);
+
+    /**
+     * Delete dict data.
+     */
+    void deleteDictData(Long dictCode);
 }

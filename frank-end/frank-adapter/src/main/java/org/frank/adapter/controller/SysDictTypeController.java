@@ -1,6 +1,7 @@
 package org.frank.adapter.controller;
 
 
+import cn.hutool.core.collection.CollUtil;
 import io.swagger.annotations.ApiOperation;
 import jakarta.annotation.Resource;
 import org.frank.app.service.SysDictTypeService;
@@ -10,9 +11,13 @@ import org.frank.common.core.page.PageResult;
 import org.frank.common.exception.BusinessException;
 import org.frank.shared.sysDictType.req.PageQuery;
 import org.frank.shared.sysDictType.req.SysDictTypeAddReq;
+import org.frank.shared.sysDictType.req.SysDictTypeUpdateReq;
+import org.frank.shared.sysDictType.resp.SysDictTypeOptionListResp;
 import org.frank.shared.sysDictType.resp.SysDictTypeResp;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 数据字典信息
@@ -49,14 +54,27 @@ public class SysDictTypeController extends BaseController {
         return AjaxResult.success(result);
     }
 
-    @GetMapping("/remove/{dictId}")
-    @ApiOperation("Delete dict type by dictId.")
-    public AjaxResult<Void> remove(@PathVariable("dictId") Long dictId) {
-        service.deleteDictTypeById(dictId);
+    @PostMapping("/update")
+    @ApiOperation("Update dict type.")
+    public AjaxResult<Void> update(@Validated @RequestBody SysDictTypeUpdateReq req) {
+        service.updateDictType(req);
         return AjaxResult.success();
     }
 
+    @PostMapping("/remove")
+    @ApiOperation("Delete dict type by dictId.")
+    public AjaxResult<Void> remove(@RequestBody List<Long> dictIds) {
+        if (CollUtil.isEmpty(dictIds)) return AjaxResult.failed("Dict id list can not be empty.");
 
+        service.removeByIds(dictIds);
+        return AjaxResult.success();
+    }
+
+    @GetMapping("/option-list")
+    @ApiOperation("Get dict type option list to select.")
+    public AjaxResult<SysDictTypeOptionListResp> optionList() {
+        return AjaxResult.success(service.selectDictTypeAll());
+    }
 
 
 }

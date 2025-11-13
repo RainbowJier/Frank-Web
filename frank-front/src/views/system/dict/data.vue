@@ -66,16 +66,7 @@
                v-hasPermi="['system:dict:remove']"
             >删除</el-button>
          </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="warning"
-               plain
-               icon="Download"
-               @click="handleExport"
-               v-hasPermi="['system:dict:export']"
-            >导出</el-button>
-         </el-col>
-         <el-col :span="1.5">
+           <el-col :span="1.5">
             <el-button
                type="warning"
                plain
@@ -176,13 +167,18 @@
 </template>
 
 <script setup name="Data">
+import { ref, reactive, toRefs, getCurrentInstance, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import useDictStore from '@/store/modules/dict'
 import { optionselect as getDictOptionselect, getType } from "@/api/system/dict/type"
 import { listData, getData, delData, addData, updateData } from "@/api/system/dict/data"
 
+// 当前实例和路由
 const { proxy } = getCurrentInstance()
 const { sys_normal_disable } = proxy.useDict("sys_normal_disable")
+const route = useRoute()
 
+// 响应式数据
 const dataList = ref([])
 const open = ref(false)
 const loading = ref(true)
@@ -194,16 +190,19 @@ const total = ref(0)
 const title = ref("")
 const defaultDictType = ref("")
 const typeOptions = ref([])
-const route = useRoute()
-// 数据标签回显样式
-const listClassOptions = ref([
-  { value: "default", label: "默认" }, 
-  { value: "primary", label: "主要" }, 
+
+// 常量定义
+const LIST_CLASS_OPTIONS = Object.freeze([
+  { value: "default", label: "默认" },
+  { value: "primary", label: "主要" },
   { value: "success", label: "成功" },
   { value: "info", label: "信息" },
   { value: "warning", label: "警告" },
   { value: "danger", label: "危险" }
 ])
+
+// 计算属性
+const listClassOptions = computed(() => LIST_CLASS_OPTIONS)
 
 const data = reactive({
   form: {},
@@ -223,30 +222,48 @@ const data = reactive({
 
 const { queryParams, form, rules } = toRefs(data)
 
-/** 查询字典类型详细 */
-function getTypes(dictId) {
-  getType(dictId).then(response => {
+/**
+ * 查询字典类型详细
+ * @param {string|number} dictId 字典ID
+ */
+async function getTypes(dictId) {
+  try {
+    const response = await getType(dictId)
     queryParams.value.dictType = response.data.dictType
     defaultDictType.value = response.data.dictType
-    getList()
-  })
+    await getList()
+  } catch (error) {
+    console.error('获取字典类型详情失败:', error)
+    proxy.$modal.msgError('获取字典类型详情失败')
+  }
 }
 
 /** 查询字典类型列表 */
-function getTypeList() {
-  getDictOptionselect().then(response => {
-    typeOptions.value = response.data
-  })
+async function getTypeList() {
+  try {
+    const response = await getDictOptionselect()
+    typeOptions.value = response.data || []
+  } catch (error) {
+    console.error('获取字典类型列表失败:', error)
+    typeOptions.value = []
+  }
 }
 
 /** 查询字典数据列表 */
-function getList() {
+async function getList() {
   loading.value = true
-  listData(queryParams.value).then(response => {
-    dataList.value = response.rows
-    total.value = response.total
+  try {
+    const response = await listData(queryParams.value)
+    dataList.value = response.data.rows || []
+    total.value = response.data.total || 0
+  } catch (error) {
+    console.error('获取字典数据列表失败:', error)
+    proxy.$modal.msgError('获取数据列表失败')
+    dataList.value = []
+    total.value = 0
+  } finally {
     loading.value = false
-  })
+  }
 }
 
 /** 取消按钮 */
@@ -264,16 +281,18 @@ function reset() {
     cssClass: undefined,
     listClass: "default",
     dictSort: 0,
-    status: "0",
+    status: "1",
     remark: undefined
   }
-  proxy.resetForm("dataRef")
+  nextTick(() => {
+    proxy.resetForm("dataRef")
+  })
 }
 
 /** 搜索按钮操作 */
-function handleQuery() {
+async function handleQuery() {
   queryParams.value.pageNum = 1
-  getList()
+  await getList()
 }
 
 /** 返回按钮操作 */
@@ -283,10 +302,10 @@ function handleClose() {
 }
 
 /** 重置按钮操作 */
-function resetQuery() {
+async function resetQuery() {
   proxy.resetForm("queryRef")
   queryParams.value.dictType = defaultDictType.value
-  handleQuery()
+  await handleQuery()
 }
 
 /** 新增按钮操作 */
@@ -297,66 +316,115 @@ function handleAdd() {
   form.value.dictType = queryParams.value.dictType
 }
 
-/** 多选框选中数据 */
+/**
+ * 表格多选框选中数据
+ * @param {Array} selection 选中的数据项
+ */
 function handleSelectionChange(selection) {
   ids.value = selection.map(item => item.dictCode)
-  single.value = selection.length != 1
-  multiple.value = !selection.length
+  single.value = selection.length !== 1
+  multiple.value = selection.length === 0
 }
 
-/** 修改按钮操作 */
-function handleUpdate(row) {
+/**
+ * 修改按钮操作
+ * @param {Object} row 行数据
+ */
+async function handleUpdate(row) {
   reset()
-  const dictCode = row.dictCode || ids.value
-  getData(dictCode).then(response => {
+  try {
+    const dictCode = row?.dictCode || ids.value
+    if (!dictCode) {
+      proxy.$modal.msgError('请选择要修改的数据')
+      return
+    }
+
+    const response = await getData(dictCode)
     form.value = response.data
+    // 将数值型的status转换为字符型，以便与sys_normal_disable字典中的字符型值匹配
+    if (form.value.status !== undefined) {
+      form.value.status = String(form.value.status)
+    }
     open.value = true
     title.value = "修改字典数据"
-  })
+  } catch (error) {
+    console.error('获取字典数据详情失败:', error)
+    proxy.$modal.msgError('获取数据详情失败')
+  }
 }
 
-/** 提交按钮 */
-function submitForm() {
-  proxy.$refs["dataRef"].validate(valid => {
-    if (valid) {
-      if (form.value.dictCode != undefined) {
-        updateData(form.value).then(response => {
-          useDictStore().removeDict(queryParams.value.dictType)
-          proxy.$modal.msgSuccess("修改成功")
-          open.value = false
-          getList()
-        })
-      } else {
-        addData(form.value).then(response => {
-          useDictStore().removeDict(queryParams.value.dictType)
-          proxy.$modal.msgSuccess("新增成功")
-          open.value = false
-          getList()
-        })
-      }
+/** 提交表单 */
+async function submitForm() {
+  try {
+    const valid = await proxy.$refs["dataRef"].validate()
+    if (!valid) return
+
+    const dictStore = useDictStore()
+
+    if (form.value.dictCode) {
+      await updateData(form.value)
+      proxy.$modal.msgSuccess("修改成功")
+    } else {
+      await addData(form.value)
+      proxy.$modal.msgSuccess("新增成功")
     }
-  })
+
+    open.value = false
+    dictStore.removeDict(queryParams.value.dictType)
+    await getList()
+
+  } catch (error) {
+    console.error('表单提交失败:', error)
+    proxy.$modal.msgError('操作失败，请重试')
+  }
 }
 
-/** 删除按钮操作 */
-function handleDelete(row) {
-  const dictCodes = row.dictCode || ids.value
-  proxy.$modal.confirm('是否确认删除字典编码为"' + dictCodes + '"的数据项？').then(function() {
-    return delData(dictCodes)
-  }).then(() => {
-    getList()
+/**
+ * 删除按钮操作
+ * @param {Object} row 行数据
+ */
+async function handleDelete(row) {
+  try {
+    const dictCodes = row?.dictCode || ids.value
+    if (!dictCodes) {
+      proxy.$modal.msgError('请选择要删除的数据')
+      return
+    }
+
+    await proxy.$modal.confirm(`是否确认删除字典编码为"${dictCodes}"的数据项？`)
+    await delData(dictCodes)
+
     proxy.$modal.msgSuccess("删除成功")
     useDictStore().removeDict(queryParams.value.dictType)
-  }).catch(() => {})
+    await getList()
+
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('删除失败:', error)
+      proxy.$modal.msgError('删除失败，请重试')
+    }
+  }
 }
 
-/** 导出按钮操作 */
-function handleExport() {
-  proxy.download("system/dict/data/export", {
-    ...queryParams.value
-  }, `dict_data_${new Date().getTime()}.xlsx`)
-}
 
-getTypes(route.params && route.params.dictId)
-getTypeList()
+// 初始化数据
+onMounted(async () => {
+  const dictId = route.params?.dictId
+  if (dictId) {
+    await Promise.all([
+      getTypes(dictId),
+      getTypeList()
+    ])
+  } else {
+    await getTypeList()
+    proxy.$modal.msgWarning('未找到字典类型参数')
+  }
+})
+
+// 组件销毁时清理数据
+onUnmounted(() => {
+  dataList.value = []
+  typeOptions.value = []
+  ids.value = []
+})
 </script>
