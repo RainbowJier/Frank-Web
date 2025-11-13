@@ -76,5 +76,11 @@ public class SysDictTypeController extends BaseController {
         return AjaxResult.success(service.selectDictTypeAll());
     }
 
+    @GetMapping("/refreshCache")
+    @ApiOperation("Refresh dict type cache.")
+    public AjaxResult<Void> refreshCache() {
+        service.resetDictCache();
+        return AjaxResult.success();
+    }
 
 }

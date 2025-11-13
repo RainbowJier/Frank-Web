@@ -56,7 +56,7 @@ export function optionselect() {
 // 刷新字典缓存
 export function refreshCache() {
   return request({
-    url: '/system/dict/type/refreshCache',
-    method: 'delete'
+    url: '/sys-dict-type/refreshCache',
+    method: 'get'
   })
 }

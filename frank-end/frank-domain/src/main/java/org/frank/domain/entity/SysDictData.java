@@ -4,9 +4,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
@@ -18,6 +19,8 @@ import lombok.experimental.Accessors;
 @TableName(value = "sys_dict_data")
 @Data
 @Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class SysDictData extends BaseEntity {
     /**
      * 字典编码
@@ -68,16 +71,10 @@ public class SysDictData extends BaseEntity {
     private String isDefault;
 
     /**
-     * 状态（1正常，-1停用）
+     * 状态（1正常，0停用）
      */
     @TableField(value = "status")
     private Integer status;
-
-    /**
-     * 无参构造函数（Jackson反序列化需要）
-     */
-    public SysDictData() {
-    }
 
     /**
      * 带参数的构造函数

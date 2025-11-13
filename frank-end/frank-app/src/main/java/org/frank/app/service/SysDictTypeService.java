@@ -40,4 +40,14 @@ public interface SysDictTypeService {
      * Get dict type option list to select.
      */
     SysDictTypeOptionListResp selectDictTypeAll();
+
+    /**
+     * Reset dict cache.
+     */
+    void resetDictCache();
+
+    /**
+     * Loading dict cache.
+     */
+    void loadingDictCache();
 }

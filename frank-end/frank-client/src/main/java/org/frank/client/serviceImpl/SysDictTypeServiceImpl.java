@@ -11,7 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.frank.app.service.SysDictTypeService;
 import org.frank.common.core.page.PageResult;
 import org.frank.common.exception.BusinessException;
+import org.frank.common.util.DictUtil;
+import org.frank.domain.entity.SysDictData;
 import org.frank.domain.entity.SysDictType;
+import org.frank.domain.gateway.ISysDictDataGateway;
 import org.frank.domain.gateway.ISysDictTypeGateway;
 import org.frank.shared.sysDictType.req.PageQuery;
 import org.frank.shared.sysDictType.req.SysDictTypeAddReq;
@@ -21,7 +24,10 @@ import org.frank.shared.sysDictType.resp.SysDictTypeResp;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -29,6 +35,9 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
 
     @Resource
     private ISysDictTypeGateway gateway;
+
+    @Resource
+    private ISysDictDataGateway sysDictDataGateway;
 
     @Override
     public PageResult selectDictTypeList(PageQuery params) {
@@ -122,5 +131,21 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     @Override
     public SysDictTypeOptionListResp selectDictTypeAll() {
         return BeanUtil.copyProperties(gateway.list(), SysDictTypeOptionListResp.class);
+    }
+
+    @Override
+    public void resetDictCache() {
+        DictUtil.clearDictCache();
+        loadingDictCache();
+    }
+
+    @Override
+    public void loadingDictCache() {
+        List<SysDictData> list = sysDictDataGateway.list();
+        Map<String, List<SysDictData>> dictDataMap = list.stream()
+                .collect(Collectors.groupingBy(SysDictData::getDictType));
+        for (Map.Entry<String, List<SysDictData>> entry : dictDataMap.entrySet()) {
+            DictUtil.setDictCache(entry.getKey(), entry.getValue().stream().sorted(Comparator.comparing(SysDictData::getDictSort)).collect(Collectors.toList()));
+        }
     }
 }

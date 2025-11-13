@@ -16,7 +16,6 @@ import useUserStore from '@/store/modules/user'
 let downloadLoadingInstance = null
 
 // 重新登录控制标志
-export let isRelogin = { show: true }
 
 // 请求配置常量
 const REQUEST_CONFIG = {
@@ -143,8 +142,7 @@ service.interceptors.request.use(config => {
  * 处理401未授权错误
  */
 function handleUnauthorizedError() {
-  if (isRelogin.show) {
-    ElMessageBox.confirm(
+  ElMessageBox.confirm(
       '登录状态已过期，您可以继续留在该页面，或者重新登录',
       '系统提示',
       {
@@ -153,15 +151,13 @@ function handleUnauthorizedError() {
         type: 'warning'
       }
     ).then(() => {
-      isRelogin.show = false
       const userStore = useUserStore()
       userStore.logOut().then(() => {
         location.href = '/index'
       })
     }).catch(() => {
-      isRelogin.show = false
+      // 取消重新登录操作
     })
-  }
   return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
 }
 
@@ -231,9 +227,10 @@ service.interceptors.response.use(
       }
 
       // 获取响应状态码和消息
-      const code = res.data?.code || 200
+      const code = res.code || 200
       const msg = errorCode[code] || res.data?.msg || errorCode['default']
 
+      console.log(code)
       // 处理不同的响应状态码
       switch (code) {
         case 200:
