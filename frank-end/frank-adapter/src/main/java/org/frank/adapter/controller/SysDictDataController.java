@@ -55,10 +55,10 @@ public class SysDictDataController extends BaseController {
         return AjaxResult.success();
     }
 
-    @GetMapping("delete/{dictCode}")
+    @PostMapping("delete")
     @ApiOperation("Delete.")
-    public AjaxResult<Void> delete(@PathVariable("dictCode") Long dictCode) {
-        service.deleteDictData(dictCode);
+    public AjaxResult<Void> delete(@RequestBody List<Long> dictCodes) {
+        service.deleteDictDataBatch(dictCodes);
         return AjaxResult.success();
     }
 

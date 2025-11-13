@@ -9,7 +9,7 @@ public enum ResultCodeEnum {
     SUCCESS(200, "操作成功"),
     FAILED(500, "操作失败"),
     VALIDATE_FAILED(417, "参数检验失败"),
-    UNAUTHORIZED(500, "暂未登录或token已经过期"),
+    UNAUTHORIZED(401, "暂未登录或token已经过期"),
     FORBIDDEN(403, "没有相关权限"),
     BAD_REQUEST(400, "客户端错误"),
     NOT_FOUND(404, "无法找到所请求的资源");

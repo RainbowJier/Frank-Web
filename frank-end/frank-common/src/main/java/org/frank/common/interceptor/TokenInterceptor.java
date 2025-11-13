@@ -59,7 +59,7 @@ public class TokenInterceptor implements HandlerInterceptor {
             throw new AuthenticationException("Please login first.");
         }
 
-        // verify token valid or not.
+        // verify if token is valid or not.
         if (!tokenService.verifyToken(loginUser)) {
             log.warn("Token is invalid or expired for URI: {}", requestURI);
             throw new AuthenticationException("Token is invalid or expired.");

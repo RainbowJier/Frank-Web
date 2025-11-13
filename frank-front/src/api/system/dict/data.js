@@ -44,9 +44,10 @@ export function updateData(data) {
 }
 
 // 删除字典数据
-export function delData(dictCode) {
+export function delData(dictCodes) {
   return request({
-    url: '/sys-dict-data/delete/' + dictCode,
-    method: 'get'
+    url: '/sys-dict-data/delete',
+    method: 'post',
+    data: dictCodes
   })
 }

@@ -143,8 +143,7 @@ service.interceptors.request.use(config => {
  * 处理401未授权错误
  */
 function handleUnauthorizedError() {
-  if (!isRelogin.show) {
-    isRelogin.show = true
+  if (isRelogin.show) {
     ElMessageBox.confirm(
       '登录状态已过期，您可以继续留在该页面，或者重新登录',
       '系统提示',

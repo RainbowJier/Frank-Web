@@ -34,8 +34,5 @@ public interface SysDictDataService {
      */
     void updateDictData(SysDictDataUpdateReq req);
 
-    /**
-     * Delete dict data.
-     */
-    void deleteDictData(Long dictCode);
+    void deleteDictDataBatch(List<Long> dictCodes);
 }

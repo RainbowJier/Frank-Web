@@ -56,7 +56,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         wrapper.like(StringUtils.hasText(params.getDictType()), SysDictData::getDictType, params.getDictType())
                 .like(StringUtils.hasText(params.getDictLabel()), SysDictData::getDictLabel, params.getDictLabel())
                 .eq(params.getStatus() != null, SysDictData::getStatus, params.getStatus())
-                .orderByDesc(SysDictData::getCreateTime);
+                .orderByAsc(SysDictData::getDictSort);
 
         IPage<SysDictData> list = gateway.page(page, wrapper);
 
@@ -102,10 +102,9 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         DictUtil.removeDictCache(req.getDictType());
     }
 
-
     @Override
-    public void deleteDictData(Long dictCode) {
-        if (BooleanUtil.isFalse(gateway.removeById(dictCode))) {
+    public void deleteDictDataBatch(List<Long> dictCodes) {
+        if (BooleanUtil.isFalse(gateway.removeByIds(dictCodes))) {
             throw new BusinessException("Failed to delete dict data.");
         }
     }

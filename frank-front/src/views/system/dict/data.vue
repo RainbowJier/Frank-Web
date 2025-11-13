@@ -391,8 +391,11 @@ async function handleDelete(row) {
       return
     }
 
+    // 将单条数据也转换为数组格式
+    const dictCodesArray = Array.isArray(dictCodes) ? dictCodes : [dictCodes]
+
     await proxy.$modal.confirm(`是否确认删除字典编码为"${dictCodes}"的数据项？`)
-    await delData(dictCodes)
+    await delData(dictCodesArray)
 
     proxy.$modal.msgSuccess("删除成功")
     useDictStore().removeDict(queryParams.value.dictType)
