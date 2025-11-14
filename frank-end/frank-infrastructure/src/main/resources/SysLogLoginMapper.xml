@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.frank.infrastructure.mapper.SysLogLoginMapper">
+
+    <resultMap id="BaseResultMap" type="org.frank.domain.entity.SysLogLogin">
+        <id property="id" column="id"/>
+        <result property="userName" column="user_name"/>
+        <result property="ipaddr" column="ipaddr"/>
+        <result property="loginLocation" column="login_location"/>
+        <result property="browser" column="browser"/>
+        <result property="os" column="os"/>
+        <result property="status" column="status"/>
+        <result property="msg" column="msg"/>
+        <result property="loginTime" column="login_time"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        info_id,user_name,ipaddr,login_location,browser,os,
+        status,msg,login_time
+    </sql>
+</mapper>

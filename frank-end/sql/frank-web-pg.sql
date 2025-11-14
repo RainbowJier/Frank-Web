@@ -539,12 +539,49 @@ SELECT setval(pg_get_serial_sequence('sys_dict_type', 'dict_id'),
               (SELECT MAX(dict_id) FROM sys_dict_type));
 
 
+-- ----------------------------
+-- sys_log_login
+-- ----------------------------
+DROP TABLE sys_log_login;
+CREATE TABLE sys_log_login
+(
+    id             BIGSERIAL PRIMARY KEY,
+    user_name      VARCHAR(50)  DEFAULT ''  NOT NULL,
+    ipaddr         VARCHAR(128) DEFAULT ''  NOT NULL,
+    login_location VARCHAR(255) DEFAULT ''  NOT NULL,
+    browser        VARCHAR(50)  DEFAULT ''  NOT NULL,
+    os             VARCHAR(50)  DEFAULT ''  NOT NULL,
+    status         CHAR(1)      DEFAULT '0' NOT NULL,
+    msg            VARCHAR(255) DEFAULT ''  NOT NULL,
+    login_time     TIMESTAMP    DEFAULT now(),
+    del_flag       int          default 1,
+    create_by      bigint       default null,
+    create_time    timestamp    default now(),
+    update_by      bigint       default null,
+    update_time    timestamp,
+    remark         varchar(500) default null
+);
+
+COMMENT ON TABLE sys_log_login IS '系统访问记录';
+COMMENT ON COLUMN sys_log_login.id IS '访问ID';
+COMMENT ON COLUMN sys_log_login.user_name IS '用户账号';
+COMMENT ON COLUMN sys_log_login.ipaddr IS '登录IP地址';
+COMMENT ON COLUMN sys_log_login.login_location IS '登录地点';
+COMMENT ON COLUMN sys_log_login.browser IS '浏览器类型';
+COMMENT ON COLUMN sys_log_login.os IS '操作系统';
+COMMENT ON COLUMN sys_log_login.status IS '登录状态1成功 0失败）';
+COMMENT ON COLUMN sys_log_login.msg IS '提示消息';
+COMMENT ON COLUMN sys_log_login.login_time IS '访问时间';
+comment on column sys_dict_type.del_flag is '删除标志（1-存在 0-删除）';
+comment on column sys_dict_type.create_by is '创建者';
+comment on column sys_dict_type.create_time is '创建时间';
+comment on column sys_dict_type.update_by is '更新者';
+comment on column sys_dict_type.update_time is '更新时间';
+comment on column sys_dict_type.remark is '备注';
 
 
-
-
-
-
+CREATE INDEX idx_sys_log_login_status ON sys_log_login (status);
+CREATE INDEX idx_sys_log_login_lt ON sys_log_login (login_time);
 
 
 

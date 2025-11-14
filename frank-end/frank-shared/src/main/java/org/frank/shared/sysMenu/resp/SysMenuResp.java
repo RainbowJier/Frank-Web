@@ -36,19 +36,19 @@ public class SysMenuResp {
     private String routeName;
 
     @ApiModelProperty(value = "是否为外链（1是 0否）")
-    private Integer isFrame;
+    private String isFrame;
 
     @ApiModelProperty(value = "是否缓存（1缓存 0不缓存）")
-    private Integer isCache;
+    private String isCache;
 
     @ApiModelProperty(value = "菜单类型（M目录 C菜单 F按钮）")
     private String menuType;
 
     @ApiModelProperty(value = "菜单状态（1显示 0隐藏）")
-    private Integer visible;
+    private String visible;
 
     @ApiModelProperty(value = "菜单状态（1显示 0隐藏）")
-    private Integer status;
+    private String status;
 
     @ApiModelProperty(value = "权限标识")
     private String perms;

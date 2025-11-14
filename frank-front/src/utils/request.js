@@ -227,7 +227,7 @@ service.interceptors.response.use(
       }
 
       // 获取响应状态码和消息
-      const code = res.code || 200
+      const code = res.data?.code || 200
       const msg = errorCode[code] || res.data?.msg || errorCode['default']
 
       console.log(code)
