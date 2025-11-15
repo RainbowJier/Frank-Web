@@ -84,8 +84,8 @@ public class SysLoginServiceImpl implements SysLoginService {
     private SysUser checkExistUser(String userName) {
         SysUser user = sysUserGateway.selectByUsername(userName);
         if (ObjectUtil.isNull(user)) {
-            log.info("用户 {} 不存在", userName);
-            throw new AuthenticationException("用户名或密码错误");
+            log.info("User {} does not exist", userName);
+            throw new AuthenticationException("Username or password is incorrect");
         }
         return user;
     }
@@ -98,8 +98,8 @@ public class SysLoginServiceImpl implements SysLoginService {
         }
 
         if (retryCount >= maxRetryCount) {
-            log.warn("用户 {} 账户已被锁定", sysUser.getUserName());
-            throw new AuthenticationException("账户已被锁定，请稍后再试");
+            log.warn("User {} account has been locked", sysUser.getUserName());
+            throw new AuthenticationException("Account has been locked, please try again later");
         }
 
         boolean isMatch = matchesPassword(password, sysUser.getPassword());
@@ -107,8 +107,8 @@ public class SysLoginServiceImpl implements SysLoginService {
         if (!isMatch) {
             retryCount = retryCount + 1;
             redisCache.setCacheObject(getPasswordErrorCountKey(sysUser.getUserName()), retryCount, lockTime, TimeUnit.MINUTES);
-            log.warn("用户 {} 密码错误，已错误 {} 次", sysUser.getUserName(), retryCount);
-            throw new AuthenticationException("用户名或密码错误");
+            log.warn("User {} password error, {} times wrong", sysUser.getUserName(), retryCount);
+            throw new AuthenticationException("Username or password is incorrect");
         } else {
             clearLoginRecordCache(sysUser.getUserName());
         }
