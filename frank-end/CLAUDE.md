@@ -680,7 +680,7 @@ DTO响应类: {Function}Resp (如: SysUserResp)
 /**
  * 系统用户控制器
  *
- * @author Claude AI Assistant
+ * @author Frank
  * @since 2025-11-10
  */
 @RestController
@@ -778,7 +778,7 @@ public class SysUserController {
 /**
  * 用户服务接口
  *
- * @author Claude AI Assistant
+ * @author Frank
  * @since 2025-11-10
  */
 public interface SysUserService {
@@ -869,7 +869,7 @@ public interface SysUserService {
 /**
  * 用户服务实现类
  *
- * @author Claude AI Assistant
+ * @author Frank
  * @since 2025-11-10
  */
 @Service
@@ -1195,7 +1195,7 @@ public class SysUserServiceImpl implements SysUserService {
 /**
  * 系统用户实体
  *
- * @author Claude AI Assistant
+ * @author Frank
  * @since 2025-11-10
  */
 @Data
@@ -1281,7 +1281,7 @@ public class SysUser extends BaseEntity {
 /**
  * 基础请求对象
  *
- * @author Claude AI Assistant
+ * @author Frank
  * @since 2025-11-10
  */
 @Data
@@ -1304,7 +1304,7 @@ public class BaseReq implements Serializable {
 /**
  * 用户分页查询请求
  *
- * @author Claude AI Assistant
+ * @author Frank
  * @since 2025-11-10
  */
 @Data
@@ -1335,7 +1335,7 @@ public class SysUserPageQueryReq extends BaseReq {
 /**
  * 新增用户请求
  *
- * @author Claude AI Assistant
+ * @author Frank
  * @since 2025-11-10
  */
 @Data
@@ -1381,7 +1381,7 @@ public class SysUserAddReq implements Serializable {
 /**
  * 用户响应
  *
- * @author Claude AI Assistant
+ * @author Frank
  * @since 2025-11-10
  */
 @Data
