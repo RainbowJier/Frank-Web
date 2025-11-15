@@ -42,6 +42,10 @@ public class Constants {
      */
     public static final String LOGIN_SUCCESS = "Success";
 
+    public static final String SUCCESS = "1";
+
+    public static final String ERROR = "0";
+
     /**
      * 注销
      */

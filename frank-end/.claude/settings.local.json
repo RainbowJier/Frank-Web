@@ -3,7 +3,8 @@
     "allow": [
       "Bash(mvn:*)",
       "mcp__sequential-thinking__sequentialthinking",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "ask": []

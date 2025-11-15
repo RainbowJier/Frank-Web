@@ -1,6 +1,8 @@
 package org.frank.common.util;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.http.useragent.UserAgent;
+import cn.hutool.http.useragent.UserAgentUtil;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -149,5 +151,20 @@ public class ServletUtil {
      */
     public static String urlDecode(String str) {
         return URLDecoder.decode(str, StandardCharsets.UTF_8);
+    }
+
+
+    public static UserAgent parseUserAgent() {
+        HttpServletRequest request = getRequest();
+        String uaStr = request.getHeader("User-Agent");
+        return UserAgentUtil.parse(uaStr);
+    }
+
+    public static String getBrowser() {
+        return parseUserAgent().getBrowser().toString();
+    }
+
+    public static String getOs() {
+        return parseUserAgent().getOs().toString();
     }
 }

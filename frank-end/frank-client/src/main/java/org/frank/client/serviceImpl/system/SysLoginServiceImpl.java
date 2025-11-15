@@ -1,16 +1,22 @@
 package org.frank.client.serviceImpl.system;
 
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.frank.app.service.monitor.SysLogService;
 import org.frank.app.service.system.SysLoginService;
 import org.frank.common.components.TokenService;
 import org.frank.common.constant.CacheConstants;
+import org.frank.common.constant.Constants;
 import org.frank.common.core.domain.LoginUser;
 import org.frank.common.core.redis.RedisCache;
 import org.frank.common.exception.AuthenticationException;
+import org.frank.common.util.IpUtil;
+import org.frank.common.util.ServletUtil;
 import org.frank.common.util.sign.BCryptUtils;
+import org.frank.domain.entity.SysLogLogin;
 import org.frank.domain.entity.SysUser;
 import org.frank.domain.gateway.ISysUserGateway;
 import org.frank.shared.sysLogin.req.LoginReq;
@@ -32,6 +38,9 @@ public class SysLoginServiceImpl implements SysLoginService {
     @Resource
     private TokenService tokenService;
 
+    @Resource
+    private SysLogService sysLogService;
+
     @Value(value = "${user.password.maxRetryCount}")
     private int maxRetryCount;
 
@@ -40,15 +49,35 @@ public class SysLoginServiceImpl implements SysLoginService {
 
     @Override
     public String login(LoginReq loginReq) {
-        SysUser sysUser = checkExistUser(loginReq.getUsername());
-
-        validatePassword(sysUser, loginReq.getPassword());
-
         LoginUser loginUser = new LoginUser();
-        loginUser.setUserId(sysUser.getUserId())
-                .setUserName(sysUser.getUserName());
 
-        return tokenService.createToken(loginUser);
+        try {
+            SysUser sysUser = checkExistUser(loginReq.getUsername());
+            validatePassword(sysUser, loginReq.getPassword());
+
+            loginUser.setUserId(sysUser.getUserId())
+                    .setUserName(sysUser.getUserName())
+                    .setIpaddr(IpUtil.getIpAddr())
+                    .setLoginLocation(IpUtil.getIpLocation(IpUtil.getIpAddr()))
+                    .setBrowser(ServletUtil.getBrowser())
+                    .setOs(ServletUtil.getOs());
+
+            recordLoginLog(loginUser, Constants.SUCCESS);
+
+            return tokenService.createToken(loginUser);
+        } catch (Exception e) {
+            recordLoginLog(loginUser, Constants.ERROR);
+            throw new AuthenticationException("Failed to login.");
+        }
+    }
+
+    /**
+     * record login log asynchronously
+     */
+    private void recordLoginLog(LoginUser loginUser, String status) {
+        SysLogLogin sysLogLogin = BeanUtil.copyProperties(loginUser, SysLogLogin.class);
+        sysLogLogin.setStatus(status);
+        sysLogService.saveLoginLogAsync(sysLogLogin);
     }
 
 

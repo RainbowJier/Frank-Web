@@ -81,9 +81,22 @@ const useUserStore = defineStore(
             removeToken()
             resolve()
           }).catch(error => {
-            reject(error)
+            // 即使后端logout失败，也要清除本地状态
+            this.token = ''
+            this.roles = []
+            this.permissions = []
+            removeToken()
+            resolve()
           })
         })
+      },
+      // 强制退出（不调用后端接口，直接清除本地状态）
+      forceLogOut() {
+        this.token = ''
+        this.roles = []
+        this.permissions = []
+        removeToken()
+        return Promise.resolve()
       }
     }
   })

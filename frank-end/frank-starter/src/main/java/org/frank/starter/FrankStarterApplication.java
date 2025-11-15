@@ -8,6 +8,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * FRANK项目启动类
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.ComponentScan;
 @MapperScan("org.frank.infrastructure.mapper")
 @ComponentScan("org.frank")
 @EnableConfigurationProperties({CorsProperties.class, ExcludePathsProperties.class})
+@EnableAsync
 public class FrankStarterApplication {
     public static final String BANNER = """
             \s

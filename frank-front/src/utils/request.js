@@ -152,7 +152,8 @@ function handleUnauthorizedError() {
       }
     ).then(() => {
       const userStore = useUserStore()
-      userStore.logOut().then(() => {
+      // 使用forceLogOut避免用过期token调用后端logout接口
+      userStore.forceLogOut().then(() => {
         location.href = '/index'
       })
     }).catch(() => {
