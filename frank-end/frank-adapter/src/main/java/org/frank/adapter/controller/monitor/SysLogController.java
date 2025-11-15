@@ -1,5 +1,6 @@
 package org.frank.adapter.controller.monitor;
 
+import cn.hutool.core.collection.CollUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import jakarta.annotation.Resource;
@@ -9,10 +10,9 @@ import org.frank.app.service.monitor.SysLogService;
 import org.frank.common.core.domain.AjaxResult;
 import org.frank.common.core.page.PageResult;
 import org.frank.shared.sysLog.req.LoginPageQueryReq;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -26,7 +26,24 @@ public class SysLogController {
 
     @PostMapping("/login/list")
     @ApiOperation("Query login logs list by pagination.")
-    public AjaxResult<PageResult> list(@RequestBody @Valid LoginPageQueryReq req) {
+    public AjaxResult<PageResult> selectLoginPage(@RequestBody @Valid LoginPageQueryReq req) {
         return AjaxResult.success(service.selectLoginPage(req));
     }
+
+    @GetMapping("/login/clean")
+    @ApiOperation("Clean log login list.")
+    public AjaxResult<Void> cleanLoginList() {
+        service.cleanLoginList();
+        return AjaxResult.success();
+    }
+
+    @PostMapping("/login/delete")
+    @ApiOperation("Delete login log by batch.")
+    public AjaxResult<Void> deleteLoginLog(@RequestBody List<Long> infoIds) {
+        if (CollUtil.isEmpty(infoIds)) return AjaxResult.failed("Please select at least one record to delete.");
+        service.deleteLoginLogByIds(infoIds);
+        return AjaxResult.success();
+    }
+
+
 }

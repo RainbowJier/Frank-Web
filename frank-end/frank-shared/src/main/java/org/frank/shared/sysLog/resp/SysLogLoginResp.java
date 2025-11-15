@@ -17,7 +17,7 @@ import java.util.Date;
 @ApiModel(description = "登录日志响应")
 public class SysLogLoginResp implements Serializable {
     @ApiModelProperty(value = "日志ID")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(value = "用户账号")
     private String userName;

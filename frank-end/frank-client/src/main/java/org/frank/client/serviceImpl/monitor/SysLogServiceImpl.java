@@ -16,6 +16,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class SysLogServiceImpl implements SysLogService {
@@ -30,7 +32,8 @@ public class SysLogServiceImpl implements SysLogService {
         LambdaQueryWrapper<SysLogLogin> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(StringUtils.hasText(req.getUserName()), SysLogLogin::getUserName, req.getUserName())
                 .like(StringUtils.hasText(req.getIpaddr()), SysLogLogin::getIpaddr, req.getIpaddr())
-                .eq(StringUtils.hasText(req.getStatus()), SysLogLogin::getStatus, req.getStatus());
+                .eq(StringUtils.hasText(req.getStatus()), SysLogLogin::getStatus, req.getStatus())
+                .orderByDesc(SysLogLogin::getLoginTime);
         if (req.getBeginTime() != null && req.getEndTime() != null) {
             queryWrapper.ge(SysLogLogin::getLoginTime, req.getBeginTime())
                     .le(SysLogLogin::getLoginTime, req.getEndTime());
@@ -59,5 +62,16 @@ public class SysLogServiceImpl implements SysLogService {
             log.error("Failed to save login log, username: {}, IP: {}",
                     sysLogLogin.getUserName(), sysLogLogin.getIpaddr());
         }
+    }
+
+
+    @Override
+    public void cleanLoginList() {
+        sysLogLoginGateway.cleanAll();
+    }
+
+    @Override
+    public void deleteLoginLogByIds(List<Long> infoIds) {
+        sysLogLoginGateway.removeByIds(infoIds);
     }
 }

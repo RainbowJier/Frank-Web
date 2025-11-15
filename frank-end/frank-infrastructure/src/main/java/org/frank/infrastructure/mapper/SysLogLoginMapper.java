@@ -7,7 +7,6 @@ import org.frank.domain.entity.SysLogLogin;
 
 @Mapper
 public interface SysLogLoginMapper extends BaseMapper<SysLogLogin> {
-
 }
 
 

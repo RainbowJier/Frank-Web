@@ -1,6 +1,7 @@
 package org.frank.infrastructure.gateway;
 
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.frank.domain.entity.SysLogLogin;
@@ -17,7 +18,13 @@ public class SysLogLoginServiceImpl
     @Resource
     private SysLogLoginMapper mapper;
 
-
+    @Override
+    public void cleanAll() {
+        LambdaUpdateWrapper<SysLogLogin> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(SysLogLogin::getDelFlag, 1)
+                .set(SysLogLogin::getDelFlag, 0);
+        mapper.update(wrapper);
+    }
 }
 
 

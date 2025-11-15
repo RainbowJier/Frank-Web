@@ -26,4 +26,5 @@
         info_id,user_name,ipaddr,login_location,browser,os,
         status,msg,login_time
     </sql>
+
 </mapper>

@@ -27,7 +27,7 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: ASSIGN_ID
-      logic-delete-field: del_flag
+      logic-delete-field: 'del_flag'
       logic-not-delete-value: 1
       logic-delete-value: 0
 

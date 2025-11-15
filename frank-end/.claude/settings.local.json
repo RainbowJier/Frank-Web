@@ -4,7 +4,8 @@
       "Bash(mvn:*)",
       "mcp__sequential-thinking__sequentialthinking",
       "Bash(tree:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(java:*)"
     ],
     "deny": [],
     "ask": []

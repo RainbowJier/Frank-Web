@@ -2,6 +2,7 @@ package org.frank.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,6 +16,7 @@ public abstract class BaseEntity implements Serializable {
      * delete flag, 1-normal 0-deleted.
      */
     @TableField(value = "del_flag")
+    @TableLogic(value = "1", delval = "0")
     private Integer delFlag;
 
     @TableField(value = "create_by", fill = FieldFill.INSERT)
