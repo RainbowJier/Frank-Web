@@ -274,9 +274,9 @@ DDD分层架构 + Gateway模式
   +-------------------------------------------------------------------+
   | frank-adapter (适配器层 - Controllers)                              |
   +-------------------------------------------------------------------+
-  | frank-app (应用服务层 - Service Interface)                               |
+  | frank-app (应用服务层 - Service Interface)                         |
   +-------------------------------------------------------------------+
-  | frank-client (客户端层 - Service Impl)                         |
+  | frank-client (客户端层 - Service Impl)                             |
   +-------------------------------------------------------------------+
   | frank-domain (领域层 - Entities, Gateways)                          |
   +-------------------------------------------------------------------+
@@ -306,13 +306,13 @@ DDD分层架构 + Gateway模式
     * 负责处理外部输入，主要是 RESTful API 的实现。
     * 包含所有的 `Controller` 类，将 HTTP 请求转换为对 `app` 层的调用。
 
-* `frank-client`: **应用服务模块**
+* `frank-app`: **应用服务模块**
+  * 定义了应用服务层对外暴露的接口。
+  * 这一层是 `adapter` 和 `client` 之间的桥梁，定义了清晰的服务契约。
+
+* `frank-client`: **客户端模块**
     * 实现了 `app` 层定义的业务接口。
     * 负责编排和协调 `domain` 层的领域对象和领域服务，以完成一个完整的业务用例。
-
-* `frank-app`: **客户端模块**
-    * 定义了应用服务层对外暴露的接口。
-    * 这一层是 `adapter` 和 `client` 之间的桥梁，定义了清晰的服务契约。
 
 * `frank-domain`: **领域模块**
     * 项目的核心，包含了业务领域的实体（`SysUser`、`SysRole`、`SysMenu`）、值对象和领域事件。
@@ -370,14 +370,14 @@ DDD分层架构 + Gateway模式
 ### `frank-app`
 
 * **`src/main/java/org/frank/app/service`**:
-    * **规范**: 存放业务逻辑的具体实现类，命名通常以 `ServiceImpl` 结尾。
-    * **作用**: 实现 `frank-client` 中定义的业务接口，编排领域对象和网关，完成完整的业务流程。
+  * **规范**: 存放业务逻辑的接口，按功能模块分子包组织（如 `monitor`、`system` 等）。
+  * **作用**: 定义了应用层需要向外（主要是 `adapter` 层）暴露的服务契约，是各层之间解耦的关键。
 
 ### `frank-client`
 
-* **`src/main/java/org/frank/client/service`**:
-    * **规范**: 存放业务逻辑的接口，命名通常以 `Service` 结尾。
-    * **作用**: 定义了应用层需要向外（主要是 `adapter` 层）暴露的服务契约，是各层之间解耦的关键。
+* **`src/main/java/org/frank/client/serviceImpl`**:
+  * **规范**: 存放业务逻辑的具体实现类，按功能模块分子包组织，命名通常以 `ServiceImpl` 结尾。
+  * **作用**: 实现 `frank-app` 中定义的业务接口，编排领域对象和网关，完成完整的业务流程。
 
 ### `frank-domain`
 
@@ -386,16 +386,16 @@ DDD分层架构 + Gateway模式
     * **作用**: 包含丰富的业务逻辑和状态，是领域模型的核心。例如 `SysUser`、`SysRole`、`SysMenu` 实体。
 * **`src/main/java/org/frank/domain/gateway`**:
     * **规范**: 存放数据持久化的接口，即网关（Gateway）接口。
-    * **作用**: 定义了领域层希望基础设施层如何持久化其状态的契约。
+  * **作用**: 定义了领域层希望基础设施层如何持久化其状态的契约，继承MyBatis-Plus的IService接口。
 
 ### `frank-infrastructure`
 
 * **`src/main/java/org/frank/infrastructure/gateway`**:
     * **规范**: 存放 Gateway 接口的具体实现类，命名以 `Impl` 结尾。
-    * **作用**: 实现 `frank-domain` 中定义的持久化接口，将领域对象与数据库记录进行转换，并调用 Mapper 完成实际的数据库操作。
+  * **作用**: 实现 `frank-domain` 中定义的持久化接口，继承MyBatis-Plus的ServiceImpl，将领域对象与数据库记录进行转换。
 * **`src/main/java/org/frank/infrastructure/mapper`**:
     * **规范**: 存放 MyBatis-Plus 的 Mapper 接口。
-    * **作用**: 直接与数据库表进行映射，提供底层的、面向数据记录的 CRUD 操作。
+  * **作用**: 继承MyBatis-Plus的BaseMapper接口，直接与数据库表进行映射，提供底层的、面向数据记录的 CRUD 操作。
 
 ### `frank-shared`
 
@@ -561,11 +561,54 @@ graph TD
 ### 核心开发注意事项
 
 1. **架构遵循DDD模式**: 新功能开发应严格按照现有模块划分进行
-2. **数据库操作**: 使用MyBatis-Plus，避免直接写SQL
-3. **API响应格式**: 统一使用`AjaxResult`包装响应
-4. **异常处理**: 在`frank-adapter/controller/exception`中添加全局异常处理器
-5. **DTO转换**: 在`frank-shared`中定义请求和响应DTO，对应实体类`req`请求参数，统一继承`BaseReq`
-6. **实体创建**: 领域实体放在`frank-domain/entity`，继承`BaseEntity`
+2. **模块化组织**: 按功能模块分子包组织（如 `monitor`、`system`、`auth` 等）
+3. **数据库操作**: 使用MyBatis-Plus的IService和BaseMapper，避免直接写SQL
+4. **API响应格式**: 统一使用`AjaxResult`包装响应
+5. **异常处理**: 在`frank-adapter/controller/exception`中添加全局异常处理器
+6. **DTO转换**: 在`frank-shared`中定义请求和响应DTO，对应实体类`req`请求参数，统一继承`BaseReq`
+7. **实体创建**: 领域实体放在`frank-domain/entity`，继承`BaseEntity`
+8. **依赖注入**: 使用`@Resource`注解进行依赖注入，保持一致性
+
+### 新增模块开发规范
+
+**标准文件结构（以monitor模块为例）：**
+
+```
+frank-adapter/src/main/java/org/frank/adapter/controller/monitor/
+├── SysLogOperController.java                    # 控制器
+
+frank-app/src/main/java/org/frank/app/service/monitor/
+├── SysLogOperService.java                        # 服务接口
+
+frank-client/src/main/java/org/frank/client/serviceImpl/monitor/
+├── SysLogOperServiceImpl.java                    # 服务实现
+
+frank-domain/src/main/java/org/frank/domain/
+├── entity/SysLogOper.java                       # 领域实体
+└── gateway/ISysLogOperGateway.java              # Gateway接口
+
+frank-infrastructure/src/main/java/org/frank/infrastructure/
+├── gateway/SysLogOperGatewayImpl.java            # Gateway实现
+└── mapper/SysLogOperMapper.java                  # Mapper接口
+
+frank-shared/src/main/java/org/frank/shared/sysLogOper/
+├── req/SysLogOperPageQueryReq.java               # 请求DTO
+└── resp/SysLogOperResp.java                      # 响应DTO
+```
+
+**架构层次关系：**
+
+- **Adapter层** → 调用 **App层** 接口
+- **App层** → 定义业务接口契约
+- **Client层** → 实现App层接口，调用Domain层
+- **Domain层** → 定义实体和Gateway接口
+- **Infrastructure层** → 实现Gateway接口和数据访问
+
+**关键依赖关系：**
+
+- Gateway接口继承：`extends IService<Entity>`
+- Gateway实现继承：`extends ServiceImpl<Mapper, Entity>`
+- Mapper接口继承：`extends BaseMapper<Entity>`
 
 ---
 
@@ -601,15 +644,15 @@ org.frank.{module}.{layer}.{function}
 **类命名规范：**
 
 ```
-Controller类: {Entity}Controller (如: SysUserController)
-Service接口: {Entity}Service (如: SysUserService)
-Service实现: {Entity}ServiceImpl (如: SysUserServiceImpl)
-Gateway接口: I{Entity}Gateway (如: ISysUserGateway)
-Gateway实现: {Entity}GatewayImpl (如: SysUserGatewayImpl)
-Mapper接口: {Entity}Mapper (如: SysUserMapper)
-Entity实体: {Entity} (如: SysUser)
-DTO请求类: {Function}Req (如: SysUserAddReq)
-DTO响应类: {Function}Resp (如: SysUserResp)
+Controller类: {Entity}Controller (如: SysLogOperController)
+Service接口: {Entity}Service (如: SysLogOperService)
+Service实现: {Entity}ServiceImpl (如: SysLogOperServiceImpl)
+Gateway接口: I{Entity}Gateway (如: ISysLogOperGateway)
+Gateway实现: {Entity}GatewayImpl (如: SysLogOperGatewayImpl)
+Mapper接口: {Entity}Mapper (如: SysLogOperMapper)
+Entity实体: {Entity} (如: SysLogOper)
+DTO请求类: {Function}Req (如: SysLogOperPageQueryReq)
+DTO响应类: {Function}Resp (如: SysLogOperResp)
 ```
 
 **方法命名规范：**
@@ -802,90 +845,47 @@ public class SysUserController {
 
 ```java
 /**
- * 用户服务接口
+ * 操作日志服务接口
  *
  * @author Frank
- * @since 2025-11-10
+ * @since 2025-11-16
  */
-public interface SysUserService {
+public interface SysLogOperService {
 
     /**
-     * 分页查询用户列表
+     * 分页查询操作日志
      *
      * @param req 查询条件
      * @return 分页结果
      */
-    PageResult<SysUserResp> selectUserPage(SysUserPageQueryReq req);
+    PageResult<SysLogOperResp> selectLogOperPage(SysLogOperPageQueryReq req);
 
     /**
-     * 根据ID查询用户信息
+     * 根据ID查询操作日志详情
      *
-     * @param userId 用户ID
-     * @return 用户信息
+     * @param operId 日志ID
+     * @return 操作日志详情
      */
-    SysUserResp selectUserById(Long userId);
+    SysLogOperResp selectLogOperById(Long operId);
 
     /**
-     * 新增用户
+     * 插入操作日志
      *
-     * @param req 用户信息
+     * @param sysLogOper 操作日志
      */
-    void insertUser(SysUserAddReq req);
+    void insertLogOper(SysLogOper sysLogOper);
 
     /**
-     * 修改用户信息
+     * 批量删除操作日志
      *
-     * @param req 用户信息
+     * @param operIds 日志ID数组
      */
-    void updateUser(SysUserUpdateReq req);
+    void deleteLogOperByIds(String operIds);
 
     /**
-     * 删除用户
-     *
-     * @param userIds 用户ID数组
+     * 清空操作日志
      */
-    void deleteUserByIds(String userIds);
-
-    /**
-     * 重置用户密码
-     *
-     * @param req 重置密码请求
-     */
-    void resetPassword(ResetPasswordReq req);
-
-    /**
-     * 修改用户状态
-     *
-     * @param req 状态修改请求
-     */
-    void changeUserStatus(ChangeStatusReq req);
-
-    /**
-     * 检查用户名是否唯一
-     *
-     * @param userName 用户名
-     * @param userId 用户ID（排除自己）
-     * @return true:唯一 false:不唯一
-     */
-    boolean checkUserNameUnique(String userName, Long userId);
-
-    /**
-     * 检查手机号是否唯一
-     *
-     * @param phoneNumber 手机号
-     * @param userId 用户ID（排除自己）
-     * @return true:唯一 false:不唯一
-     */
-    boolean checkPhoneUnique(String phoneNumber, Long userId);
-
-    /**
-     * 检查邮箱是否唯一
-     *
-     * @param email 邮箱
-     * @param userId 用户ID（排除自己）
-     * @return true:唯一 false:不唯一
-     */
-    boolean checkEmailUnique(String email, Long userId);
+    void cleanLogOper();
 }
 ```
 
@@ -893,52 +893,43 @@ public interface SysUserService {
 
 ```java
 /**
- * 用户服务实现类
+ * 操作日志服务实现类
  *
  * @author Frank
- * @since 2025-11-10
+ * @since 2025-11-16
  */
-@Service
 @Slf4j
-public class SysUserServiceImpl implements SysUserService {
+@Service
+public class SysLogOperServiceImpl implements SysLogOperService {
 
-    @Autowired
-    private ISysUserGateway sysUserGateway;
-
-    @Autowired
-    private ISysUserRelRoleGateway userRoleGateway;
-
-    @Autowired
-    private RedisCache redisCache;
-
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+  @Resource
+  private ISysLogOperGateway gateway;
 
     @Override
-    public PageResult<SysUserResp> selectUserPage(SysUserPageQueryReq req) {
+    public PageResult<SysLogOperResp> selectLogOperPage(SysLogOperPageQueryReq req) {
         // 构建查询条件
-        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.like(StringUtil.isNotEmpty(req.getUserName()),
-                         SysUser::getUserName, req.getUserName())
-                   .like(StringUtil.isNotEmpty(req.getPhoneNumber()),
-                         SysUser::getPhoneNumber, req.getPhoneNumber())
+      LambdaQueryWrapper<SysLogOper> queryWrapper = new LambdaQueryWrapper<>();
+      queryWrapper.like(StringUtil.isNotEmpty(req.getTitle()),
+                      SysLogOper::getTitle, req.getTitle())
+              .eq(req.getBusinessType() != null,
+                      SysLogOper::getBusinessType, req.getBusinessType())
                    .eq(req.getStatus() != null,
-                       SysUser::getStatus, req.getStatus())
+                           SysLogOper::getStatus, req.getStatus())
                    .between(req.getBeginTime() != null && req.getEndTime() != null,
-                            SysUser::getCreateTime, req.getBeginTime(), req.getEndTime())
-                   .eq(SysUser::getDelFlag, Constants.NORMAL)
-                   .orderByDesc(SysUser::getCreateTime);
+                           SysLogOper::getOperTime, req.getBeginTime(), req.getEndTime())
+              .eq(SysLogOper::getDelFlag, Constants.NORMAL)
+              .orderByDesc(SysLogOper::getOperTime);
 
         // 执行分页查询
-        IPage<SysUser> page = new Page<>(req.getPageNum(), req.getPageSize());
-        IPage<SysUser> userPage = sysUserGateway.selectPage(page, queryWrapper);
+      IPage<SysLogOper> page = new Page<>(req.getPageNum(), req.getPageSize());
+      IPage<SysLogOper> logPage = gateway.page(page, queryWrapper);
 
         // 转换为响应对象
-        List<SysUserResp> respList = userPage.getRecords().stream()
+      List<SysLogOperResp> respList = logPage.getRecords().stream()
                 .map(this::convertToResp)
                 .collect(Collectors.toList());
 
-        return PageResult.of(respList, userPage.getTotal());
+      return PageResult.of(respList, logPage.getTotal());
     }
 
     @Override
@@ -1646,15 +1637,6 @@ java -jar frank-starter/target/frank-starter-1.0.0.jar
 2. 等待依赖下载完成
 3. 运行FrankStarterApplication.main()方法
 4. 访问 http://localhost:9040/frankweb/doc.html
-
-### 验证启动成功
-
-**检查项目启动日志：**
-
-```
-Tomcat started on port(s): 9040 (http) with context path '/frankweb'
-Started FrankStarterApplication in X.XXX seconds
-```
 
 **访问验证地址：**
 

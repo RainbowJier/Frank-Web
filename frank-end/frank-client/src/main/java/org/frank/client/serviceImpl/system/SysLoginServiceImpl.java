@@ -5,7 +5,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.frank.app.service.monitor.SysLogService;
+import org.frank.app.service.monitor.SysLogLoginService;
 import org.frank.app.service.system.SysLoginService;
 import org.frank.common.components.TokenService;
 import org.frank.common.constant.CacheConstants;
@@ -39,7 +39,7 @@ public class SysLoginServiceImpl implements SysLoginService {
     private TokenService tokenService;
 
     @Resource
-    private SysLogService sysLogService;
+    private SysLogLoginService sysLogLoginService;
 
     @Value(value = "${user.password.maxRetryCount}")
     private int maxRetryCount;
@@ -77,7 +77,7 @@ public class SysLoginServiceImpl implements SysLoginService {
     private void recordLoginLog(LoginUser loginUser, String status) {
         SysLogLogin sysLogLogin = BeanUtil.copyProperties(loginUser, SysLogLogin.class);
         sysLogLogin.setStatus(status);
-        sysLogService.saveLoginLogAsync(sysLogLogin);
+        sysLogLoginService.saveLoginLogAsync(sysLogLogin);
     }
 
 

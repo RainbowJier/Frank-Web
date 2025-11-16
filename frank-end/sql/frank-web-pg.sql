@@ -585,4 +585,60 @@ CREATE INDEX idx_sys_log_login_lt ON sys_log_login (login_time);
 
 
 
+-- ----------------------------
+-- sys_log_oper
+-- ----------------------------
+DROP TABLE sys_log_oper;
+CREATE TABLE sys_log_oper
+(
+    id             BIGSERIAL PRIMARY KEY,
+    title          VARCHAR(50)   DEFAULT '',
+    business_type  INTEGER       DEFAULT 0,
+    method         VARCHAR(200)  DEFAULT '',
+    request_method VARCHAR(10)   DEFAULT '',
+    operator_type  INTEGER       DEFAULT 0,
+    oper_url       VARCHAR(255)  DEFAULT '',
+    oper_ip        VARCHAR(128)  DEFAULT '',
+    oper_location  VARCHAR(255)  DEFAULT '',
+    oper_param     VARCHAR(2000) DEFAULT '',
+    json_result    VARCHAR(2000) DEFAULT '',
+    status         INTEGER       DEFAULT 1,
+    error_msg      VARCHAR(2000) DEFAULT '',
+    cost_time      BIGINT        DEFAULT 0,
+    del_flag       int           default 1,
+    create_by      bigint        default null,
+    create_time    timestamp     default now(),
+    update_by      bigint        default null,
+    update_time    timestamp     default now(),
+    remark         varchar(500)  default null
+);
+
+COMMENT ON TABLE sys_log_oper IS '操作日志记录';
+COMMENT ON COLUMN sys_log_oper.id IS '日志主键';
+COMMENT ON COLUMN sys_log_oper.title IS '模块标题';
+COMMENT ON COLUMN sys_log_oper.business_type IS '业务类型（0其它 1新增 2修改 3删除）';
+COMMENT ON COLUMN sys_log_oper.method IS '方法名称';
+COMMENT ON COLUMN sys_log_oper.request_method IS '请求方式';
+COMMENT ON COLUMN sys_log_oper.operator_type IS '操作类别（0其它 1后台用户 2手机端用户）';
+COMMENT ON COLUMN sys_log_oper.oper_url IS '请求URL';
+COMMENT ON COLUMN sys_log_oper.oper_ip IS '主机地址';
+COMMENT ON COLUMN sys_log_oper.oper_location IS '操作地点';
+COMMENT ON COLUMN sys_log_oper.oper_param IS '请求参数';
+COMMENT ON COLUMN sys_log_oper.json_result IS '返回参数';
+COMMENT ON COLUMN sys_log_oper.status IS '操作状态（1正常 0异常）';
+COMMENT ON COLUMN sys_log_oper.error_msg IS '错误消息';
+COMMENT ON COLUMN sys_log_oper.cost_time IS '消耗时间';
+comment on column sys_dict_type.del_flag is '删除标志（1-存在 0-删除）';
+comment on column sys_dict_type.create_by is '创建者';
+comment on column sys_dict_type.create_time is '创建时间';
+comment on column sys_dict_type.update_by is '更新者';
+comment on column sys_dict_type.update_time is '更新时间';
+comment on column sys_dict_type.remark is '备注';
+
+CREATE INDEX idx_sys_log_oper_bt ON sys_log_oper (business_type);
+CREATE INDEX idx_sys_log_oper_s ON sys_log_oper (status);
+
+
+
+
 

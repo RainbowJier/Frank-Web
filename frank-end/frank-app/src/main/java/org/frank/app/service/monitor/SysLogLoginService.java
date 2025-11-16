@@ -2,11 +2,11 @@ package org.frank.app.service.monitor;
 
 import org.frank.common.core.page.PageResult;
 import org.frank.domain.entity.SysLogLogin;
-import org.frank.shared.sysLog.req.LoginPageQueryReq;
+import org.frank.shared.sysLogLogin.req.LoginPageQueryReq;
 
 import java.util.List;
 
-public interface SysLogService {
+public interface SysLogLoginService {
 
     /**
      * Query login logs list by pagination.

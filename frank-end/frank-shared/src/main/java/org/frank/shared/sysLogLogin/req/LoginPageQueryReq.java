@@ -1,4 +1,4 @@
-package org.frank.shared.sysLog.req;
+package org.frank.shared.sysLogLogin.req;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

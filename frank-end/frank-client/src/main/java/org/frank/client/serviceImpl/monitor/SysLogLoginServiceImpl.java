@@ -6,12 +6,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.frank.app.service.monitor.SysLogService;
+import org.frank.app.service.monitor.SysLogLoginService;
 import org.frank.common.core.page.PageResult;
 import org.frank.domain.entity.SysLogLogin;
 import org.frank.domain.gateway.ISysLogLoginGateway;
-import org.frank.shared.sysLog.req.LoginPageQueryReq;
-import org.frank.shared.sysLog.resp.SysLogLoginResp;
+import org.frank.shared.sysLogLogin.req.LoginPageQueryReq;
+import org.frank.shared.sysLogLogin.resp.SysLogLoginResp;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class SysLogServiceImpl implements SysLogService {
+public class SysLogLoginServiceImpl implements SysLogLoginService {
 
     @Resource
     private ISysLogLoginGateway sysLogLoginGateway;
