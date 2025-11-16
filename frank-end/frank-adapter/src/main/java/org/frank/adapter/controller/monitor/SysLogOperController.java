@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.frank.app.service.monitor.SysLogOperService;
 import org.frank.common.core.domain.AjaxResult;
 import org.frank.common.core.page.PageResult;
+import org.frank.shared.sysLogOper.req.SysLogOperPageReq;
 import org.frank.shared.sysLogOper.resp.SysLogOperResp;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class SysLogOperController {
 
     @PostMapping("/page")
     @ApiOperation("Query by pagination.")
-    public AjaxResult<PageResult> pageQuery(@RequestBody @Valid SysLogOperPageQueryReq req) {
+    public AjaxResult<PageResult> pageQuery(@RequestBody @Valid SysLogOperPageReq req) {
         return null;
     }
 
