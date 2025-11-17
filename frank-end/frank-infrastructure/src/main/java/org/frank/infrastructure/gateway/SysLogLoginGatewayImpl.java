@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class SysLogLoginServiceImpl
+public class SysLogLoginGatewayImpl
         extends ServiceImpl<SysLogLoginMapper, SysLogLogin>
         implements ISysLogLoginGateway {
 
