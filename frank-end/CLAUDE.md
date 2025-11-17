@@ -771,73 +771,6 @@ public class SysUserController {
         return AjaxResult.success(result);
     }
 
-    /**
-     * 根据ID获取用户详情
-     */
-    @GetMapping("/{id}")
-    @ApiOperation("获取用户详情")
-    @ApiParam("用户ID")
-    public AjaxResult<SysUserResp> getUserById(@PathVariable Long id) {
-        SysUserResp user = sysUserService.selectUserById(id);
-        return AjaxResult.success(user);
-    }
-
-    /**
-     * 新增用户
-     */
-    @PostMapping
-    @ApiOperation("新增用户")
-    public AjaxResult<Void> addUser(@RequestBody @Valid SysUserAddReq req) {
-        sysUserService.insertUser(req);
-        return AjaxResult.success();
-    }
-
-    /**
-     * 修改用户
-     */
-    @PutMapping("/{id}")
-    @ApiOperation("修改用户")
-    @ApiParam("用户ID")
-    public AjaxResult<Void> updateUser(@PathVariable Long id, @RequestBody @Valid SysUserUpdateReq req) {
-        req.setId(id);
-        sysUserService.updateUser(req);
-        return AjaxResult.success();
-    }
-
-    /**
-     * 删除用户
-     */
-    @DeleteMapping("/{ids}")
-    @ApiOperation("删除用户")
-    @ApiParam("用户ID，多个用逗号分隔")
-    public AjaxResult<Void> deleteUser(@PathVariable String ids) {
-        sysUserService.deleteUserByIds(ids);
-        return AjaxResult.success();
-    }
-
-    /**
-     * 重置密码
-     */
-    @PutMapping("/{id}/reset-password")
-    @ApiOperation("重置密码")
-    @ApiParam("用户ID")
-    public AjaxResult<Void> resetPassword(@PathVariable Long id, @RequestBody @Valid ResetPasswordReq req) {
-        req.setUserId(id);
-        sysUserService.resetPassword(req);
-        return AjaxResult.success();
-    }
-
-    /**
-     * 修改用户状态
-     */
-    @PutMapping("/{id}/status")
-    @ApiOperation("修改用户状态")
-    @ApiParam("用户ID")
-    public AjaxResult<Void> changeStatus(@PathVariable Long id, @RequestBody @Valid ChangeStatusReq req) {
-        req.setUserId(id);
-        sysUserService.changeUserStatus(req);
-        return AjaxResult.success();
-    }
 }
 ```
 
@@ -852,40 +785,7 @@ public class SysUserController {
  */
 public interface SysLogOperService {
 
-    /**
-     * 分页查询操作日志
-     *
-     * @param req 查询条件
-     * @return 分页结果
-     */
-    PageResult<SysLogOperResp> selectLogOperPage(SysLogOperPageQueryReq req);
 
-    /**
-     * 根据ID查询操作日志详情
-     *
-     * @param operId 日志ID
-     * @return 操作日志详情
-     */
-    SysLogOperResp selectLogOperById(Long operId);
-
-    /**
-     * 插入操作日志
-     *
-     * @param sysLogOper 操作日志
-     */
-    void insertLogOper(SysLogOper sysLogOper);
-
-    /**
-     * 批量删除操作日志
-     *
-     * @param operIds 日志ID数组
-     */
-    void deleteLogOperByIds(String operIds);
-
-    /**
-     * 清空操作日志
-     */
-    void cleanLogOper();
 }
 ```
 
@@ -905,304 +805,7 @@ public class SysLogOperServiceImpl implements SysLogOperService {
   @Resource
   private ISysLogOperGateway gateway;
 
-    @Override
-    public PageResult<SysLogOperResp> selectLogOperPage(SysLogOperPageQueryReq req) {
-        // 构建查询条件
-      LambdaQueryWrapper<SysLogOper> queryWrapper = new LambdaQueryWrapper<>();
-      queryWrapper.like(StringUtil.isNotEmpty(req.getTitle()),
-                      SysLogOper::getTitle, req.getTitle())
-              .eq(req.getBusinessType() != null,
-                      SysLogOper::getBusinessType, req.getBusinessType())
-                   .eq(req.getStatus() != null,
-                           SysLogOper::getStatus, req.getStatus())
-                   .between(req.getBeginTime() != null && req.getEndTime() != null,
-                           SysLogOper::getOperTime, req.getBeginTime(), req.getEndTime())
-              .eq(SysLogOper::getDelFlag, Constants.NORMAL)
-              .orderByDesc(SysLogOper::getOperTime);
 
-        // 执行分页查询
-      IPage<SysLogOper> page = new Page<>(req.getPageNum(), req.getPageSize());
-      IPage<SysLogOper> logPage = gateway.page(page, queryWrapper);
-
-        // 转换为响应对象
-      List<SysLogOperResp> respList = logPage.getRecords().stream()
-                .map(this::convertToResp)
-                .collect(Collectors.toList());
-
-      return PageResult.of(respList, logPage.getTotal());
-    }
-
-    @Override
-    @Transactional
-    public void insertUser(SysUserAddReq req) {
-        // 参数校验
-        checkUserAddParam(req);
-
-        // 检查用户名、手机号、邮箱唯一性
-        if (!checkUserNameUnique(req.getUserName(), null)) {
-            throw new BusinessException("用户名已存在");
-        }
-        if (!checkPhoneUnique(req.getPhoneNumber(), null)) {
-            throw new BusinessException("手机号已存在");
-        }
-        if (!checkEmailUnique(req.getEmail(), null)) {
-            throw new BusinessException("邮箱已存在");
-        }
-
-        // 构建用户对象
-        SysUser user = buildUserFromAddReq(req);
-
-        // 设置默认密码
-        user.setPassword(passwordEncoder.encode(UserConstants.DEFAULT_PASSWORD));
-
-        // 保存用户
-        sysUserGateway.insert(user);
-
-        // 保存用户角色关系
-        if (CollectionUtil.isNotEmpty(req.getRoleIds())) {
-            userRoleGateway.insertUserRoleRelations(user.getId(), req.getRoleIds());
-        }
-
-        log.info("新增用户成功，用户名: {}", user.getUserName());
-    }
-
-    @Override
-    @Transactional
-    public void updateUser(SysUserUpdateReq req) {
-        // 参数校验
-        if (req.getId() == null) {
-            throw new BusinessException("用户ID不能为空");
-        }
-
-        // 查询用户信息
-        SysUser existUser = sysUserGateway.selectById(req.getId());
-        if (existUser == null || Constants.DEL_FLAG_DELETE.equals(existUser.getDelFlag())) {
-            throw new BusinessException("用户不存在");
-        }
-
-        // 检查唯一性（排除自己）
-        if (!checkUserNameUnique(req.getUserName(), req.getId())) {
-            throw new BusinessException("用户名已存在");
-        }
-        if (!checkPhoneUnique(req.getPhoneNumber(), req.getId())) {
-            throw new BusinessException("手机号已存在");
-        }
-        if (!checkEmailUnique(req.getEmail(), req.getId())) {
-            throw new BusinessException("邮箱已存在");
-        }
-
-        // 构建更新对象
-        SysUser updateUser = buildUserFromUpdateReq(req);
-
-        // 更新用户
-        sysUserGateway.updateById(updateUser);
-
-        // 更新用户角色关系
-        userRoleGateway.updateUserRoleRelations(req.getId(), req.getRoleIds());
-
-        // 清除用户缓存
-        clearUserCache(req.getId());
-
-        log.info("修改用户成功，用户ID: {}", req.getId());
-    }
-
-    @Override
-    @Transactional
-    public void deleteUserByIds(String userIds) {
-        if (StringUtil.isEmpty(userIds)) {
-            throw new BusinessException("用户ID不能为空");
-        }
-
-        List<Long> userIdList = Arrays.stream(userIds.split(","))
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
-
-        // 检查是否包含超级管理员
-        for (Long userId : userIdList) {
-            SysUser user = sysUserGateway.selectById(userId);
-            if (user != null && UserConstants.SUPER_ADMIN_ID.equals(userId)) {
-                throw new BusinessException("超级管理员不能删除");
-            }
-        }
-
-        // 批量逻辑删除
-        sysUserGateway.deleteBatchIds(userIdList);
-
-        // 删除用户角色关系
-        userRoleGateway.deleteUserRoleRelations(userIds);
-
-        log.info("批量删除用户成功，用户IDs: {}", userIds);
-    }
-
-    @Override
-    public void resetPassword(ResetPasswordReq req) {
-        // 参数校验
-        if (req.getUserId() == null || StringUtil.isEmpty(req.getPassword())) {
-            throw new BusinessException("参数不完整");
-        }
-
-        // 查询用户
-        SysUser user = sysUserGateway.selectById(req.getUserId());
-        if (user == null) {
-            throw new BusinessException("用户不存在");
-        }
-
-        // 加密新密码
-        String encryptPassword = passwordEncoder.encode(req.getPassword());
-
-        // 更新密码
-        SysUser updateUser = new SysUser();
-        updateUser.setId(req.getUserId());
-        updateUser.setPassword(encryptPassword);
-        updateUser.setUpdateBy(SecurityUtils.getUsername());
-        sysUserGateway.updateById(updateUser);
-
-        // 强制用户下线
-        clearUserLoginCache(req.getUserId());
-
-        log.info("重置密码成功，用户ID: {}", req.getUserId());
-    }
-
-    @Override
-    public void changeUserStatus(ChangeStatusReq req) {
-        // 参数校验
-        if (req.getUserId() == null || req.getStatus() == null) {
-            throw new BusinessException("参数不完整");
-        }
-
-        // 检查是否是超级管理员
-        if (UserConstants.SUPER_ADMIN_ID.equals(req.getUserId())) {
-            throw new BusinessException("超级管理员状态不能修改");
-        }
-
-        // 查询用户
-        SysUser user = sysUserGateway.selectById(req.getUserId());
-        if (user == null) {
-            throw new BusinessException("用户不存在");
-        }
-
-        // 更新状态
-        SysUser updateUser = new SysUser();
-        updateUser.setId(req.getUserId());
-        updateUser.setStatus(req.getStatus());
-        updateUser.setUpdateBy(SecurityUtils.getUsername());
-        sysUserGateway.updateById(updateUser);
-
-        // 如果是禁用状态，强制用户下线
-        if (Constants.STATUS_DISABLE.equals(req.getStatus())) {
-            clearUserLoginCache(req.getUserId());
-        }
-
-        log.info("修改用户状态成功，用户ID: {}, 状态: {}", req.getUserId(), req.getStatus());
-    }
-
-    // ==================== 私有方法 ====================
-
-    /**
-     * 转换为响应对象
-     */
-    private SysUserResp convertToResp(SysUser user) {
-        if (user == null) {
-            return null;
-        }
-
-        SysUserResp resp = new SysUserResp();
-        BeanUtils.copyProperties(user, resp);
-
-        // 查询用户角色信息
-        List<Long> roleIds = userRoleGateway.selectRoleIdsByUserId(user.getId());
-        resp.setRoleIds(roleIds);
-
-        return resp;
-    }
-
-    /**
-     * 校验用户新增参数
-     */
-    private void checkUserAddParam(SysUserAddReq req) {
-        if (StringUtil.isEmpty(req.getUserName())) {
-            throw new BusinessException("用户名不能为空");
-        }
-        if (StringUtil.isEmpty(req.getPhoneNumber())) {
-            throw new BusinessException("手机号不能为空");
-        }
-        if (!RegexUtil.matchPhone(req.getPhoneNumber())) {
-            throw new BusinessException("手机号格式不正确");
-        }
-        if (StringUtil.isNotEmpty(req.getEmail()) && !RegexUtil.matchEmail(req.getEmail())) {
-            throw new BusinessException("邮箱格式不正确");
-        }
-    }
-
-    /**
-     * 构建用户对象（新增用）
-     */
-    private SysUser buildUserFromAddReq(SysUserAddReq req) {
-        SysUser user = new SysUser();
-        BeanUtils.copyProperties(req, user);
-        user.setCreateBy(SecurityUtils.getUsername());
-        user.setCreateTime(LocalDateTime.now());
-        user.setDelFlag(Constants.NORMAL);
-        user.setStatus(Constants.STATUS_NORMAL);
-        return user;
-    }
-
-    /**
-     * 构建用户对象（更新用）
-     */
-    private SysUser buildUserFromUpdateReq(SysUserUpdateReq req) {
-        SysUser user = new SysUser();
-        BeanUtils.copyProperties(req, user);
-        user.setUpdateBy(SecurityUtils.getUsername());
-        user.setUpdateTime(LocalDateTime.now());
-        return user;
-    }
-
-    /**
-     * 清除用户缓存
-     */
-    private void clearUserCache(Long userId) {
-        String cacheKey = CacheConstants.USER_KEY + userId;
-        redisCache.deleteObject(cacheKey);
-    }
-
-    /**
-     * 清除用户登录缓存
-     */
-    private void clearUserLoginCache(Long userId) {
-        // 清除用户信息缓存
-        String userKey = CacheConstants.USER_KEY + userId;
-        redisCache.deleteObject(userKey);
-
-        // 清除用户Token（这里可以根据实际Token管理机制实现）
-        // tokenService.clearUserToken(userId);
-    }
-
-    // ==================== 唯一性检查方法 ====================
-
-    @Override
-    public boolean checkUserNameUnique(String userName, Long userId) {
-        Long existUserId = sysUserGateway.selectUserIdByUserName(userName);
-        return existUserId == null || existUserId.equals(userId);
-    }
-
-    @Override
-    public boolean checkPhoneUnique(String phoneNumber, Long userId) {
-        if (StringUtil.isEmpty(phoneNumber)) {
-            return true;
-        }
-        Long existUserId = sysUserGateway.selectUserIdByPhone(phoneNumber);
-        return existUserId == null || existUserId.equals(userId);
-    }
-
-    @Override
-    public boolean checkEmailUnique(String email, Long userId) {
-        if (StringUtil.isEmpty(email)) {
-            return true;
-        }
-        Long existUserId = sysUserGateway.selectUserIdByEmail(email);
-        return existUserId == null || existUserId.equals(userId);
-    }
 }
 ```
 
@@ -1231,62 +834,6 @@ public class SysUser extends BaseEntity {
     @ApiModelProperty(value = "用户账号")
     private String userName;
 
-    @TableField("nick_name")
-    @ApiModelProperty(value = "用户昵称")
-    private String nickName;
-
-    @TableField("email")
-    @ApiModelProperty(value = "用户邮箱")
-    private String email;
-
-    @TableField("phone_number")
-    @ApiModelProperty(value = "手机号码")
-    private String phoneNumber;
-
-    @TableField("sex")
-    @ApiModelProperty(value = "用户性别（0男 1女 2未知）")
-    private String sex;
-
-    @TableField("avatar")
-    @ApiModelProperty(value = "头像地址")
-    private String avatar;
-
-    @TableField("password")
-    @ApiModelProperty(value = "密码")
-    private String password;
-
-    @TableField("status")
-    @ApiModelProperty(value = "帐号状态（0正常 1停用）")
-    private String status;
-
-    @TableField("login_ip")
-    @ApiModelProperty(value = "最后登录IP")
-    private String loginIp;
-
-    @TableField("login_date")
-    @ApiModelProperty(value = "最后登录时间")
-    private LocalDateTime loginDate;
-
-    @TableField("dept_id")
-    @ApiModelProperty(value = "部门ID")
-    private Long deptId;
-
-    @Override
-    public String toString() {
-        return "SysUser{" +
-                "id=" + id +
-                ", userName='" + userName + '\'' +
-                ", nickName='" + nickName + '\'' +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", sex='" + sex + '\'' +
-                ", avatar='" + avatar + '\'' +
-                ", status='" + status + '\'' +
-                ", loginIp='" + loginIp + '\'' +
-                ", loginDate=" + loginDate +
-                ", deptId=" + deptId +
-                '}';
-    }
 }
 ```
 
@@ -1305,13 +852,6 @@ public class SysUser extends BaseEntity {
 @ApiModel(description = "基础请求对象")
 public class BaseReq implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty(value = "当前页码")
-    private Integer pageNum;
-
-    @ApiModelProperty(value = "每页大小")
-    private Integer pageSize;
 }
 ```
 
@@ -1327,22 +867,8 @@ public class BaseReq implements Serializable {
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ApiModel(description = "用户分页查询请求")
-public class SysUserPageQueryReq extends BaseReq {
+public class SysUserPageReq extends BasePage {
 
-    @ApiModelProperty(value = "用户名")
-    private String userName;
-
-    @ApiModelProperty(value = "手机号")
-    private String phoneNumber;
-
-    @ApiModelProperty(value = "状态")
-    private String status;
-
-    @ApiModelProperty(value = "开始时间")
-    private LocalDateTime beginTime;
-
-    @ApiModelProperty(value = "结束时间")
-    private LocalDateTime endTime;
 }
 ```
 
@@ -1359,36 +885,7 @@ public class SysUserPageQueryReq extends BaseReq {
 @ApiModel(description = "新增用户请求")
 public class SysUserAddReq implements Serializable {
 
-    @ApiModelProperty(value = "用户名", required = true)
-    @NotBlank(message = "用户名不能为空")
-    private String userName;
 
-    @ApiModelProperty(value = "用户昵称")
-    private String nickName;
-
-    @ApiModelProperty(value = "用户邮箱")
-    @Email(message = "邮箱格式不正确")
-    private String email;
-
-    @ApiModelProperty(value = "手机号码", required = true)
-    @NotBlank(message = "手机号不能为空")
-    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
-    private String phoneNumber;
-
-    @ApiModelProperty(value = "用户性别（0男 1女 2未知）")
-    private String sex;
-
-    @ApiModelProperty(value = "头像地址")
-    private String avatar;
-
-    @ApiModelProperty(value = "部门ID")
-    private Long deptId;
-
-    @ApiModelProperty(value = "角色ID列表")
-    private List<Long> roleIds;
-
-    @ApiModelProperty(value = "状态")
-    private String status;
 }
 ```
 
@@ -1408,41 +905,6 @@ public class SysUserAddReq implements Serializable {
 @ApiModel(description = "用户响应")
 public class SysUserResp implements Serializable {
 
-    @ApiModelProperty(value = "用户ID")
-    private Long id;
-
-    @ApiModelProperty(value = "用户名")
-    private String userName;
-
-    @ApiModelProperty(value = "用户昵称")
-    private String nickName;
-
-    @ApiModelProperty(value = "用户邮箱")
-    private String email;
-
-    @ApiModelProperty(value = "手机号码")
-    private String phoneNumber;
-
-    @ApiModelProperty(value = "用户性别（0男 1女 2未知）")
-    private String sex;
-
-    @ApiModelProperty(value = "头像地址")
-    private String avatar;
-
-    @ApiModelProperty(value = "状态")
-    private String status;
-
-    @ApiModelProperty(value = "部门ID")
-    private Long deptId;
-
-    @ApiModelProperty(value = "角色ID列表")
-    private List<Long> roleIds;
-
-    @ApiModelProperty(value = "创建时间")
-    private LocalDateTime createTime;
-
-    @ApiModelProperty(value = "更新时间")
-    private LocalDateTime updateTime;
 }
 ```
 
@@ -1616,20 +1078,6 @@ spring:
 - 配置应用性能监控
 
 ### 项目构建与启动
-
-**命令行启动：**
-
-```bash
-# 编译项目
-mvn clean compile
-
-# 运行项目
-mvn spring-boot:run -pl frank-starter
-
-# 或使用java命令
-mvn clean package
-java -jar frank-starter/target/frank-starter-1.0.0.jar
-```
 
 **IDE启动：**
 
