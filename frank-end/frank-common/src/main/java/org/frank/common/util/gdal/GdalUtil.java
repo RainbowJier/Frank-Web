@@ -108,7 +108,7 @@ public class GdalUtil {
 
             PageResult<Map<String, Object>> result;
             if (Boolean.TRUE.equals(param.getDistinct())) {
-                log.info("--- 执行策略：内存去重查询 (注意：数据量过大可能导致慢查询) ---");
+                log.info("--- 执行策略：内存去重查询 (注意：全量加载) ---");
                 result = executeDistinctQuery(param);
             } else {
                 log.info("--- 执行策略：普通分页查询 (计算偏移量) ---");
@@ -126,20 +126,14 @@ public class GdalUtil {
     }
 
     /**
-     * 导出数据到 GDB (指定目录 + 自动命名版)
-     * <p>
-     * 1. <b>输出目录</b>：取自 param.getTargetGdbPath()。
-     * 2. <b>文件名生成</b>：源GDB文件名 + _yyyyMMddHHmmss + .gdb。
-     * 3. <b>图层命名</b>：保持原名 (因为是新文件，无冲突)。
-     * </p>
+     * 导出数据到 GDB (指定目录 + 自动命名 + 批量事务)
      */
     public void exportToGdb(GdalQueryParam param) {
         long start = System.currentTimeMillis();
 
         // 1. 基础校验
-        validateFile(param.getGdbPath()); // 校验源 GDB 是否存在
+        validateFile(param.getGdbPath());
         String targetDirStr = param.getTargetGdbPath();
-
         if (targetDirStr == null || targetDirStr.isEmpty()) {
             throw new RuntimeException("导出失败：必须指定目标存放目录 (targetGdbPath)");
         }
@@ -148,68 +142,66 @@ public class GdalUtil {
         File sourceFile = new File(param.getGdbPath());
         File targetDir = new File(targetDirStr);
 
-        // 如果目标目录不存在，自动创建
         if (!targetDir.exists()) {
-            boolean created = targetDir.mkdirs();
-            if (!created) {
+            if (!targetDir.mkdirs()) {
                 throw new RuntimeException("无法创建目标目录: " + targetDirStr);
             }
         }
 
-        // 3. 构建新 GDB 的完整路径
-        // 逻辑：源文件名(去掉后缀) + 时间戳 + .gdb
+        // 构造文件名: SourceName_yyyyMMddHHmmss.gdb
         String sourceName = sourceFile.getName();
         String nameNoExt = sourceName.contains(".") ?
                 sourceName.substring(0, sourceName.lastIndexOf(".")) : sourceName;
         String timeSuffix = new SimpleDateFormat("_yyyyMMddHHmmss").format(new Date());
 
-        // 最终路径： D:/backup/source_20231122120000.gdb
         File finalTargetFile = new File(targetDir, nameNoExt + timeSuffix + ".gdb");
         String finalTargetPath = finalTargetFile.getAbsolutePath();
 
-        log.info(">>> GDAL 导出开始");
-        log.info("    源文件: [{}]", param.getGdbPath());
-        log.info("    输出至: [{}]", finalTargetPath);
+        log.info(">>> GDAL 导出开始 | 源: [{}] -> 目标: [{}]", param.getGdbPath(), finalTargetPath);
 
         if (Boolean.TRUE.equals(param.getDistinct())) {
-            log.warn("!!! 提示：导出模式下自动忽略去重参数，采用流式全量传输。");
+            log.warn("!!! 提示：导出模式下忽略去重参数");
         }
 
-        ogr.RegisterAll();
+        // 3. 获取驱动 (优先尝试 OpenFileGDB，它不需要安装额外 SDK)
         Driver driver = ogr.GetDriverByName("OpenFileGDB");
         if (driver == null) driver = ogr.GetDriverByName("FileGDB");
         if (driver == null) throw new RuntimeException("未找到 GDB 驱动 (OpenFileGDB/FileGDB)");
 
         DataSource targetDs = null;
         try {
-            // 4. 创建全新的目标 GDB
+            // 4. 创建目标 GDB
             targetDs = driver.CreateDataSource(finalTargetPath);
             if (targetDs == null) {
-                throw new RuntimeException("无法创建 GDB 文件，请检查权限或路径: " + finalTargetPath);
+                throw new RuntimeException("无法创建 GDB 文件: " + finalTargetPath);
             }
 
-            // 获取需要导出的源图层列表
             List<String> sourceLayers = getTargetLayerNames(param.getGdbPath(), param.getLayerNames(), param.getFuzzyMatchLayer());
-            log.info("    包含图层: {} 个 -> 开始导出...", sourceLayers.size());
+            log.info("    包含图层: {} 个 -> 开始流式导出", sourceLayers.size());
 
             for (String sourceLayerName : sourceLayers) {
-                // 5. 关键：目标图层名直接使用源图层名 (无需改名)
+                // 目标图层名 = 源图层名 (新文件无冲突)
                 processExportLayer(param.getGdbPath(), sourceLayerName, sourceLayerName, param.getWhereClause(), targetDs);
             }
             log.info("<<< GDAL 导出成功 | 耗时: {}ms", System.currentTimeMillis() - start);
 
         } catch (Exception e) {
             log.error("!!! GDAL 导出失败", e);
-            // 导出失败时，可选：清理生成的半成品文件
-            FileUtil.del(finalTargetFile);
+            // 失败清理：尝试删除生成的 GDB 文件夹
+            try {
+                if (targetDs != null) targetDs.delete(); // 先释放句柄
+                FileUtil.del(finalTargetFile);
+            } catch (Exception ex) {
+                log.warn("清理垃圾文件失败: {}", finalTargetPath);
+            }
             throw e;
         } finally {
-            if (targetDs != null) targetDs.delete(); // 释放资源
+            if (targetDs != null) targetDs.delete(); // 再次确保释放
         }
     }
 
     // ========================================================================
-    // 2. 普通查询策略 (保持不变)
+    // 2. 普通查询策略 (Optimized)
     // ========================================================================
 
     private PageResult<Map<String, Object>> executeNormalQuery(GdalQueryParam param) {
@@ -218,11 +210,10 @@ public class GdalUtil {
         List<String> targetLayers = getTargetLayerNames(
                 param.getGdbPath(), param.getLayerNames(), param.getFuzzyMatchLayer()
         );
-        log.debug("识别目标图层: {}", targetLayers);
 
+        // 并发统计各图层总数
         Map<String, Long> layerCounts = getLayerCountsParallel(param, targetLayers);
         long globalTotal = layerCounts.values().stream().mapToLong(Long::longValue).sum();
-        log.info("统计完成。总记录数: {} | 各图层明细: {}", globalTotal, layerCounts);
 
         PageResult<Map<String, Object>> result = buildEmptyPageResult(param, globalTotal);
         if (globalTotal == 0) {
@@ -230,12 +221,14 @@ public class GdalUtil {
             return result;
         }
 
+        // 计算分页任务分配
         List<LayerFetchTask> fetchTasks = planFetchTasks(layerCounts, result.getPageNum(), result.getPageSize());
         if (fetchTasks.isEmpty()) {
             result.setQueryTime(calcTime(startTime));
             return result;
         }
 
+        // 并发读取数据 (Core)
         List<CompletableFuture<List<Map<String, Object>>>> fetchFutures = fetchTasks.stream()
                 .map(task -> CompletableFuture.supplyAsync(() ->
                         readLayerSegment(param, task), executor))
@@ -255,7 +248,7 @@ public class GdalUtil {
         DataSource ds = null;
         List<Map<String, Object>> results = new ArrayList<>();
         try {
-            ds = ogr.Open(param.getGdbPath(), 0);
+            ds = ogr.Open(param.getGdbPath(), 0); // 0 = ReadOnly
             Layer layer = ds.GetLayer(task.layerName);
             if (layer == null) return results;
 
@@ -263,13 +256,19 @@ public class GdalUtil {
                 layer.SetAttributeFilter(param.getWhereClause());
             }
 
+            // [优化] 预先构建字段索引映射，避免循环内 GetFieldIndex (高性能关键)
+            Map<String, Integer> fieldIndexMap = buildFieldIndexMap(layer, param.getReturnFields());
+
             layer.SetNextByIndex(task.offset);
             Feature feat;
             int count = 0;
-            List<String> returnFields = param.getReturnFields();
 
             while (count < task.limit && (feat = layer.GetNextFeature()) != null) {
-                results.add(convertFeature(feat, returnFields));
+                // [优化] 使用索引读取
+                results.add(convertFeatureOptimized(feat, fieldIndexMap));
+
+                // [优化] 必须显式 delete，否则 Native 内存泄漏
+                feat.delete();
                 count++;
             }
         } catch (Exception e) {
@@ -281,35 +280,41 @@ public class GdalUtil {
     }
 
     // ========================================================================
-    // 3. 去重查询策略 (保持不变)
+    // 3. 去重查询策略 (双重去重优化版)
     // ========================================================================
 
+    /**
+     * 执行去重查询
+     * 策略：SQL层去重 (Stage 1) -> 内存合并去重 (Stage 2) -> 内存分页
+     */
     private PageResult<Map<String, Object>> executeDistinctQuery(GdalQueryParam param) {
         long startTime = System.currentTimeMillis();
         List<String> targetLayers = getTargetLayerNames(param.getGdbPath(), param.getLayerNames(), param.getFuzzyMatchLayer());
 
+        // 并发执行：每个图层都在 SQL 层面先做一次 DISTINCT
         List<CompletableFuture<List<Map<String, Object>>>> futureList = targetLayers.stream()
                 .map(layerName -> CompletableFuture.supplyAsync(() ->
-                        readLayerAll(param, layerName), executor))
+                        readLayerWithSqlDistinct(param, layerName), executor))
                 .collect(Collectors.toList());
 
+        // Stage 2: 内存合并去重
+        // 即使每个图层内部去重了，图层 A 和 图层 B 之间可能还有重复数据，所以这里 Set 不能省
         Set<Map<String, Object>> distinctSet = new LinkedHashSet<>();
+
         for (CompletableFuture<List<Map<String, Object>>> future : futureList) {
+            // 这里 join 拿到的已经是瘦身后的数据了，内存压力骤减
             distinctSet.addAll(future.join());
         }
 
+        // 内存分页逻辑 (保持不变)
         List<Map<String, Object>> distinctList = new ArrayList<>(distinctSet);
         int total = distinctList.size();
         int pageSize = (param.getPageSize() == null || param.getPageSize() < 1) ? (total > 0 ? total : 10) : param.getPageSize();
         int fromIndex = (param.getPageNum() - 1) * pageSize;
         int toIndex = Math.min(fromIndex + pageSize, total);
 
-        List<Map<String, Object>> pageRecords;
-        if (fromIndex >= total) {
-            pageRecords = new ArrayList<>();
-        } else {
-            pageRecords = distinctList.subList(fromIndex, toIndex);
-        }
+        List<Map<String, Object>> pageRecords = (fromIndex >= total) ?
+                new ArrayList<>() : distinctList.subList(fromIndex, toIndex);
 
         PageResult<Map<String, Object>> result = new PageResult<>();
         result.setTotal(total);
@@ -319,6 +324,78 @@ public class GdalUtil {
         result.setRecords(pageRecords);
         result.setQueryTime(calcTime(startTime));
         return result;
+    }
+
+    /**
+     * 基于 SQL 的去重读取 (Stage 1 Deduplication)
+     * 利用 OGR SQL 的 "SELECT DISTINCT" 能力，减少 JNI 数据传输量
+     */
+    private List<Map<String, Object>> readLayerWithSqlDistinct(GdalQueryParam param, String layerName) {
+        DataSource ds = null;
+        Layer sqlResultLayer = null;
+        List<Map<String, Object>> results = new ArrayList<>();
+        try {
+            // 注意：ExecuteSQL 需要以 ReadOnly 方式打开，否则可能锁文件
+            ds = ogr.Open(param.getGdbPath(), 0);
+            if (ds == null) return results;
+
+            // 1. 构建 OGR SQL 语句
+            // 语法: SELECT DISTINCT field1, field2 FROM layer_name WHERE ...
+            String fieldsClause = "*";
+            List<String> returnFields = param.getReturnFields();
+
+            // 如果指定了字段，拼接字段名；否则默认 * (注意: DISTINCT * 性能可能较差，建议去重时必须指定字段)
+            if (returnFields != null && !returnFields.isEmpty()) {
+                fieldsClause = String.join(", ", returnFields);
+            }
+
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append("SELECT DISTINCT ").append(fieldsClause)
+                    .append(" FROM ").append(layerName);
+
+            if (param.getWhereClause() != null && !param.getWhereClause().isEmpty()) {
+                sqlBuilder.append(" WHERE ").append(param.getWhereClause());
+            }
+
+            String sql = sqlBuilder.toString();
+            log.debug("执行去重 SQL: {}", sql);
+
+            // 2. 执行 SQL 查询
+            // ExecuteSQL 返回的是一个临时的 Layer 对象
+            sqlResultLayer = ds.ExecuteSQL(sql);
+
+            if (sqlResultLayer != null) {
+                // 3. 读取结果
+                // 此时 sqlResultLayer 里的数据已经是去重后的，数量少了很多
+
+                // 预构建索引优化
+                FeatureDefn defn = sqlResultLayer.GetLayerDefn();
+                Map<String, Integer> fieldIndexMap = new HashMap<>();
+                int fieldCount = defn.GetFieldCount();
+                for (int i = 0; i < fieldCount; i++) {
+                    fieldIndexMap.put(defn.GetFieldDefn(i).GetName(), i);
+                }
+
+                sqlResultLayer.ResetReading();
+                Feature feat;
+                while ((feat = sqlResultLayer.GetNextFeature()) != null) {
+                    results.add(convertFeatureOptimized(feat, fieldIndexMap));
+                    feat.delete(); // 释放 Feature
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("SQL 去重查询失败: " + layerName, e);
+        } finally {
+            // 4. 极其重要：释放 SQL 结果集图层
+            if (ds != null && sqlResultLayer != null) {
+                ds.ReleaseResultSet(sqlResultLayer);
+            }
+            if (ds != null) {
+                ds.delete();
+            }
+        }
+        return results;
     }
 
     private List<Map<String, Object>> readLayerAll(GdalQueryParam param, String layerName) {
@@ -332,11 +409,15 @@ public class GdalUtil {
             if (param.getWhereClause() != null && !param.getWhereClause().isEmpty()) {
                 layer.SetAttributeFilter(param.getWhereClause());
             }
+
+            // [优化] 预构建索引
+            Map<String, Integer> fieldIndexMap = buildFieldIndexMap(layer, param.getReturnFields());
+
             layer.ResetReading();
             Feature feat;
-            List<String> returnFields = param.getReturnFields();
             while ((feat = layer.GetNextFeature()) != null) {
-                results.add(convertFeature(feat, returnFields));
+                results.add(convertFeatureOptimized(feat, fieldIndexMap));
+                feat.delete(); // [优化] 释放
             }
         } catch (Exception e) {
             log.error("全量读取失败: " + layerName, e);
@@ -347,9 +428,12 @@ public class GdalUtil {
     }
 
     // ========================================================================
-    // 4. 核心转换与工具方法 (Utilities)
+    // 4. 核心转换与工具方法 (Core Utilities)
     // ========================================================================
 
+    /**
+     * 优化的导出处理逻辑 (支持批量事务)
+     */
     private void processExportLayer(String sourcePath, String sourceLayerName, String targetLayerName, String whereClause, DataSource targetDs) {
         DataSource sourceDs = null;
         try {
@@ -365,39 +449,54 @@ public class GdalUtil {
             }
 
             long featCount = sourceLayer.GetFeatureCount();
-            if (featCount == 0) {
-                log.debug("跳过空图层: {}", sourceLayerName);
-                return;
-            }
+            if (featCount == 0) return;
 
-            log.info("正在导出: {} -> {} | 记录数: {}", sourceLayerName, targetLayerName, featCount);
-
+            // 创建目标图层 (复制坐标系和几何类型)
             Layer targetLayer = targetDs.CreateLayer(targetLayerName, sourceLayer.GetSpatialRef(), sourceLayer.GetGeomType());
             if (targetLayer == null) {
                 throw new RuntimeException("创建目标图层失败: " + targetLayerName);
             }
 
+            // 复制字段结构
             FeatureDefn sourceDefn = sourceLayer.GetLayerDefn();
             for (int i = 0; i < sourceDefn.GetFieldCount(); i++) {
                 targetLayer.CreateField(sourceDefn.GetFieldDefn(i));
             }
 
-            targetLayer.StartTransaction();
+            log.debug("开始导出: {} ({} 条)", sourceLayerName, featCount);
+
+            // [优化] 批量事务处理
+            final int BATCH_SIZE = 20000;
+            long currentBatch = 0;
+
+            targetLayer.StartTransaction(); // 开启事务
             sourceLayer.ResetReading();
             Feature srcFeat;
-            int exportedCount = 0;
+
+            // 缓存 FeatureDefn 引用，避免循环中重复 JNI 调用
+            FeatureDefn targetDefn = targetLayer.GetLayerDefn();
 
             while ((srcFeat = sourceLayer.GetNextFeature()) != null) {
-                Feature targetFeat = new Feature(targetLayer.GetLayerDefn());
+                Feature targetFeat = new Feature(targetDefn);
+                // [优化] SetFrom 是 C++ 层面的快速拷贝
                 targetFeat.SetFrom(srcFeat);
                 targetLayer.CreateFeature(targetFeat);
 
+                // 显式释放 Native 对象
                 targetFeat.delete();
                 srcFeat.delete();
-                exportedCount++;
+
+                currentBatch++;
+                // 达到批次，提交并重启事务
+                if (currentBatch % BATCH_SIZE == 0) {
+                    targetLayer.CommitTransaction();
+                    targetLayer.StartTransaction();
+                }
             }
+
+            // 提交剩余数据
             targetLayer.CommitTransaction();
-            log.debug("图层导出完毕: {} ({} 行)", targetLayerName, exportedCount);
+            log.info("图层导出完毕: {}", targetLayerName);
 
         } catch (Exception e) {
             log.error("图层导出出错: " + sourceLayerName, e);
@@ -407,24 +506,44 @@ public class GdalUtil {
         }
     }
 
-    private Map<String, Object> convertFeature(Feature feat, List<String> returnFields) {
-        Map<String, Object> attrs = new LinkedHashMap<>();
+    /**
+     * [优化] 构建字段名到索引的映射
+     */
+    private Map<String, Integer> buildFieldIndexMap(Layer layer, List<String> returnFields) {
+        Map<String, Integer> map = new HashMap<>();
+        FeatureDefn defn = layer.GetLayerDefn();
+
         if (returnFields != null && !returnFields.isEmpty()) {
             for (String fieldName : returnFields) {
-                int idx = feat.GetFieldIndex(fieldName);
+                int idx = defn.GetFieldIndex(fieldName);
                 if (idx != -1) {
-                    attrs.put(fieldName, feat.GetFieldAsString(idx));
+                    map.put(fieldName, idx);
                 }
             }
         } else {
-            int fieldCount = feat.GetFieldCount();
+            // 所有字段
+            int fieldCount = defn.GetFieldCount();
             for (int i = 0; i < fieldCount; i++) {
-                FieldDefn defn = feat.GetFieldDefnRef(i);
-                attrs.put(defn.GetName(), feat.GetFieldAsString(i));
+                FieldDefn fieldDefn = defn.GetFieldDefn(i);
+                map.put(fieldDefn.GetName(), i);
             }
+        }
+        return map;
+    }
+
+    /**
+     * [优化] 基于索引快速读取属性
+     */
+    private Map<String, Object> convertFeatureOptimized(Feature feat, Map<String, Integer> fieldIndexMap) {
+        Map<String, Object> attrs = new LinkedHashMap<>(fieldIndexMap.size());
+        for (Map.Entry<String, Integer> entry : fieldIndexMap.entrySet()) {
+            // GetFieldAsString(int) 比 (String) 快得多
+            attrs.put(entry.getKey(), feat.GetFieldAsString(entry.getValue()));
         }
         return attrs;
     }
+
+    // --- 下列辅助方法逻辑保持通用不变 ---
 
     private Map<String, Long> getLayerCountsParallel(GdalQueryParam param, List<String> targetLayers) {
         Map<String, Long> layerCounts = new LinkedHashMap<>();
@@ -499,7 +618,6 @@ public class GdalUtil {
     private List<String> getTargetLayerNames(String gdbPath, List<String> userLayers, Boolean fuzzyMatch) {
         DataSource ds = ogr.Open(gdbPath, 0);
         if (ds == null) {
-            log.error("无法打开 GDB 进行图层检查: {}", gdbPath);
             throw new RuntimeException("无法打开 GDB 文件: " + gdbPath);
         }
         List<String> allLayers = new ArrayList<>();
@@ -520,8 +638,7 @@ public class GdalUtil {
 
     private void validateFile(String path) {
         if (path == null || !new File(path).exists()) {
-            log.error("GDB 文件校验失败。路径不存在: {}", path);
-            throw new RuntimeException("File not found: " + path);
+            throw new RuntimeException("文件不存在: " + path);
         }
     }
 

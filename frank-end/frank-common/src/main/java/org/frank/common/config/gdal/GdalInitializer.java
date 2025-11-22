@@ -35,10 +35,15 @@ public class GdalInitializer {
         log.debug("注册栅格数据驱动...");
         gdal.AllRegister();
 
-        // 配置支持中文路径
-        gdal.SetConfigOption("GDAL_FILENAME_IS_UTF8", "YES");
+        // [优化] 设置 GDAL 缓存大小 (MB)。建议设为物理内存的 1/8 - 1/4。
+        // 对于大文件读写，增大此值可显著减少磁盘 IO。
+        gdal.SetConfigOption("GDAL_CACHEMAX", "512");
 
-        // 配置属性表字段支持中文
+        // [优化] 启用多线程压缩 (如果驱动支持)
+        gdal.SetConfigOption("GDAL_NUM_THREADS", "ALL_CPUS");
+
+        // [兼容] 强制使用 UTF-8 处理文件名，防止中文路径乱码
+        gdal.SetConfigOption("GDAL_FILENAME_IS_UTF8", "YES");
         gdal.SetConfigOption("SHAPE_ENCODING", "CP936");
 
         // 验证GDAL是否正确初始化
