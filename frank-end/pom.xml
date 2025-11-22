@@ -30,6 +30,7 @@
         <druid.version>1.2.16</druid.version>
         <jwt.version>0.12.5</jwt.version>
         <bcrypt.version>0.10.2</bcrypt.version>
+        <gdal.version>3.7.2</gdal.version>
     </properties>
 
     <modules>
@@ -137,6 +138,13 @@
                 <groupId>at.favre.lib</groupId>
                 <artifactId>bcrypt</artifactId>
                 <version>${bcrypt.version}</version>
+            </dependency>
+
+            <!-- GDAL -->
+            <dependency>
+                <groupId>org.gdal</groupId>
+                <artifactId>gdal</artifactId>
+                <version>${gdal.version}</version>
             </dependency>
 
             <!-- 内部模块依赖管理 -->

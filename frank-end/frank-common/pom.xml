@@ -80,6 +80,12 @@
             <artifactId>bcrypt</artifactId>
         </dependency>
 
+        <!-- GDAL -->
+        <dependency>
+            <groupId>org.gdal</groupId>
+            <artifactId>gdal</artifactId>
+        </dependency>
+
         <!-- Spring Boot Starter Data Redis -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

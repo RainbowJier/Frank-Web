@@ -5,7 +5,21 @@
       "mcp__sequential-thinking__sequentialthinking",
       "Bash(tree:*)",
       "mcp__ide__getDiagnostics",
-      "Bash(java:*)"
+      "Bash(java:*)",
+      "Bash(where:*)",
+      "Bash(dir:*)",
+      "Bash(set:*)",
+      "Bash(set PATH=%JAVA_HOME%bin:*)",
+      "Bash(%PATH%)",
+      "Bash(export:*)",
+      "Bash(export PATH=\"$JAVA_HOME/bin:$PATH\":*)",
+      "Bash(\"D:/Environment/JDK/JDK17/bin/java\":*)",
+      "Bash(javac:*)",
+      "Bash(jar:*)",
+      "Bash(git restore:*)",
+      "Bash(findstr:*)",
+      "Bash(\"D:/Environment/JDK/JDK17/bin/java\" -version)",
+      "Bash(\"D:/Environment/JDK/JDK17/bin/java.exe\" -version)"
     ],
     "deny": [],
     "ask": []
